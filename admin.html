@@ -1905,54 +1905,36 @@
         // Universal Google Apps Script Runner Bridge for Cloudflare
         const google = {
             script: {
-                run: {
-                    _successHandler: null,
-                    _failureHandler: null,
-                    withSuccessHandler(fn) {
-                        const proxy = Object.create(this);
-                        proxy._successHandler = fn;
-                        return proxy;
-                    },
-                    withFailureHandler(fn) {
-                        const proxy = Object.create(this);
-                        proxy._failureHandler = fn;
-                        return proxy;
-                    },
-                    async _call(action, params = {}) {
-                        try {
-                            const res = await fetch(GAS_API_URL, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                body: JSON.stringify({ action, ...params })
-                            });
-                            const json = await res.json();
-                            if (this._successHandler) this._successHandler(json);
-                            return json;
-                        } catch (err) {
-                            if (this._failureHandler) this._failureHandler(err);
-                            else console.error(`API Error in ${action}:`, err);
-                        }
-                    },
-                    checkAdminPassword(pw) { return this._call('checkAdminPassword', { password: pw }); },
-                    listAvailableYears() { return this._call('listAvailableYears'); },
-                    getDashboardSummary(token, scope, filters) { return this._call('getDashboardSummary', { token, scope, filters }); },
-                    getEntries(token, filters) { return this._call('getEntries', { token, filters }); },
-                    deleteEntry(token, year, rowIndex) { return this._call('deleteEntry', { token, year, rowIndex }); },
-                    getExportData(token, filters) { return this._call('getExportData', { token, filters }); },
-                    getMembers(token, filters) { return this._call('getMembers', { token, filters }); },
-                    saveMember(token, memberData) { return this._call('saveMember', { token, memberData }); },
-                    adjustMemberQuota(token, memberId, addAmount) { return this._call('adjustMemberQuota', { token, memberId, addAmount }); },
-                    deleteMember(token, memberId) { return this._call('deleteMember', { token, memberId }); },
-                    getPricesForAdmin(token) { return this._call('getPricesForAdmin', { token }); },
-                    updatePrices(token, prices) { return this._call('updatePrices', { token, prices }); },
-                    getMemberQuotasForAdmin(token) { return this._call('getMemberQuotasForAdmin', { token }); },
-                    updateMemberQuotas(token, quotas) { return this._call('updateMemberQuotas', { token, quotas }); },
-                    changeAdminPassword(token, newPassword) { return this._call('changeAdminPassword', { token, newPassword }); },
-                    getBankInfoForAdmin(token) { return this._call('getBankInfoForAdmin', { token }); },
-                    updateBankInfo(token, bankData) { return this._call('updateBankInfo', { token, bankData }); },
-                    getFacultiesForAdmin(token) { return this._call('getFacultiesForAdmin', { token }); },
-                    saveFaculties(token, facultiesList) { return this._call('saveFaculties', { token, facultiesList }); }
-                }
+                run: (function() {
+                    function createRunner(successFn, failureFn) {
+                        return new Proxy({}, {
+                            get(target, prop) {
+                                if (prop === 'withSuccessHandler') {
+                                    return function(fn) { return createRunner(fn, failureFn); };
+                                }
+                                if (prop === 'withFailureHandler') {
+                                    return function(fn) { return createRunner(successFn, fn); };
+                                }
+                                return function(...args) {
+                                    fetch(GAS_API_URL, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                        body: JSON.stringify({ action: prop, args: args })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (successFn) successFn(data);
+                                    })
+                                    .catch(err => {
+                                        if (failureFn) failureFn(err);
+                                        else console.error(`API Error in ${prop}:`, err);
+                                    });
+                                };
+                            }
+                        });
+                    }
+                    return createRunner();
+                })()
             }
         };
 
