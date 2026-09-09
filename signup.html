@@ -2,13 +2,16 @@
 <html lang="th">
 
 <head>
+    <base target="_top">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>สมัครสมาชิกฟิตเนส - Fitness Membership Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>สมัครสมาชิกฟิตเนส - Fitness Membership</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -23,6 +26,7 @@
             --primary-light: #d1fae5;
             --primary-bg: #ecfdf5;
             --emerald-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            --gold-gradient: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
             --card-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.98) 100%);
             --text-title: #064e3b;
             --text-main: #1f2937;
@@ -40,20 +44,18 @@
             font-family: 'Prompt', 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(145deg, #064e3b 0%, #065f46 30%, #047857 70%, #059669 100%);
             min-height: 100vh;
-            min-height: -webkit-fill-available;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(40px + env(safe-area-inset-bottom, 0px));
+            padding: 24px 16px 50px;
             color: var(--text-main);
             line-height: 1.5;
         }
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 500px;
             position: relative;
-            margin: 0 auto;
         }
 
         .glass-card {
@@ -66,19 +68,25 @@
             border: 1px solid rgba(255, 255, 255, 0.9);
             position: relative;
             animation: fadeIn .35s ease-out;
-            width: 100%;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .lang-switch {
             display: flex;
             justify-content: center;
             gap: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             background: #f1f5f9;
             padding: 4px;
             border-radius: 999px;
@@ -108,28 +116,26 @@
 
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        .header-badge {
+        .header-icon {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            background: #d1fae5;
-            color: #065f46;
-            border-radius: 999px;
-            font-size: 12.5px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            border: 1px solid #a7f3d0;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
         }
 
         h1 {
             font-size: 22px;
             font-weight: 800;
             color: var(--text-title);
-            letter-spacing: -0.3px;
             margin-bottom: 4px;
         }
 
@@ -138,179 +144,157 @@
             color: var(--text-muted);
         }
 
+        /* Virtual Card Preview */
+        .member-card-preview {
+            background: var(--gold-gradient);
+            color: #fff;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: 0 12px 28px -6px rgba(4, 120, 87, 0.4);
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform .2s ease;
+        }
+
+        .member-card-preview::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            bottom: -30px;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-brand {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #a7f3d0;
+        }
+
+        .card-tier-pill {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .card-name {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+            min-height: 28px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-faculty {
+            font-size: 12.5px;
+            color: #d1fae5;
+            min-height: 19px;
+            font-weight: 500;
+        }
+
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 12px;
+        }
+
+        .card-meta-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #a7f3d0;
+            font-weight: 600;
+        }
+
+        .card-meta-val {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        /* Membership Tier Grid */
         .tier-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
 
         .tier-card {
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 14px 8px;
+            padding: 12px 6px;
             text-align: center;
             cursor: pointer;
+            transition: all .2s ease;
             background: #fff;
-            transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 110px;
         }
 
         .tier-card:hover {
             border-color: #a7f3d0;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.12);
+            background: var(--primary-bg);
         }
 
         .tier-card.selected {
             border-color: var(--primary);
-            background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
-            box-shadow: 0 10px 22px -4px rgba(16, 185, 129, 0.25);
-            transform: translateY(-2px);
+            background: #ecfdf5;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
         }
 
-        .tier-card.selected::after {
-            content: '✓';
-            position: absolute;
-            top: -7px;
-            right: -7px;
-            width: 20px;
-            height: 20px;
-            background: var(--primary);
-            color: #fff;
-            border-radius: 50%;
-            font-size: 11px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        .tier-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: #1f2937;
+        .tier-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
             margin-bottom: 4px;
-            line-height: 1.25;
+        }
+
+        .tier-card.selected .tier-name {
+            color: var(--primary-dark);
         }
 
         .tier-price {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
-            color: var(--primary-dark);
-            margin: 2px 0;
+            color: var(--text-title);
         }
 
-        .tier-unit {
+        .tier-price span {
             font-size: 11px;
-            color: var(--text-muted);
             font-weight: 500;
+            color: var(--text-muted);
         }
 
         .tier-quota {
-            display: inline-block;
-            margin-top: 6px;
-            padding: 3px 6px;
-            background: #f1f5f9;
-            color: #475569;
-            border-radius: 6px;
-            font-size: 11px;
+            font-size: 10.5px;
+            color: #059669;
             font-weight: 700;
+            margin-top: 2px;
         }
 
-        .tier-card.selected .tier-quota {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .card-preview {
-            background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%);
-            border-radius: var(--radius-md);
-            padding: 18px 20px;
-            color: #fff;
-            margin-bottom: 22px;
-            box-shadow: 0 12px 28px -6px rgba(4, 120, 87, 0.35);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-preview::after {
-            content: '';
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 140px;
-            height: 140px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .card-preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .card-preview-brand {
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: #a7f3d0;
-            text-transform: uppercase;
-        }
-
-        .card-preview-type {
-            font-size: 11.5px;
-            padding: 3px 10px;
-            background: rgba(255, 255, 255, 0.18);
-            border-radius: 999px;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-        }
-
-        .card-preview-name {
-            font-size: 17px;
-            font-weight: 800;
-            margin-bottom: 2px;
-            letter-spacing: -0.2px;
-        }
-
-        .card-preview-sub {
-            font-size: 12px;
-            color: #d1fae5;
-            margin-bottom: 12px;
-        }
-
-        .card-preview-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            padding-top: 10px;
-        }
-
-        .card-preview-id {
-            font-family: monospace;
-            font-size: 13.5px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #fef08a;
-        }
-
-        .card-preview-quota {
-            font-size: 12px;
-            font-weight: 700;
-            color: #ecfdf5;
-        }
-
+        /* Form Fields */
         .field-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
             position: relative;
         }
 
@@ -328,7 +312,7 @@
             padding: 12px 14px;
             border: 1.5px solid var(--border-color);
             border-radius: var(--radius-md);
-            font-size: 14.5px;
+            font-size: 14px;
             font-family: inherit;
             background: #fff;
             transition: all .2s ease;
@@ -342,6 +326,9 @@
             background: #fff;
         }
 
+        /* ========================================================
+           CUSTOM EMERALD THEMED DROPDOWN (NO BROWSER POPUP)
+           ======================================================== */
         .c-dropdown {
             position: relative;
             user-select: none;
@@ -358,7 +345,7 @@
             background: #fff;
             border: 1.5px solid var(--border-color);
             border-radius: var(--radius-md);
-            font-size: 14.5px;
+            font-size: 14px;
             font-family: inherit;
             color: var(--text-main);
             font-weight: 500;
@@ -367,7 +354,9 @@
             text-align: left;
         }
 
-        .c-dropdown-btn:hover { border-color: #cbd5e1; }
+        .c-dropdown-btn:hover {
+            border-color: #cbd5e1;
+        }
 
         .c-dropdown.open .c-dropdown-btn {
             border-color: var(--primary);
@@ -411,22 +400,45 @@
             animation: dropFade .18s ease-out;
         }
 
-        .c-dropdown-menu::-webkit-scrollbar { width: 5px; }
-        .c-dropdown-menu::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
-        .c-dropdown-menu::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
-        .c-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10b981; }
-
-        @keyframes dropFade {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Slim Emerald Scrollbar */
+        .c-dropdown-menu::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .c-dropdown.open .c-dropdown-menu { display: block; }
+        .c-dropdown-menu::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-thumb {
+            background: #a7f3d0;
+            border-radius: 4px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+
+        @keyframes dropFade {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .c-dropdown.open .c-dropdown-menu {
+            display: block;
+        }
 
         .c-dropdown-item {
             padding: 10px 14px;
             border-radius: var(--radius-sm);
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
             color: #334155;
             cursor: pointer;
@@ -463,6 +475,7 @@
             border-radius: var(--radius-md);
             background: #ecfdf5;
             border: 1.5px dashed #a7f3d0;
+            animation: fadeIn .2s ease-out;
         }
 
         .bank-info-title {
@@ -508,7 +521,9 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .upload-box input[type="file"] { display: none; }
+        .upload-box input[type="file"] {
+            display: none;
+        }
 
         .upload-label {
             color: var(--primary-dark);
@@ -518,7 +533,7 @@
 
         button.submit {
             width: 100%;
-            margin-top: 24px;
+            margin-top: 20px;
             background: var(--emerald-gradient);
             color: #fff;
             border: none;
@@ -540,8 +555,6 @@
             box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
             transform: translateY(-1px);
         }
-
-        button.submit:active { transform: translateY(1px); }
 
         button.submit:disabled {
             background: #cbd5e1;
@@ -591,34 +604,31 @@
 
         .success-id-badge {
             background: #ecfdf5;
-            border: 2px dashed #10b981;
-            padding: 14px 20px;
+            border: 2px solid #10b981;
+            padding: 14px;
             border-radius: var(--radius-md);
-            font-family: monospace;
             font-size: 24px;
             font-weight: 800;
-            color: var(--text-title);
-            margin: 18px 0;
-            letter-spacing: 1.5px;
+            color: var(--primary-dark);
+            margin: 14px 0;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .btn-copy {
-            background: #d1fae5;
-            border: 1px solid #a7f3d0;
-            color: #065f46;
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 700;
-            padding: 5px 10px;
-            border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
         }
-
-        .btn-copy:hover { background: #a7f3d0; }
 
         .spinner {
             display: inline-block;
@@ -630,7 +640,11 @@
             animation: spin .7s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         .footer-note {
             text-align: center;
@@ -659,66 +673,76 @@
                 <button type="button" class="lang-btn" data-lang="zh">中文</button>
             </div>
 
+            <!-- Header -->
+            <div class="header">
+                <div class="header-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h1 id="pageTitle">สมัครสมาชิกฟิตเนส</h1>
+                <div class="sub" id="pageSub">กรอกข้อมูลเพื่อรับรหัสสมาชิกและโควตาสิทธิ์เข้าใช้งาน</div>
+            </div>
+
+            <!-- Virtual Card Preview -->
+            <div class="member-card-preview" id="cardPreview">
+                <div class="card-top">
+                    <span class="card-brand" id="cardBrand">FITNESS PASS</span>
+                    <span class="card-tier-pill" id="previewTier">สมาชิก (นิสิต)</span>
+                </div>
+                <div class="card-name" id="previewName">ชื่อ - นามสกุล</div>
+                <div class="card-faculty" id="previewFaculty">คณะ / หน่วยงาน</div>
+                <div class="card-bottom">
+                    <div>
+                        <div class="card-meta-label">MEMBER ID</div>
+                        <div class="card-meta-val" id="previewMemberId">MB-26-XXXX</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="card-meta-label">QUOTA</div>
+                        <div class="card-meta-val" id="previewQuota">30 ครั้ง / เดือน</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Form Section -->
             <div id="signupFormSection">
-                <div class="header">
-                    <div class="header-badge" id="headerBadge">
-                        <span>✨ สมัครสมาชิกออนไลน์</span>
+                <label id="lblPackage">เลือกแพ็กเกจสมาชิกรายเดือน *</label>
+                <div class="tier-grid" id="tierGrid">
+                    <div class="tier-card selected" data-type="รายเดือนนิสิต" data-quota="30">
+                        <div class="tier-name">นิสิต</div>
+                        <div class="tier-price" id="priceTagStu">150 <span>บ.</span></div>
+                        <div class="tier-quota">30 ครั้ง</div>
                     </div>
-                    <h1 id="pageTitle">สมัครสมาชิกฟิตเนส</h1>
-                    <div class="sub" id="pageSub">กรอกข้อมูลเพื่อรับรหัสสมาชิกและโควตาสิทธิ์เข้าใช้งาน</div>
-                </div>
-
-                <!-- Membership Tier Selection -->
-                <div class="field-group">
-                    <label id="lblPackage">เลือกแพ็กเกจสมาชิกรายเดือน *</label>
-                    <div class="tier-grid">
-                        <div class="tier-card" data-type="รายเดือนนิสิต">
-                            <div class="tier-title">นิสิต</div>
-                            <div class="tier-price">150 <span class="tier-unit">บาท</span></div>
-                            <div class="tier-quota">30 ครั้ง/เดือน</div>
-                        </div>
-                        <div class="tier-card" data-type="รายเดือนบุคลากร">
-                            <div class="tier-title">บุคลากร</div>
-                            <div class="tier-price">200 <span class="tier-unit">บาท</span></div>
-                            <div class="tier-quota">30 ครั้ง/เดือน</div>
-                        </div>
-                        <div class="tier-card selected" data-type="รายเดือนบุคคลภายนอก">
-                            <div class="tier-title">บุคคลภายนอก</div>
-                            <div class="tier-price">300 <span class="tier-unit">บาท</span></div>
-                            <div class="tier-quota">30 ครั้ง/เดือน</div>
-                        </div>
+                    <div class="tier-card" data-type="รายเดือนบุคลากร" data-quota="30">
+                        <div class="tier-name">บุคลากร</div>
+                        <div class="tier-price" id="priceTagStaff">200 <span>บ.</span></div>
+                        <div class="tier-quota">30 ครั้ง</div>
+                    </div>
+                    <div class="tier-card" data-type="รายเดือนบุคคลภายนอก" data-quota="30">
+                        <div class="tier-name">บุคคลภายนอก</div>
+                        <div class="tier-price" id="priceTagExt">300 <span>บ.</span></div>
+                        <div class="tier-quota">30 ครั้ง</div>
                     </div>
                 </div>
 
-                <!-- Live Digital Card Preview -->
-                <div class="card-preview">
-                    <div class="card-preview-header">
-                        <div class="card-preview-brand">FITNESS CENTER</div>
-                        <div class="card-preview-type" id="previewTier">บุคคลภายนอก (รายเดือน)</div>
-                    </div>
-                    <div class="card-preview-name" id="previewName">ชื่อ - นามสกุล</div>
-                    <div class="card-preview-sub" id="previewFaculty">บุคคลภายนอก</div>
-                    <div class="card-preview-footer">
-                        <div class="card-preview-id" id="previewMemberId">MB-26-XXXX</div>
-                        <div class="card-preview-quota" id="previewQuota">30 ครั้ง / เดือน</div>
-                    </div>
-                </div>
-
-                <!-- Form Inputs -->
                 <div class="field-group">
                     <label id="lblName">ชื่อ - นามสกุล *</label>
                     <input type="text" id="name" placeholder="เช่น สมชาย ใจดี" oninput="updateCardPreview()">
                 </div>
 
-                <!-- Faculty Selection -->
-                <div class="field-group" id="facultyGroup" style="display:none;">
+                <!-- Faculty Dropdown (Hidden for บุคคลภายนอก) with Custom Dropdown -->
+                <div class="field-group" id="facultyGroup">
                     <label id="lblFaculty">คณะ / หน่วยงาน *</label>
                     <div class="c-dropdown" id="facultyDropdown">
                         <input type="hidden" id="faculty" value="">
                         <button type="button" class="c-dropdown-btn">
                             <span class="c-dropdown-label">-- เลือกคณะ / หน่วยงาน --</span>
-                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
@@ -731,14 +755,15 @@
                     <input type="tel" id="phone" placeholder="08xxxxxxxx" maxlength="10">
                 </div>
 
-                <!-- Age Range Dropdown -->
+                <!-- Age Range Dropdown with Custom Dropdown -->
                 <div class="field-group">
                     <label id="lblAgeRange">ช่วงอายุ *</label>
                     <div class="c-dropdown" id="ageRangeDropdown">
                         <input type="hidden" id="ageRange" value="">
                         <button type="button" class="c-dropdown-btn">
                             <span class="c-dropdown-label">-- เลือกช่วงอายุ --</span>
-                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
@@ -756,13 +781,13 @@
                 </div>
 
                 <!-- Bank Info Box -->
-                <div class="bank-info" id="bankInfoBox">
+                <div id="bankInfoBox" class="bank-info">
                     <div class="bank-info-title" id="bankInfoTitle">โอนเงินค่าสมัครเข้าบัญชีนี้ ก่อนแนบสลิป</div>
-                    <div class="bank-info-text" id="bankInfoText"></div>
+                    <div class="bank-info-text" id="bankInfoText">กำลังโหลดข้อมูลบัญชี...</div>
                 </div>
 
                 <!-- Slip Upload Box -->
-                <div class="field-group" style="margin-top:16px;">
+                <div class="field-group" style="margin-top:14px;">
                     <label id="lblSlip">แนบสลิปการโอนเงินค่าสมัคร *</label>
                     <div class="upload-box" onclick="document.getElementById('slipFile').click()">
                         <div class="upload-label" id="uploadLabel">แตะเพื่อเลือกรูปสลิป</div>
@@ -780,20 +805,26 @@
 
             <!-- Success Section -->
             <div class="success-box" id="successBox">
-                <div style="width:52px;height:52px;background:#d1fae5;color:#059669;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <div
+                    style="width:52px;height:52px;background:#d1fae5;color:#059669;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                 </div>
-                <h2 style="font-size:20px;color:var(--text-title);font-weight:800;" id="successTitle">สมัครสมาชิกสำเร็จเรียบร้อย!</h2>
-                <p style="font-size:13.5px;color:var(--text-muted);margin-top:4px;" id="successSub">กรุณาบันทึกรหัสสมาชิกเพื่อใช้ในการเช็คอินเข้าฟิตเนส</p>
+                <h2 style="font-size:20px;color:var(--text-title);font-weight:800;" id="successTitle">
+                    สมัครสมาชิกสำเร็จเรียบร้อย!</h2>
+                <p style="font-size:13.5px;color:var(--text-muted);margin-top:4px;" id="successSub">
+                    กรุณาบันทึกรหัสสมาชิกเพื่อใช้ในการเช็คอินเข้าฟิตเนส</p>
 
                 <div class="success-id-badge">
                     <span id="finalMemberId">MB-26-0001</span>
                     <button type="button" class="btn-copy" id="btnCopy" onclick="copyMemberId()">คัดลอก</button>
                 </div>
 
-                <p style="font-size:13px;color:#065f46;font-weight:600;margin-bottom:18px;" id="finalMemberQuota">ได้รับสิทธิ์การใช้งาน 30 ครั้ง</p>
+                <p style="font-size:13px;color:#065f46;font-weight:600;margin-bottom:18px;" id="finalMemberQuota">
+                    ได้รับสิทธิ์การใช้งาน 30 ครั้ง
+                </p>
 
                 <a href="index.html" id="btnGoCheckin" style="display:inline-block;padding:12px 24px;background:var(--emerald-gradient);color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(16,185,129,0.3);">
                     ไปที่หน้าเช็คอิน
@@ -812,15 +843,46 @@
         // ==========================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
 
-        // API Fetch Bridge
-        async function callApi(action, params = {}) {
-            const response = await fetch(GAS_API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action, ...params })
-            });
-            return await response.json();
-        }
+        // Universal Google Apps Script Runner Bridge for Cloudflare
+        const google = {
+            script: {
+                run: {
+                    _successHandler: null,
+                    _failureHandler: null,
+                    withSuccessHandler(fn) {
+                        const proxy = Object.create(this);
+                        proxy._successHandler = fn;
+                        return proxy;
+                    },
+                    withFailureHandler(fn) {
+                        const proxy = Object.create(this);
+                        proxy._failureHandler = fn;
+                        return proxy;
+                    },
+                    async _call(action, params = {}) {
+                        try {
+                            const res = await fetch(GAS_API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                body: JSON.stringify({ action, ...params })
+                            });
+                            const json = await res.json();
+                            if (this._successHandler) this._successHandler(json);
+                            return json;
+                        } catch (err) {
+                            if (this._failureHandler) this._failureHandler(err);
+                            else console.error(`API Error in ${action}:`, err);
+                        }
+                    },
+                    getPublicPrices() { return this._call('getPublicPrices'); },
+                    getMonthlyPrices() { return this._call('getMonthlyPrices'); },
+                    getPublicQuotas() { return this._call('getPublicQuotas'); },
+                    getBankInfo() { return this._call('getBankInfo'); },
+                    getFaculties() { return this._call('getFaculties'); },
+                    submitSignup(data) { return this._call('submitSignup', { data }); }
+                }
+            }
+        };
 
         const TRANSLATIONS = {
             th: {
@@ -837,201 +899,278 @@
                 uploadDefault: 'แตะเพื่อเลือกรูปสลิป',
                 uploadSelected: 'เลือกรูปแล้ว (แตะเพื่อเปลี่ยน)',
                 btnSubmit: 'ยืนยันการสมัครสมาชิก',
-                footerNote: 'มีรหัสสมาชิกแล้ว?', footerLink: 'เช็คอินที่นี่',
-                headerBadge: '✨ สมัครสมาชิกออนไลน์',
-                cardFacultyExt: 'บุคคลภายนอก',
-                cardFacultyDefault: 'ไม่ได้ระบุคณะ',
-                copiedAlert: 'คัดลอกรหัสสมาชิกแล้ว: '
+                footerText: 'มีรหัสสมาชิกแล้ว?',
+                footerLink: 'ไปที่หน้าเช็คอิน',
+                successTitle: 'สมัครสมาชิกสำเร็จเรียบร้อย!',
+                successSub: 'กรุณาบันทึกรหัสสมาชิกเพื่อใช้ในการเช็คอินเข้าฟิตเนส',
+                btnCopy: 'คัดลอก',
+                btnGoCheckin: 'ไปที่หน้าเช็คอิน',
+                cardBrand: 'FITNESS PASS',
+                cardFacultyExt: 'บุคคลภายนอก / General Public',
+                cardFacultyDefault: 'คณะ / หน่วยงาน',
+                copiedAlert: 'คัดลอกรหัสสมาชิกเรียบร้อย: '
             },
             en: {
-                pageTitle: 'Fitness Membership',
-                pageSub: 'Sign up to receive your Member ID and monthly quota',
+                pageTitle: 'Fitness Membership Registration',
+                pageSub: 'Fill in details to get Member ID and usage quota',
                 lblPackage: 'Select Monthly Package *',
                 lblName: 'Full Name *', phName: 'e.g. John Doe',
-                lblFaculty: 'Faculty / Organization *', phFaculty: '-- Select Faculty / Org --',
+                lblFaculty: 'Faculty / Organization *', phFaculty: '-- Select Faculty / Organization --',
                 lblPhone: 'Phone Number *', phPhone: '08xxxxxxxx',
                 lblAgeRange: 'Age Range *', phAgeRange: '-- Select Age Range --',
-                bankTitle: 'Please transfer fee before attaching slip',
+                bankTitle: 'Transfer registration fee to this account before attaching slip',
                 bankAccNoPrefix: 'Account No:', bankAccNamePrefix: 'Account Name:',
-                lblSlip: 'Attach Payment Slip *',
-                uploadDefault: 'Tap to select slip photo',
-                uploadSelected: 'Photo selected (Tap to change)',
-                btnSubmit: 'Confirm Sign Up',
-                footerNote: 'Already a member?', footerLink: 'Check-in here',
-                headerBadge: '✨ Online Registration',
+                lblSlip: 'Payment Slip *',
+                uploadDefault: 'Tap to upload slip',
+                uploadSelected: 'Slip selected (Tap to change)',
+                btnSubmit: 'Confirm Registration',
+                footerText: 'Already a member?',
+                footerLink: 'Go to Check-in',
+                successTitle: 'Registration Successful!',
+                successSub: 'Please save your Member ID for checking in',
+                btnCopy: 'Copy',
+                btnGoCheckin: 'Go to Check-in',
+                cardBrand: 'FITNESS PASS',
                 cardFacultyExt: 'General Public',
-                cardFacultyDefault: 'No Faculty Specified',
-                copiedAlert: 'Member ID copied: '
+                cardFacultyDefault: 'Faculty / Organization',
+                copiedAlert: 'Member ID copied successfully: '
             },
             zh: {
-                pageTitle: '注册健身房会员',
-                pageSub: '填写信息以获取会员编号与月度额度',
+                pageTitle: '健身房会员注册',
+                pageSub: '填写信息以获取会员卡号及使用权益',
                 lblPackage: '选择月卡套餐 *',
                 lblName: '姓名 *', phName: '例如：张三',
-                lblFaculty: '学院 / 单位 *', phFaculty: '-- 请选择学院 / 单位 --',
+                lblFaculty: '院系 / 部门 *', phFaculty: '-- 请选择院系 / 部门 --',
                 lblPhone: '电话号码 *', phPhone: '08xxxxxxxx',
                 lblAgeRange: '年龄段 *', phAgeRange: '-- 请选择年龄段 --',
-                bankTitle: '请转账会员费至此账户后上传凭证',
-                bankAccNoPrefix: '银行账号:', bankAccNamePrefix: '账户姓名:',
-                lblSlip: '上传付款凭证 *',
-                uploadDefault: '点击选择凭证图片',
+                bankTitle: '请在上传凭证前转账至此账户',
+                bankAccNoPrefix: '账号:', bankAccNamePrefix: '户名:',
+                lblSlip: '付款凭证 *',
+                uploadDefault: '点击上传凭证',
                 uploadSelected: '已选择凭证 (点击更换)',
-                btnSubmit: '确认注册',
-                footerNote: '已有会员账号？', footerLink: '前往签到',
-                headerBadge: '✨ 在线会员注册',
+                btnSubmit: '确认注册会员',
+                footerText: '已是会员？',
+                footerLink: '前往签到页面',
+                successTitle: '会员注册成功！',
+                successSub: '请保存您的会员卡号以便入馆签到',
+                btnCopy: '复制',
+                btnGoCheckin: '前往签到',
+                cardBrand: 'FITNESS PASS',
                 cardFacultyExt: '校外人士',
-                cardFacultyDefault: '未指定学院',
-                copiedAlert: '已复制会员编号：'
+                cardFacultyDefault: '院系 / 部门',
+                copiedAlert: '已成功复制会员卡号: '
             }
         };
 
         const TIER_TRANSLATIONS = {
             th: {
-                'รายเดือนนิสิต': { title: 'นิสิต', cardTier: 'นิสิต (รายเดือน)', unit: 'บาท', quota: '30 ครั้ง' },
-                'รายเดือนบุคลากร': { title: 'บุคลากร', cardTier: 'บุคลากร (รายเดือน)', unit: 'บาท', quota: '30 ครั้ง' },
-                'รายเดือนบุคคลภายนอก': { title: 'บุคคลภายนอก', cardTier: 'บุคคลภายนอก (รายเดือน)', unit: 'บาท', quota: '30 ครั้ง' }
+                'รายเดือนนิสิต': { name: 'นิสิต', cardTier: 'สมาชิก (นิสิต)', unit: 'บ.', quotaUnit: 'ครั้ง' },
+                'รายเดือนบุคลากร': { name: 'บุคลากร', cardTier: 'สมาชิก (บุคลากร)', unit: 'บ.', quotaUnit: 'ครั้ง' },
+                'รายเดือนบุคคลภายนอก': { name: 'บุคคลภายนอก', cardTier: 'สมาชิก (บุคคลภายนอก)', unit: 'บ.', quotaUnit: 'ครั้ง' }
             },
             en: {
-                'รายเดือนนิสิต': { title: 'Student', cardTier: 'Student Monthly', unit: 'THB', quota: '30 Times' },
-                'รายเดือนบุคลากร': { title: 'Staff', cardTier: 'Staff Monthly', unit: 'THB', quota: '30 Times' },
-                'รายเดือนบุคคลภายนอก': { title: 'General', cardTier: 'General Monthly', unit: 'THB', quota: '30 Times' }
+                'รายเดือนนิสิต': { name: 'Student', cardTier: 'Member (Student)', unit: 'THB', quotaUnit: 'Times' },
+                'รายเดือนบุคลากร': { name: 'Staff', cardTier: 'Member (Staff)', unit: 'THB', quotaUnit: 'Times' },
+                'รายเดือนบุคคลภายนอก': { name: 'General Public', cardTier: 'Member (Public)', unit: 'THB', quotaUnit: 'Times' }
             },
             zh: {
-                'รายเดือนนิสิต': { title: '学生', cardTier: '学生月卡', unit: '泰铢', quota: '30 次' },
-                'รายเดือนบุคลากร': { title: '教职工', cardTier: '教工月卡', unit: '泰铢', quota: '30 次' },
-                'รายเดือนบุคคลภายนอก': { title: '校外人士', cardTier: '校外月卡', unit: '泰铢', quota: '30 次' }
+                'รายเดือนนิสิต': { name: '学生', cardTier: '会员 (学生)', unit: '泰铢', quotaUnit: '次' },
+                'รายเดือนบุคลากร': { name: '教职工', cardTier: '会员 (教工)', unit: '泰铢', quotaUnit: '次' },
+                'รายเดือนบุคคลภายนอก': { name: '校外人士', cardTier: '会员 (校外人士)', unit: '泰铢', quotaUnit: '次' }
             }
         };
 
         const AGE_RANGE_TRANSLATIONS = {
-            th: { '': '-- เลือกช่วงอายุ --', '13-17': '13-17 ปี', '18-22': '18-22 ปี', '23-29': '23-29 ปี', '30-39': '30-39 ปี', '40-49': '40-49 ปี', '50-59': '50-59 ปี', '60 ปีขึ้นไป': '60 ปีขึ้นไป' },
-            en: { '': '-- Select Age Range --', '13-17': '13-17 Years', '18-22': '18-22 Years', '23-29': '23-29 Years', '30-39': '30-39 Years', '40-49': '40-49 Years', '50-59': '50-59 Years', '60 ปีขึ้นไป': '60+ Years' },
-            zh: { '': '-- 请选择年龄段 --', '13-17': '13-17 岁', '18-22': '18-22 岁', '23-29': '23-29 岁', '30-39': '30-39 岁', '40-49': '40-49 岁', '50-59': '50-59 岁', '60 ปีขึ้นไป': '60 岁以上' }
+            th: {
+                '': '-- เลือกช่วงอายุ --',
+                '13-17': '13-17 ปี',
+                '18-22': '18-22 ปี',
+                '23-29': '23-29 ปี',
+                '30-39': '30-39 ปี',
+                '40-49': '40-49 ปี',
+                '50-59': '50-59 ปี',
+                '60 ปีขึ้นไป': '60 ปีขึ้นไป'
+            },
+            en: {
+                '': '-- Select Age Range --',
+                '13-17': '13-17 yrs',
+                '18-22': '18-22 yrs',
+                '23-29': '23-29 yrs',
+                '30-39': '30-39 yrs',
+                '40-49': '40-49 yrs',
+                '50-59': '50-59 yrs',
+                '60 ปีขึ้นไป': '60+ yrs'
+            },
+            zh: {
+                '': '-- 请选择年龄段 --',
+                '13-17': '13-17 岁',
+                '18-22': '18-22 岁',
+                '23-29': '23-29 岁',
+                '30-39': '30-39 岁',
+                '40-49': '40-49 岁',
+                '50-59': '50-59 岁',
+                '60 ปีขึ้นไป': '60 岁以上'
+            }
         };
 
         let currentLang = 'th';
-        let selectedType = 'รายเดือนบุคคลภายนอก';
-        let monthlyPrices = { 'รายเดือนนิสิต': 150, 'รายเดือนบุคลากร': 200, 'รายเดือนบุคคลภายนอก': 300 };
-        let monthlyQuotas = { 'รายเดือนนิสิต': 30, 'รายเดือนบุคลากร': 30, 'รายเดือนบุคคลภายนอก': 30 };
+        let selectedType = 'รายเดือนนิสิต';
+        let monthlyPrices = {
+            'รายเดือนนิสิต': 150,
+            'รายเดือนบุคลากร': 200,
+            'รายเดือนบุคคลภายนอก': 300
+        };
+        let monthlyQuotas = {
+            'รายเดือนนิสิต': 30,
+            'รายเดือนบุคลากร': 30,
+            'รายเดือนบุคคลภายนอก': 30
+        };
         let slipBase64 = '';
         let slipMime = '';
         let slipFilename = '';
         let rawFacultiesList = [];
         let bankInfoData = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
+            initLanguage();
             initCustomDropdowns();
+            loadFaculties();
+            loadPrices();
+            loadBankInfo();
             bindTierEvents();
             bindSlipEvents();
-            loadPrices();
-            loadFaculties();
-            loadBankInfo();
+            applyLanguage(currentLang);
+        });
 
+        // ================= CUSTOM DROPDOWN ENGINE =================
+        function initCustomDropdowns() {
+            document.addEventListener('click', e => {
+                const isDropdown = e.target.closest('.c-dropdown');
+                document.querySelectorAll('.c-dropdown.open').forEach(d => {
+                    if (d !== isDropdown) d.classList.remove('open');
+                });
+            });
+
+            bindDropdownEvents(document);
+        }
+
+        function bindDropdownEvents(root) {
+            root.querySelectorAll('.c-dropdown').forEach(dropdown => {
+                const btn = dropdown.querySelector('.c-dropdown-btn');
+                const menu = dropdown.querySelector('.c-dropdown-menu');
+                const input = dropdown.querySelector('input[type="hidden"]');
+                const label = dropdown.querySelector('.c-dropdown-label');
+
+                if (btn && !btn.dataset.bound) {
+                    btn.dataset.bound = 'true';
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        // Close other open dropdowns first
+                        document.querySelectorAll('.c-dropdown.open').forEach(d => {
+                            if (d !== dropdown) d.classList.remove('open');
+                        });
+                        dropdown.classList.toggle('open');
+                    });
+                }
+
+                if (menu && !menu.dataset.bound) {
+                    menu.dataset.bound = 'true';
+                    menu.addEventListener('click', e => {
+                        const item = e.target.closest('.c-dropdown-item');
+                        if (!item) return;
+                        const val = item.dataset.val !== undefined ? item.dataset.val : item.textContent.trim();
+                        const text = item.textContent.trim();
+
+                        menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+
+                        if (input) {
+                            input.value = val;
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        if (label) label.textContent = text;
+                        dropdown.classList.remove('open');
+
+                        if (dropdown.id === 'facultyDropdown') updateCardPreview();
+                    });
+                }
+            });
+        }
+
+        function setDropdownOptions(dropdownId, items, defaultVal) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.c-dropdown-menu');
+            const input = dropdown.querySelector('input[type="hidden"]');
+            const label = dropdown.querySelector('.c-dropdown-label');
+
+            menu.innerHTML = '';
+            items.forEach((it, idx) => {
+                const val = (it.val !== undefined) ? it.val : it;
+                const text = it.text || it;
+                const isAct = String(val) === String(defaultVal) || (!defaultVal && idx === 0);
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'c-dropdown-item' + (isAct ? ' active' : '');
+                itemDiv.dataset.val = val;
+                itemDiv.textContent = text;
+                menu.appendChild(itemDiv);
+
+                if (isAct) {
+                    if (input) input.value = val;
+                    if (label) label.textContent = text;
+                }
+            });
+        }
+
+        function setDropdownValue(dropdownId, val) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.c-dropdown-menu');
+            const input = dropdown.querySelector('input[type="hidden"]');
+            const label = dropdown.querySelector('.c-dropdown-label');
+
+            const item = menu.querySelector(`.c-dropdown-item[data-val="${val}"]`);
+            if (item) {
+                menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                if (input) input.value = val;
+                if (label) label.textContent = item.textContent.trim();
+            }
+        }
+
+        function initLanguage() {
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    currentLang = btn.dataset.lang;
+                    currentLang = btn.dataset.lang || 'th';
                     applyLanguage(currentLang);
                 });
             });
-
-            document.getElementById('faculty').addEventListener('change', () => {
-                updateCardPreview();
-            });
-        });
-
-        function initCustomDropdowns() {
-            document.querySelectorAll('.c-dropdown').forEach(dd => {
-                const btn = dd.querySelector('.c-dropdown-btn');
-                const menu = dd.querySelector('.c-dropdown-menu');
-                const hiddenInput = dd.querySelector('input[type="hidden"]');
-                const label = dd.querySelector('.c-dropdown-label');
-
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isOpen = dd.classList.contains('open');
-                    document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
-                    if (!isOpen) dd.classList.add('open');
-                });
-
-                menu.addEventListener('click', (e) => {
-                    const item = e.target.closest('.c-dropdown-item');
-                    if (!item) return;
-                    e.stopPropagation();
-
-                    menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-
-                    const val = item.dataset.val !== undefined ? item.dataset.val : '';
-                    hiddenInput.value = val;
-                    label.textContent = item.textContent.trim();
-
-                    dd.classList.remove('open');
-                    hiddenInput.dispatchEvent(new Event('change'));
-                });
-            });
-
-            document.addEventListener('click', () => {
-                document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
-            });
-        }
-
-        function setDropdownValue(ddId, val) {
-            const dd = document.getElementById(ddId);
-            if (!dd) return;
-            const input = dd.querySelector('input[type="hidden"]');
-            const label = dd.querySelector('.c-dropdown-label');
-            const items = dd.querySelectorAll('.c-dropdown-item');
-
-            let matched = false;
-            items.forEach(item => {
-                if (item.dataset.val === String(val)) {
-                    item.classList.add('active');
-                    label.textContent = item.textContent.trim();
-                    input.value = val;
-                    matched = true;
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            if (!matched && items.length > 0) {
-                items[0].classList.add('active');
-                label.textContent = items[0].textContent.trim();
-                input.value = items[0].dataset.val || '';
-            }
-        }
-
-        function setDropdownOptions(ddId, options, selectedVal) {
-            const dd = document.getElementById(ddId);
-            if (!dd) return;
-            const menu = dd.querySelector('.c-dropdown-menu');
-            menu.innerHTML = '';
-
-            options.forEach(opt => {
-                const div = document.createElement('div');
-                div.className = 'c-dropdown-item';
-                div.dataset.val = opt.val;
-                div.textContent = opt.text;
-                menu.appendChild(div);
-            });
-
-            setDropdownValue(ddId, selectedVal !== undefined ? selectedVal : (options[0] ? options[0].val : ''));
         }
 
         function renderTierOptions() {
-            const trans = TIER_TRANSLATIONS[currentLang] || TIER_TRANSLATIONS.th;
+            const tierTrans = TIER_TRANSLATIONS[currentLang] || TIER_TRANSLATIONS.th;
             document.querySelectorAll('.tier-card').forEach(card => {
-                const type = card.dataset.type;
-                if (type && trans[type]) {
-                    const t = trans[type];
-                    const p = monthlyPrices[type] !== undefined ? monthlyPrices[type] : '';
-                    const q = monthlyQuotas[type] !== undefined ? monthlyQuotas[type] : 30;
+                const typeKey = card.dataset.type;
+                if (tierTrans[typeKey]) {
+                    const nameEl = card.querySelector('.tier-name');
+                    const priceEl = card.querySelector('.tier-price');
+                    const quotaEl = card.querySelector('.tier-quota');
 
-                    card.querySelector('.tier-title').textContent = t.title;
-                    card.querySelector('.tier-price').innerHTML = `${p} <span class="tier-unit">${t.unit}</span>`;
-                    card.querySelector('.tier-quota').textContent = `${q} ${t.quota}` + (currentLang === 'zh' ? ' / 月' : currentLang === 'en' ? ' / Month' : '/เดือน');
+                    if (nameEl) nameEl.textContent = tierTrans[typeKey].name;
+
+                    const price = monthlyPrices[typeKey] !== undefined ? monthlyPrices[typeKey] : 0;
+                    if (priceEl) {
+                        priceEl.innerHTML = `${price} <span>${tierTrans[typeKey].unit}</span>`;
+                    }
+
+                    const quota = monthlyQuotas[typeKey] !== undefined ? monthlyQuotas[typeKey] : 30;
+                    card.dataset.quota = quota;
+                    if (quotaEl) {
+                        quotaEl.textContent = `${quota} ${tierTrans[typeKey].quotaUnit}`;
+                    }
                 }
             });
         }
@@ -1066,17 +1205,16 @@
         }
 
         function renderBankInfo() {
-            if (!bankInfoData) return;
+            if (!bankInfoData || !bankInfoData.accountNumber) return;
             const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
             document.getElementById('bankInfoText').innerHTML =
-                `<div><strong>ธนาคาร:</strong> ${bankInfoData.bankName || ''}</div>` +
-                `<div>${t.bankAccNoPrefix} <span class="acc-number">${bankInfoData.accountNumber || ''}</span></div>` +
+                `<div><strong>ธนาคาร / Bank:</strong> ${bankInfoData.bankName || ''}</div>` +
+                `<div>${t.bankAccNoPrefix} <span class="acc-number">${bankInfoData.accountNumber}</span></div>` +
                 `<div>${t.bankAccNamePrefix} <strong>${bankInfoData.accountName || ''}</strong></div>`;
         }
 
         function applyLanguage(lang) {
             const t = TRANSLATIONS[lang] || TRANSLATIONS.th;
-            document.getElementById('headerBadge').querySelector('span').textContent = t.headerBadge;
             document.getElementById('pageTitle').textContent = t.pageTitle;
             document.getElementById('pageSub').textContent = t.pageSub;
             document.getElementById('lblPackage').textContent = t.lblPackage;
@@ -1089,11 +1227,16 @@
             document.getElementById('bankInfoTitle').textContent = t.bankTitle;
             document.getElementById('lblSlip').textContent = t.lblSlip;
             document.getElementById('submitBtn').innerHTML = '<span>' + t.btnSubmit + '</span>';
-            document.getElementById('footerNoteText').textContent = t.footerNote;
+            document.getElementById('footerNoteText').textContent = t.footerText;
             document.getElementById('footerNoteLink').textContent = t.footerLink;
+            document.getElementById('successTitle').textContent = t.successTitle;
+            document.getElementById('successSub').textContent = t.successSub;
+            document.getElementById('btnCopy').textContent = t.btnCopy;
+            document.getElementById('btnGoCheckin').textContent = t.btnGoCheckin;
+            document.getElementById('cardBrand').textContent = t.cardBrand;
 
-            const uploadLbl = document.getElementById('uploadLabel');
             if (!slipBase64) {
+                const uploadLbl = document.getElementById('uploadLabel');
                 if (uploadLbl) uploadLbl.textContent = t.uploadDefault;
             }
 
@@ -1104,43 +1247,48 @@
             updateCardPreview();
         }
 
-        async function loadFaculties() {
-            try {
-                const list = await callApi('getFaculties');
-                rawFacultiesList = list || [];
-                renderFacultyOptions();
-            } catch (err) {
-                console.error("loadFaculties error:", err);
-            }
+        function loadFaculties() {
+            google.script.run
+                .withSuccessHandler(list => {
+                    rawFacultiesList = list || [];
+                    renderFacultyOptions();
+                })
+                .getFaculties();
         }
 
-        async function loadPrices() {
-            try {
-                const prices = await callApi('getMonthlyPrices');
-                if (prices) {
-                    for (const k in prices) monthlyPrices[k] = Number(prices[k]);
-                    renderTierOptions();
-                }
-                const quotas = await callApi('getPublicQuotas');
-                if (quotas) {
-                    for (const k in quotas) monthlyQuotas[k] = Number(quotas[k]);
-                    renderTierOptions();
-                }
-            } catch (err) {
-                console.error("loadPrices error:", err);
-            }
+        function loadPrices() {
+            google.script.run
+                .withSuccessHandler(prices => {
+                    if (prices) {
+                        for (const k in prices) {
+                            monthlyPrices[k] = Number(prices[k]);
+                        }
+                        renderTierOptions();
+                    }
+                })
+                .getMonthlyPrices();
+
+            google.script.run
+                .withSuccessHandler(quotas => {
+                    if (quotas) {
+                        for (const k in quotas) {
+                            monthlyQuotas[k] = Number(quotas[k]);
+                        }
+                        renderTierOptions();
+                    }
+                })
+                .getPublicQuotas();
         }
 
-        async function loadBankInfo() {
-            try {
-                const info = await callApi('getBankInfo');
-                if (info && info.accountNumber) {
-                    bankInfoData = info;
-                    renderBankInfo();
-                }
-            } catch (err) {
-                console.error("loadBankInfo error:", err);
-            }
+        function loadBankInfo() {
+            google.script.run
+                .withSuccessHandler(info => {
+                    if (info && info.accountNumber) {
+                        bankInfoData = info;
+                        renderBankInfo();
+                    }
+                })
+                .getBankInfo();
         }
 
         function bindTierEvents() {
@@ -1201,7 +1349,7 @@
             });
         }
 
-        async function doSignup() {
+        function doSignup() {
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const ageRange = document.getElementById('ageRange').value;
@@ -1229,25 +1377,27 @@
                 slipFilename: slipFilename
             };
 
-            try {
-                const res = await callApi('submitSignup', { data: payload });
-                btn.disabled = false;
-                btn.innerHTML = '<span>' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '</span>';
+            google.script.run
+                .withSuccessHandler(res => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '</span>';
 
-                if (res && res.status === 'ok') {
-                    document.getElementById('signupFormSection').style.display = 'none';
-                    document.getElementById('successBox').style.display = 'block';
-                    document.getElementById('finalMemberId').textContent = res.memberId;
-                    document.getElementById('previewMemberId').textContent = res.memberId;
-                    document.getElementById('finalMemberQuota').textContent = `ได้รับสิทธิ์การใช้งาน ${res.totalLimit} ครั้ง (สิทธิ์คงเหลือ: ${res.remaining} ครั้ง)`;
-                } else {
-                    showMsg(res.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก', 'err');
-                }
-            } catch (err) {
-                btn.disabled = false;
-                btn.innerHTML = '<span>' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '</span>';
-                showMsg('เกิดข้อผิดพลาด: ' + err.message, 'err');
-            }
+                    if (res && res.status === 'ok') {
+                        document.getElementById('signupFormSection').style.display = 'none';
+                        document.getElementById('successBox').style.display = 'block';
+                        document.getElementById('finalMemberId').textContent = res.memberId;
+                        document.getElementById('previewMemberId').textContent = res.memberId;
+                        document.getElementById('finalMemberQuota').textContent = `ได้รับสิทธิ์การใช้งาน ${res.totalLimit} ครั้ง (สิทธิ์คงเหลือ: ${res.remaining} ครั้ง)`;
+                    } else {
+                        showMsg(res.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก', 'err');
+                    }
+                })
+                .withFailureHandler(err => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '</span>';
+                    showMsg('เกิดข้อผิดพลาด: ' + err.message, 'err');
+                })
+                .submitSignup(payload);
         }
 
         function copyMemberId() {
