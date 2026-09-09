@@ -826,13 +826,15 @@
                     ได้รับสิทธิ์การใช้งาน 30 ครั้ง
                 </p>
 
-                <a href="index.html" id="btnGoCheckin" style="display:inline-block;padding:12px 24px;background:var(--emerald-gradient);color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(16,185,129,0.3);">
+                <a href="index.html" id="btnGoCheckin"
+                    style="display:inline-block;padding:12px 24px;background:var(--emerald-gradient);color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(16,185,129,0.3);">
                     ไปที่หน้าเช็คอิน
                 </a>
             </div>
 
             <div class="footer-note" id="footerNote">
-                <span id="footerNoteText">มีรหัสสมาชิกแล้ว?</span> <a href="index.html" id="footerNoteLink">เช็คอินที่นี่</a>
+                <span id="footerNoteText">มีรหัสสมาชิกแล้ว?</span> <a href="index.html"
+                    id="footerNoteLink">เช็คอินที่นี่</a>
             </div>
         </div>
     </div>
@@ -846,30 +848,30 @@
         // Universal Google Apps Script Runner Bridge for Cloudflare
         const google = {
             script: {
-                run: (function() {
+                run: (function () {
                     function createRunner(successFn, failureFn) {
                         return new Proxy({}, {
                             get(target, prop) {
                                 if (prop === 'withSuccessHandler') {
-                                    return function(fn) { return createRunner(fn, failureFn); };
+                                    return function (fn) { return createRunner(fn, failureFn); };
                                 }
                                 if (prop === 'withFailureHandler') {
-                                    return function(fn) { return createRunner(successFn, fn); };
+                                    return function (fn) { return createRunner(successFn, fn); };
                                 }
-                                return function(...args) {
+                                return function (...args) {
                                     fetch(GAS_API_URL, {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                                         body: JSON.stringify({ action: prop, args: args })
                                     })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if (successFn) successFn(data);
-                                    })
-                                    .catch(err => {
-                                        if (failureFn) failureFn(err);
-                                        else console.error(`API Error in ${prop}:`, err);
-                                    });
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (successFn) successFn(data);
+                                        })
+                                        .catch(err => {
+                                            if (failureFn) failureFn(err);
+                                            else console.error(`API Error in ${prop}:`, err);
+                                        });
                                 };
                             }
                         });
@@ -1168,6 +1170,7 @@
                     }
                 }
             });
+            updateCardPreview();
         }
 
         function renderAgeRangeOptions() {
@@ -1312,11 +1315,14 @@
 
             const faculty = isExternal ? t.cardFacultyExt : (document.getElementById('faculty').value || t.cardFacultyDefault);
             const tierTrans = TIER_TRANSLATIONS[currentLang] || TIER_TRANSLATIONS.th;
+            const quota = monthlyQuotas[selectedType] !== undefined ? monthlyQuotas[selectedType] : 30;
+            const quotaUnit = (tierTrans[selectedType] && tierTrans[selectedType].quotaUnit) || 'ครั้ง';
+            const perMonth = (currentLang === 'zh' ? ' / 月' : currentLang === 'en' ? ' / Month' : ' / เดือน');
 
             document.getElementById('previewName').textContent = name;
             document.getElementById('previewFaculty').textContent = faculty;
             document.getElementById('previewTier').textContent = (tierTrans[selectedType] && tierTrans[selectedType].cardTier) || selectedType;
-            document.getElementById('previewQuota').textContent = (tierTrans[selectedType] ? tierTrans[selectedType].quota : '30 ครั้ง') + (currentLang === 'zh' ? ' / 月' : currentLang === 'en' ? ' / Month' : ' / เดือน');
+            document.getElementById('previewQuota').textContent = `${quota} ${quotaUnit}${perMonth}`;
         }
 
         function compressImage(file, maxWidth = 1000, quality = 0.75) {
