@@ -1,15 +1,1585 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App</title>
-  <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-    iframe { width: 100%; height: 100%; border: none; }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>เช็คอินฟิตเนส - Fitness Center Check-in</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --primary-bg: #ecfdf5;
+            --emerald-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            --card-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.98) 100%);
+            --text-title: #064e3b;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e2e8f0;
+            --border-focus: #10b981;
+            --radius-lg: 22px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --shadow-subtle: 0 14px 35px -5px rgba(16, 185, 129, 0.15), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+            --shadow-pop: 0 16px 36px -4px rgba(0, 0, 0, 0.16), 0 8px 16px -4px rgba(16, 185, 129, 0.1);
+        }
+
+        body {
+            font-family: 'Prompt', 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #064e3b 0%, #065f46 25%, #047857 60%, #059669 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(40px + env(safe-area-inset-bottom, 0px));
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: var(--card-gradient);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-lg);
+            padding: 28px 22px 32px;
+            box-shadow: var(--shadow-subtle), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            position: relative;
+            animation: fadeIn .35s ease-out;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lang-switch {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 18px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 999px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .lang-btn.active {
+            background: #fff;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .header-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+
+        .mode-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            border: none;
+            background: transparent;
+            padding: 10px 8px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mode-btn.active {
+            background: #fff;
+            color: var(--primary-dark);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+        }
+
+        .member-lookup-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 1.5px solid #a7f3d0;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 18px;
+            display: none;
+            animation: fadeIn .25s ease-out;
+        }
+
+        .member-lookup-box.show {
+            display: block;
+        }
+
+        .member-search-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .member-search-row input {
+            flex: 1;
+            padding: 11px 13px;
+            border: 1.5px solid #a7f3d0;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .member-search-row button {
+            background: var(--emerald-gradient);
+            color: #fff;
+            border: none;
+            padding: 0 16px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .member-info-card {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fff;
+            border-radius: var(--radius-sm);
+            border: 1px solid #d1fae5;
+            display: none;
+        }
+
+        .member-info-card.show {
+            display: block;
+        }
+
+        .member-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .member-name-tag {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+
+        .quota-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .quota-badge.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .member-details-text {
+            font-size: 12.5px;
+            color: #4b5563;
+            line-height: 1.4;
+        }
+
+        .field-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14.5px;
+            font-family: inherit;
+            background: #fff;
+            transition: all .2s ease;
+            color: var(--text-main);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.15);
+            background: #fff;
+        }
+
+        .c-dropdown {
+            position: relative;
+            user-select: none;
+            width: 100%;
+        }
+
+        .c-dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 14px;
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14.5px;
+            font-family: inherit;
+            color: var(--text-main);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s ease;
+            text-align: left;
+        }
+
+        .c-dropdown-btn:hover {
+            border-color: #cbd5e1;
+        }
+
+        .c-dropdown.open .c-dropdown-btn {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.15);
+        }
+
+        .c-dropdown-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .c-dropdown-arrow {
+            width: 16px;
+            height: 16px;
+            color: #64748b;
+            transition: transform .2s ease;
+            flex-shrink: 0;
+        }
+
+        .c-dropdown.open .c-dropdown-arrow {
+            transform: rotate(180deg);
+            color: var(--primary-dark);
+        }
+
+        .c-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 100%;
+            max-height: 260px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1.5px solid #d1fae5;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-pop);
+            z-index: 300;
+            padding: 6px;
+            display: none;
+            animation: dropFade .18s ease-out;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar { width: 5px; }
+        .c-dropdown-menu::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
+        .c-dropdown-menu::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
+        .c-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+        @keyframes dropFade {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .c-dropdown.open .c-dropdown-menu { display: block; }
+
+        .c-dropdown-item {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all .15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .c-dropdown-item:hover {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+        }
+
+        .c-dropdown-item.active {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        .c-dropdown-item.active::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .type-opt {
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-md);
+            padding: 11px 8px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            background: #fff;
+            transition: all .2s ease;
+            color: #374151;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 64px;
+        }
+
+        .type-opt:hover {
+            border-color: #a7f3d0;
+            background: var(--primary-bg);
+        }
+
+        .type-opt:active { transform: scale(0.98); }
+
+        .type-opt.selected {
+            border-color: var(--primary);
+            background: #ecfdf5;
+            color: var(--primary-dark);
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
+        }
+
+        .type-opt .opt-label {
+            font-size: 12.5px;
+            line-height: 1.3;
+        }
+
+        .type-opt .price-tag {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-top: 3px;
+        }
+
+        .type-opt .price-tag.free { color: #059669; }
+
+        .bank-info {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            background: #ecfdf5;
+            border: 1.5px dashed #a7f3d0;
+            animation: fadeIn .2s ease-out;
+        }
+
+        .bank-info-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+        }
+
+        .bank-info-text {
+            font-size: 13.5px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .bank-info-text .acc-number {
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: 0.5px;
+        }
+
+        .upload-box {
+            border: 2px dashed #a7f3d0;
+            border-radius: var(--radius-md);
+            padding: 18px;
+            text-align: center;
+            margin-top: 6px;
+            cursor: pointer;
+            background: #f9fafb;
+            transition: all .2s ease;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: #ecfdf5;
+        }
+
+        .upload-box img {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-box input[type="file"] { display: none; }
+
+        .upload-label {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 13.5px;
+        }
+
+        .free-note {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            background: #d1fae5;
+            color: #065f46;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        button.submit {
+            width: 100%;
+            margin-top: 22px;
+            background: var(--emerald-gradient);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            transition: all .2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.submit:hover {
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        button.submit:active { transform: translateY(1px); }
+
+        button.submit:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .msg {
+            margin-top: 14px;
+            padding: 13px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+            animation: fadeIn .2s;
+        }
+
+        .msg.ok {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+            border: 1px solid #a7f3d0;
+        }
+
+        .msg.err {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+            border: 1px solid #fecaca;
+        }
+
+        .msg.warn {
+            background: #fef3c7;
+            color: #92400e;
+            display: block;
+            border: 1px solid #fde68a;
+        }
+
+        .edit-link {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--primary-dark);
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 600;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-note a {
+            color: var(--primary-dark);
+            font-weight: 700;
+            text-decoration: none;
+        }
+    </style>
 </head>
+
 <body>
-  <iframe src="https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec"></iframe>
+    <div class="container">
+        <div class="glass-card">
+            <!-- Language Switcher -->
+            <div class="lang-switch" id="langSwitch">
+                <button type="button" class="lang-btn active" data-lang="th">ไทย</button>
+                <button type="button" class="lang-btn" data-lang="en">EN</button>
+                <button type="button" class="lang-btn" data-lang="zh">中文</button>
+            </div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="header-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 5v14"></path>
+                        <path d="M18 5v14"></path>
+                        <path d="M2 9h4"></path>
+                        <path d="M2 15h4"></path>
+                        <path d="M18 9h4"></path>
+                        <path d="M18 15h4"></path>
+                        <path d="M6 12h12"></path>
+                    </svg>
+                </div>
+                <h1 id="pageTitle">เช็คอินฟิตเนส</h1>
+                <div class="sub" id="pageSub">กรุณากรอกข้อมูลเพื่อบันทึกการเข้าใช้บริการ</div>
+            </div>
+
+            <!-- Mode Selector -->
+            <div class="mode-toggle">
+                <button type="button" class="mode-btn active" id="modeDailyBtn" onclick="switchMode('daily')">
+                    บุคคลทั่วไป / รายวัน
+                </button>
+                <button type="button" class="mode-btn" id="modeMemberBtn" onclick="switchMode('member')">
+                    สมาชิกฟิตเนส
+                </button>
+            </div>
+
+            <!-- Member ID Verification Box -->
+            <div class="member-lookup-box" id="memberLookupBox">
+                <label id="lblMemberId" style="color:var(--text-title);margin-bottom:6px;">รหัสสมาชิก หรือ เบอร์โทรศัพท์ (Member ID / Phone)</label>
+                <div class="member-search-row">
+                    <input type="text" id="memberIdInput" placeholder="เช่น 08xxxxxxxx หรือ MB-26-0001"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();verifyMember();}">
+                    <button type="button" id="lookupMemberBtn" onclick="verifyMember()">
+                        ตรวจสอบ
+                    </button>
+                </div>
+
+                <div class="member-info-card" id="memberInfoCard">
+                    <div class="member-info-header">
+                        <span class="member-name-tag" id="cardMemberName">สมชาย ใจดี</span>
+                        <span class="quota-badge" id="cardMemberQuota">สิทธิ์คงเหลือ: 30/30 ครั้ง</span>
+                    </div>
+                    <div class="member-details-text" id="cardMemberDetails">
+                        ประเภท: รายเดือนนิสิต
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="field-group">
+                <label id="lblName">ชื่อ - นามสกุล *</label>
+                <input type="text" id="name" placeholder="เช่น สมชาย ใจดี">
+            </div>
+
+            <!-- Daily User Types -->
+            <div id="dailyTypeSection">
+                <label id="lblUserType">ประเภทผู้ใช้บริการ *</label>
+                <div class="type-grid" id="dailyTypeGrid">
+                    <div class="type-opt" data-type="นิสิต" data-price="20">
+                        <span class="opt-label">นิสิต</span>
+                        <span class="price-tag">20 บาท</span>
+                    </div>
+                    <div class="type-opt" data-type="บุคลากร" data-price="30">
+                        <span class="opt-label">บุคลากร</span>
+                        <span class="price-tag">30 บาท</span>
+                    </div>
+                    <div class="type-opt selected" data-type="บุคคลทั่วไป" data-price="50">
+                        <span class="opt-label">บุคคลทั่วไป</span>
+                        <span class="price-tag">50 บาท</span>
+                    </div>
+                    <div class="type-opt" data-type="นิสิตคณะวิทยาศาสตร์การกีฬา" data-price="0">
+                        <span class="opt-label">นิสิตวิทย์กีฬา</span>
+                        <span class="price-tag free">ฟรี 0 บาท</span>
+                    </div>
+                    <div class="type-opt" data-type="บุคลากรคณะวิทยาศาสตร์การกีฬา" data-price="0">
+                        <span class="opt-label">บุคลากรวิทย์กีฬา</span>
+                        <span class="price-tag free">ฟรี 0 บาท</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member Types -->
+            <div id="memberTypeSection" style="display:none;">
+                <label id="lblMemberType">ประเภทสมาชิกรายเดือน *</label>
+                <div class="type-grid" id="memberTypeGrid">
+                    <div class="type-opt selected" data-type="รายเดือนนิสิต" data-price="0">
+                        <span class="opt-label">สมาชิก (นิสิต)</span>
+                        <span class="price-tag free">เช็คอินฟรี</span>
+                    </div>
+                    <div class="type-opt" data-type="รายเดือนบุคลากร" data-price="0">
+                        <span class="opt-label">สมาชิก (บุคลากร)</span>
+                        <span class="price-tag free">เช็คอินฟรี</span>
+                    </div>
+                    <div class="type-opt" data-type="รายเดือนบุคคลภายนอก" data-price="0">
+                        <span class="opt-label">สมาชิก (บุคคลภายนอก)</span>
+                        <span class="price-tag free">เช็คอินฟรี</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Faculty Selection -->
+            <div class="field-group" id="facultyFieldGroup" style="display:none;margin-top:15px;">
+                <label id="lblFaculty">คณะ / หน่วยงาน *</label>
+                <div class="c-dropdown" id="facultyDropdown">
+                    <input type="hidden" id="faculty" value="">
+                    <button type="button" class="c-dropdown-btn">
+                        <span class="c-dropdown-label">-- เลือกคณะ / หน่วยงาน --</span>
+                        <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="c-dropdown-menu"></div>
+                </div>
+            </div>
+
+            <div class="field-group" style="margin-top:15px;">
+                <label id="lblPhone">เบอร์โทรศัพท์ *</label>
+                <input type="tel" id="phone" placeholder="08xxxxxxxx" maxlength="10">
+            </div>
+
+            <!-- Age Range -->
+            <div class="field-group">
+                <label id="lblAgeRange">ช่วงอายุ *</label>
+                <div class="c-dropdown" id="ageRangeDropdown">
+                    <input type="hidden" id="ageRange" value="">
+                    <button type="button" class="c-dropdown-btn">
+                        <span class="c-dropdown-label">-- เลือกช่วงอายุ --</span>
+                        <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="c-dropdown-menu">
+                        <div class="c-dropdown-item active" data-val="">-- เลือกช่วงอายุ --</div>
+                        <div class="c-dropdown-item" data-val="13-17">13-17 ปี</div>
+                        <div class="c-dropdown-item" data-val="18-22">18-22 ปี</div>
+                        <div class="c-dropdown-item" data-val="23-29">23-29 ปี</div>
+                        <div class="c-dropdown-item" data-val="30-39">30-39 ปี</div>
+                        <div class="c-dropdown-item" data-val="40-49">40-49 ปี</div>
+                        <div class="c-dropdown-item" data-val="50-59">50-59 ปี</div>
+                        <div class="c-dropdown-item" data-val="60 ปีขึ้นไป">60 ปีขึ้นไป</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bank Transfer Box -->
+            <div id="bankInfoBox" class="bank-info" style="display:none;">
+                <div class="bank-info-title" id="bankInfoTitleEl">โอนเงินเข้าบัญชีนี้ ก่อนแนบสลิป</div>
+                <div class="bank-info-text" id="bankInfoText"></div>
+            </div>
+
+            <!-- Slip Section -->
+            <div id="slipSection" style="display:none;">
+                <label id="lblSlip" style="margin-top:16px;">แนบสลิปการชำระเงิน *</label>
+                <div class="upload-box" id="uploadBox" onclick="document.getElementById('slipFile').click()">
+                    <div class="upload-label" id="uploadLabel">แตะเพื่อเลือกรูปสลิป</div>
+                    <img id="preview" style="display:none;" alt="slip preview">
+                    <input type="file" id="slipFile" accept="image/*">
+                </div>
+            </div>
+
+            <div class="free-note" id="freeNote" style="display:none;">
+                ประเภทนี้ไม่เสียค่าบริการ ไม่ต้องแนบสลิป
+            </div>
+
+            <!-- Submit Button -->
+            <button type="button" class="submit" id="submitBtn" onclick="doSubmit(false)">
+                <span>บันทึกการเช็คอิน</span>
+            </button>
+
+            <div class="edit-link" id="editLink"
+                onclick="localStorage.removeItem('fc_last_checkin_info'); resetForm();">ไม่ใช่ฉัน / เปลี่ยนข้อมูล</div>
+            <div class="msg" id="msgBox"></div>
+
+            <div class="footer-note">
+                <span id="signupNoteText">ต้องการสมัครสมาชิกเพื่อรับสิทธิ์ใช้งาน?</span>
+                <a href="signup.html" id="signupLinkText">สมัครสมาชิกที่นี่</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ⚙️ กำหนด URL Web App ของ Google Apps Script
+        // ==========================================
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyXXXXXXXXXXXXX/exec";
+
+        // API Fetch Bridge
+        async function callApi(action, params = {}) {
+            const response = await fetch(GAS_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action, ...params })
+            });
+            return await response.json();
+        }
+
+        const TRANSLATIONS = {
+            th: {
+                pageTitle: 'เช็คอินฟิตเนส',
+                pageSub: 'กรุณากรอกข้อมูลเพื่อบันทึกการเข้าใช้บริการ',
+                modeDaily: 'บุคคลทั่วไป / รายวัน',
+                modeMember: 'สมาชิกฟิตเนส',
+                lblName: 'ชื่อ - นามสกุล *', phName: 'เช่น สมชาย ใจดี',
+                lblFaculty: 'คณะ / หน่วยงาน *', phFaculty: '-- เลือกคณะ / หน่วยงาน --',
+                lblPhone: 'เบอร์โทรศัพท์ *', phPhone: '08xxxxxxxx',
+                lblAgeRange: 'ช่วงอายุ *', phAgeRange: '-- เลือกช่วงอายุ --',
+                lblUserType: 'ประเภทผู้ใช้บริการ *',
+                lblMemberType: 'ประเภทสมาชิกรายเดือน *',
+                lblMemberId: 'รหัสสมาชิก หรือ เบอร์โทรศัพท์ (Member ID / Phone)', phMemberId: 'เช่น 08xxxxxxxx หรือ MB-26-0001',
+                btnLookup: 'ตรวจสอบ',
+                bankTitle: 'โอนเงินเข้าบัญชีนี้ ก่อนแนบสลิป',
+                bankAccNoPrefix: 'เลขบัญชี:', bankAccNamePrefix: 'ชื่อบัญชี:',
+                labelSlip: 'แนบสลิปการชำระเงิน *',
+                uploadDefault: 'แตะเพื่อเลือกรูปสลิป',
+                uploadSelected: 'เลือกรูปแล้ว (แตะเพื่อเปลี่ยน)',
+                freeNoteText: 'ประเภทนี้ไม่เสียค่าบริการ ไม่ต้องแนบสลิป',
+                btnSubmit: 'บันทึกการเช็คอิน',
+                signupNote: 'ต้องการสมัครสมาชิกเพื่อรับสิทธิ์ใช้งาน?',
+                signupLink: 'สมัครสมาชิกที่นี่'
+            },
+            en: {
+                pageTitle: 'Fitness Check-in',
+                pageSub: 'Please enter your information to check in',
+                modeDaily: 'Daily Pass',
+                modeMember: 'Member Check-in',
+                lblName: 'Full Name *', phName: 'e.g. John Doe',
+                lblFaculty: 'Faculty / Organization *', phFaculty: '-- Select Faculty / Org --',
+                lblPhone: 'Phone Number *', phPhone: '08xxxxxxxx',
+                lblAgeRange: 'Age Range *', phAgeRange: '-- Select Age Range --',
+                lblUserType: 'User Type *',
+                lblMemberType: 'Monthly Membership Type *',
+                lblMemberId: 'Member ID or Phone Number', phMemberId: 'e.g. 08xxxxxxxx or MB-26-0001',
+                btnLookup: 'Verify',
+                bankTitle: 'Please transfer before attaching slip',
+                bankAccNoPrefix: 'Account No:', bankAccNamePrefix: 'Account Name:',
+                labelSlip: 'Attach Payment Slip *',
+                uploadDefault: 'Tap to select slip photo',
+                uploadSelected: 'Photo selected (Tap to change)',
+                freeNoteText: 'Free admission for this category, no slip required.',
+                btnSubmit: 'Submit Check-in',
+                signupNote: 'Need a membership package?',
+                signupLink: 'Sign up here'
+            },
+            zh: {
+                pageTitle: '健身房签到系统',
+                pageSub: '请填写您的信息以登记入场',
+                modeDaily: '普通用户 / 单次',
+                modeMember: '会员签到',
+                lblName: '姓名 *', phName: '例如：张三',
+                lblFaculty: '学院 / 单位 *', phFaculty: '-- 请选择学院 / 单位 --',
+                lblPhone: '电话号码 *', phPhone: '08xxxxxxxx',
+                lblAgeRange: '年龄段 *', phAgeRange: '-- 请选择年龄段 --',
+                lblUserType: '用户类型 *',
+                lblMemberType: '月卡会员类型 *',
+                lblMemberId: '会员编号或电话号码', phMemberId: '例如：08xxxxxxxx 或 MB-26-0001',
+                btnLookup: '验证',
+                bankTitle: '请转账至此账户后上传凭证',
+                bankAccNoPrefix: '银行账号:', bankAccNamePrefix: '账户姓名:',
+                labelSlip: '上传付款凭证 *',
+                uploadDefault: '点击选择凭证图片',
+                uploadSelected: '已选择凭证 (点击更换)',
+                freeNoteText: '该类型免费入场，无需上传凭证。',
+                btnSubmit: '确认签到',
+                signupNote: '想成为会员享受更多权益？',
+                signupLink: '点击此处注册会员'
+            }
+        };
+
+        const USER_TYPE_TRANSLATIONS = {
+            th: {
+                'นิสิต': 'นิสิต',
+                'บุคลากร': 'บุคลากร',
+                'บุคคลทั่วไป': 'บุคคลทั่วไป',
+                'นิสิตคณะวิทยาศาสตร์การกีฬา': 'นิสิตวิทย์กีฬา',
+                'บุคลากรคณะวิทยาศาสตร์การกีฬา': 'บุคลากรวิทย์กีฬา',
+                'รายเดือนนิสิต': 'สมาชิก (นิสิต)',
+                'รายเดือนบุคลากร': 'สมาชิก (บุคลากร)',
+                'รายเดือนบุคคลภายนอก': 'สมาชิก (บุคคลภายนอก)'
+            },
+            en: {
+                'นิสิต': 'Student',
+                'บุคลากร': 'Staff',
+                'บุคคลทั่วไป': 'General Public',
+                'นิสิตคณะวิทยาศาสตร์การกีฬา': 'Sports Sci Student',
+                'บุคลากรคณะวิทยาศาสตร์การกีฬา': 'Sports Sci Staff',
+                'รายเดือนนิสิต': 'Member (Student)',
+                'รายเดือนบุคลากร': 'Member (Staff)',
+                'รายเดือนบุคคลภายนอก': 'Member (General)'
+            },
+            zh: {
+                'นิสิต': '学生',
+                'บุคลากร': '教职工',
+                'บุคคลทั่วไป': '校外人士',
+                'นิสิตคณะวิทยาศาสตร์การกีฬา': '体育学院学生',
+                'บุคลากรคณะวิทยาศาสตร์การกีฬา': '体育学院教工',
+                'รายเดือนนิสิต': '月卡会员 (学生)',
+                'รายเดือนบุคลากร': '月卡会员 (教工)',
+                'รายเดือนบุคคลภายนอก': '月卡会员 (校外)'
+            }
+        };
+
+        const AGE_RANGE_TRANSLATIONS = {
+            th: {
+                '': '-- เลือกช่วงอายุ --',
+                '13-17': '13-17 ปี',
+                '18-22': '18-22 ปี',
+                '23-29': '23-29 ปี',
+                '30-39': '30-39 ปี',
+                '40-49': '40-49 ปี',
+                '50-59': '50-59 ปี',
+                '60 ปีขึ้นไป': '60 ปีขึ้นไป'
+            },
+            en: {
+                '': '-- Select Age Range --',
+                '13-17': '13-17 Years',
+                '18-22': '18-22 Years',
+                '23-29': '23-29 Years',
+                '30-39': '30-39 Years',
+                '40-49': '40-49 Years',
+                '50-59': '50-59 Years',
+                '60 ปีขึ้นไป': '60+ Years'
+            },
+            zh: {
+                '': '-- 请选择年龄段 --',
+                '13-17': '13-17 岁',
+                '18-22': '18-22 岁',
+                '23-29': '23-29 岁',
+                '30-39': '30-39 岁',
+                '40-49': '40-49 岁',
+                '50-59': '50-59 岁',
+                '60 ปีขึ้นไป': '60 岁以上'
+            }
+        };
+
+        let currentLang = 'th';
+        let currentMode = 'daily';
+        let selectedType = 'บุคคลทั่วไป';
+        let selectedPrice = 50;
+        let slipBase64 = '';
+        let slipMime = '';
+        let slipFilename = '';
+        let currentPrices = {};
+        let rawFacultiesList = [];
+        let verifiedMemberData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCustomDropdowns();
+            bindTypeEvents();
+            bindSlipEvents();
+            bindPhoneAutoFill();
+            loadPrices();
+            loadFaculties();
+            loadBankInfo();
+            loadCheckinInfo();
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentLang = btn.dataset.lang;
+                    applyLanguage(currentLang);
+                });
+            });
+        });
+
+        function initCustomDropdowns() {
+            document.querySelectorAll('.c-dropdown').forEach(dd => {
+                const btn = dd.querySelector('.c-dropdown-btn');
+                const menu = dd.querySelector('.c-dropdown-menu');
+                const hiddenInput = dd.querySelector('input[type="hidden"]');
+                const label = dd.querySelector('.c-dropdown-label');
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dd.classList.contains('open');
+                    document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
+                    if (!isOpen) dd.classList.add('open');
+                });
+
+                menu.addEventListener('click', (e) => {
+                    const item = e.target.closest('.c-dropdown-item');
+                    if (!item) return;
+                    e.stopPropagation();
+
+                    menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    const val = item.dataset.val !== undefined ? item.dataset.val : '';
+                    hiddenInput.value = val;
+                    label.textContent = item.textContent.trim();
+
+                    dd.classList.remove('open');
+                    hiddenInput.dispatchEvent(new Event('change'));
+                });
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
+            });
+        }
+
+        function setDropdownValue(ddId, val) {
+            const dd = document.getElementById(ddId);
+            if (!dd) return;
+            const input = dd.querySelector('input[type="hidden"]');
+            const label = dd.querySelector('.c-dropdown-label');
+            const items = dd.querySelectorAll('.c-dropdown-item');
+
+            let matched = false;
+            items.forEach(item => {
+                if (item.dataset.val === String(val)) {
+                    item.classList.add('active');
+                    label.textContent = item.textContent.trim();
+                    input.value = val;
+                    matched = true;
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            if (!matched && items.length > 0) {
+                items[0].classList.add('active');
+                label.textContent = items[0].textContent.trim();
+                input.value = items[0].dataset.val || '';
+            }
+        }
+
+        function setDropdownOptions(ddId, options, selectedVal) {
+            const dd = document.getElementById(ddId);
+            if (!dd) return;
+            const menu = dd.querySelector('.c-dropdown-menu');
+            menu.innerHTML = '';
+
+            options.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'c-dropdown-item';
+                div.dataset.val = opt.val;
+                div.textContent = opt.text;
+                menu.appendChild(div);
+            });
+
+            setDropdownValue(ddId, selectedVal !== undefined ? selectedVal : (options[0] ? options[0].val : ''));
+        }
+
+        function renderTypeOptions() {
+            const typeTrans = USER_TYPE_TRANSLATIONS[currentLang] || USER_TYPE_TRANSLATIONS.th;
+            document.querySelectorAll('.type-opt').forEach(opt => {
+                const typeKey = opt.dataset.type;
+                if (typeKey) {
+                    const labelEl = opt.querySelector('.opt-label');
+                    const priceEl = opt.querySelector('.price-tag');
+                    if (labelEl && typeTrans[typeKey]) {
+                        labelEl.textContent = typeTrans[typeKey];
+                    }
+                    if (priceEl) {
+                        const price = currentPrices[typeKey] !== undefined ? currentPrices[typeKey] : Number(opt.dataset.price);
+                        if (typeKey.startsWith('รายเดือน')) {
+                            priceEl.textContent = (currentLang === 'en') ? 'Free Check-in' : (currentLang === 'zh' ? '免费签到' : 'เช็คอินฟรี');
+                            priceEl.className = 'price-tag free';
+                        } else if (price === 0) {
+                            priceEl.textContent = (currentLang === 'en') ? 'Free 0 THB' : (currentLang === 'zh' ? '免费 0 泰铢' : 'ฟรี 0 บาท');
+                            priceEl.className = 'price-tag free';
+                        } else {
+                            priceEl.textContent = (currentLang === 'en') ? `${price} THB` : (currentLang === 'zh' ? `${price} 泰铢` : `${price} บาท`);
+                            priceEl.className = 'price-tag';
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadPrices() {
+            try {
+                const prices = await callApi('getPublicPrices');
+                if (prices) {
+                    for (const k in prices) {
+                        currentPrices[k] = Number(prices[k]);
+                    }
+                    renderTypeOptions();
+                    const currentSelected = document.querySelector('.type-opt.selected');
+                    if (currentSelected) {
+                        const p = currentPrices[selectedType] !== undefined ? currentPrices[selectedType] : Number(currentSelected.dataset.price);
+                        selectedPrice = selectedType.startsWith('รายเดือน') ? 0 : (p || 0);
+                    }
+                    updatePaymentView();
+                }
+            } catch (err) {
+                console.error("loadPrices error:", err);
+            }
+        }
+
+        function renderAgeRangeOptions() {
+            const ageTrans = AGE_RANGE_TRANSLATIONS[currentLang] || AGE_RANGE_TRANSLATIONS.th;
+            const currentVal = document.getElementById('ageRange').value;
+            const items = Object.keys(ageTrans).map(key => ({
+                val: key,
+                text: ageTrans[key]
+            }));
+            setDropdownOptions('ageRangeDropdown', items, currentVal);
+        }
+
+        function applyLanguage(lang) {
+            const t = TRANSLATIONS[lang] || TRANSLATIONS.th;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('pageSub').textContent = t.pageSub;
+            document.getElementById('modeDailyBtn').textContent = t.modeDaily;
+            document.getElementById('modeMemberBtn').textContent = t.modeMember;
+            document.getElementById('lblName').textContent = t.lblName;
+            document.getElementById('name').placeholder = t.phName;
+            document.getElementById('lblFaculty').textContent = t.lblFaculty;
+            document.getElementById('lblPhone').textContent = t.lblPhone;
+            document.getElementById('phone').placeholder = t.phPhone;
+            document.getElementById('lblAgeRange').textContent = t.lblAgeRange;
+            document.getElementById('lblUserType').textContent = t.lblUserType;
+            document.getElementById('lblMemberType').textContent = t.lblMemberType;
+            document.getElementById('lblMemberId').textContent = t.lblMemberId;
+            document.getElementById('memberIdInput').placeholder = t.phMemberId;
+            document.getElementById('lookupMemberBtn').textContent = t.btnLookup;
+            document.getElementById('lblSlip').textContent = t.labelSlip;
+            document.getElementById('freeNote').textContent = t.freeNoteText;
+            document.getElementById('submitBtn').innerHTML = '<span>' + t.btnSubmit + '</span>';
+            document.getElementById('signupNoteText').textContent = t.signupNote;
+            document.getElementById('signupLinkText').textContent = t.signupLink;
+
+            renderTypeOptions();
+            renderAgeRangeOptions();
+            renderFacultyOptions();
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeDailyBtn').classList.toggle('active', mode === 'daily');
+            document.getElementById('modeMemberBtn').classList.toggle('active', mode === 'member');
+
+            const memberBox = document.getElementById('memberLookupBox');
+            const dailySec = document.getElementById('dailyTypeSection');
+            const memberSec = document.getElementById('memberTypeSection');
+
+            document.querySelectorAll('.type-opt').forEach(opt => opt.classList.remove('selected'));
+
+            if (mode === 'member') {
+                memberBox.classList.add('show');
+                dailySec.style.display = 'none';
+                memberSec.style.display = 'block';
+
+                const defaultOpt = document.querySelector('#memberTypeGrid .type-opt');
+                if (defaultOpt) defaultOpt.click();
+            } else {
+                memberBox.classList.remove('show');
+                dailySec.style.display = 'block';
+                memberSec.style.display = 'none';
+                verifiedMemberData = null;
+                document.getElementById('memberInfoCard').classList.remove('show');
+
+                const defaultOpt = document.querySelector('#dailyTypeGrid .type-opt[data-type="บุคคลทั่วไป"]') || document.querySelector('#dailyTypeGrid .type-opt');
+                if (defaultOpt) defaultOpt.click();
+            }
+        }
+
+        async function loadFaculties() {
+            try {
+                const list = await callApi('getFaculties');
+                rawFacultiesList = list || [];
+                renderFacultyOptions();
+            } catch (err) {
+                console.error("loadFaculties error:", err);
+            }
+        }
+
+        function renderFacultyOptions() {
+            const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+            const currentVal = document.getElementById('faculty').value;
+
+            const items = [{ val: '', text: t.phFaculty }];
+            rawFacultiesList.forEach(item => {
+                const thName = item.th || (typeof item === 'string' ? item : '');
+                const enName = item.en || thName;
+
+                let displayText = thName;
+                if (currentLang === 'en') displayText = enName;
+                else if (currentLang === 'zh') displayText = `${enName} (${thName})`;
+
+                items.push({ val: thName, text: displayText });
+            });
+
+            setDropdownOptions('facultyDropdown', items, currentVal);
+        }
+
+        function handleFacultyVisibility() {
+            const facultyGroup = document.getElementById('facultyFieldGroup');
+            const isExternal = (selectedType === 'บุคคลทั่วไป' || selectedType === 'รายเดือนบุคคลภายนอก');
+
+            if (isExternal) {
+                facultyGroup.style.display = 'none';
+                setDropdownValue('facultyDropdown', '');
+            } else {
+                facultyGroup.style.display = 'block';
+                if (selectedType.includes('วิทยาศาสตร์การกีฬา')) {
+                    const match = rawFacultiesList.find(f => (f.th || f).includes('วิทยาศาสตร์การกีฬา'));
+                    if (match) setDropdownValue('facultyDropdown', match.th || match);
+                }
+            }
+        }
+
+        async function loadBankInfo() {
+            try {
+                const info = await callApi('getBankInfo');
+                if (info && info.accountNumber) {
+                    const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+                    document.getElementById('bankInfoText').innerHTML =
+                        `<div><strong>ธนาคาร:</strong> ${info.bankName || ''}</div>` +
+                        `<div>${t.bankAccNoPrefix} <span class="acc-number">${info.accountNumber}</span></div>` +
+                        `<div>${t.bankAccNamePrefix} <strong>${info.accountName || ''}</strong></div>`;
+                }
+            } catch (err) {
+                console.error("loadBankInfo error:", err);
+            }
+        }
+
+        function bindTypeEvents() {
+            document.querySelectorAll('.type-opt').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    const parent = opt.closest('.type-grid');
+                    parent.querySelectorAll('.type-opt').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedType = opt.dataset.type;
+                    const price = currentPrices[selectedType] !== undefined ? currentPrices[selectedType] : (Number(opt.dataset.price) || 0);
+                    selectedPrice = selectedType.startsWith('รายเดือน') ? 0 : price;
+                    handleFacultyVisibility();
+                    updatePaymentView();
+                });
+            });
+        }
+
+        function updatePaymentView() {
+            const isFree = selectedPrice === 0;
+            const bankBox = document.getElementById('bankInfoBox');
+            const slipSec = document.getElementById('slipSection');
+            const freeNote = document.getElementById('freeNote');
+
+            if (!selectedType) {
+                bankBox.style.display = 'none';
+                slipSec.style.display = 'none';
+                freeNote.style.display = 'none';
+                return;
+            }
+
+            if (isFree) {
+                bankBox.style.display = 'none';
+                slipSec.style.display = 'none';
+                freeNote.style.display = 'block';
+            } else {
+                bankBox.style.display = 'block';
+                slipSec.style.display = 'block';
+                freeNote.style.display = 'none';
+            }
+        }
+
+        async function verifyMember() {
+            const q = document.getElementById('memberIdInput').value.trim() || document.getElementById('phone').value.trim();
+            if (!q) {
+                showMsg('กรุณากรอกรหัสสมาชิกหรือเบอร์โทรศัพท์', 'warn');
+                return;
+            }
+
+            const btn = document.getElementById('lookupMemberBtn');
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="spinner"></span>';
+            btn.disabled = true;
+
+            try {
+                const res = await callApi('lookupMember', { query: q });
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                if (res && res.found) {
+                    verifiedMemberData = res;
+                    document.getElementById('memberIdInput').value = res.memberId;
+
+                    if (res.name) document.getElementById('name').value = res.name;
+                    if (res.phone) document.getElementById('phone').value = res.phone;
+                    if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
+
+                    if (res.type) {
+                        document.querySelectorAll('#memberTypeGrid .type-opt').forEach(opt => {
+                            if (opt.dataset.type === res.type) opt.click();
+                        });
+                    }
+
+                    if (res.faculty && res.faculty !== 'บุคคลภายนอก') {
+                        setDropdownValue('facultyDropdown', res.faculty);
+                    }
+
+                    const card = document.getElementById('memberInfoCard');
+                    const nameTag = document.getElementById('cardMemberName');
+                    const quotaBadge = document.getElementById('cardMemberQuota');
+                    const detailsText = document.getElementById('cardMemberDetails');
+
+                    nameTag.textContent = res.name + ' (' + res.memberId + ')';
+                    quotaBadge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
+                    quotaBadge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
+
+                    detailsText.innerHTML = `ประเภท: <strong>${res.type}</strong>` +
+                        (res.faculty && res.faculty !== 'บุคคลภายนอก' ? ` • คณะ: <strong>${res.faculty}</strong>` : '') +
+                        (res.remaining <= 0 ? '<br><span style="color:#dc2626;font-weight:700;">สิทธิ์การใช้งานครบกำหนดแล้ว กรุณาต่ออายุสมาชิก</span>' : '');
+
+                    card.classList.add('show');
+                    showMsg(`พบสมาชิก ${res.name} (คงเหลือ ${res.remaining} ครั้ง)`, 'ok');
+                } else {
+                    verifiedMemberData = null;
+                    document.getElementById('memberInfoCard').classList.remove('show');
+                    showMsg(res.message || 'ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัสอีกครั้ง', 'err');
+                }
+            } catch (err) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                showMsg('เกิดข้อผิดพลาดในการตรวจสอบ: ' + err.message, 'err');
+            }
+        }
+
+        function bindSlipEvents() {
+            const fileInput = document.getElementById('slipFile');
+            const preview = document.getElementById('preview');
+            const uploadLabel = document.getElementById('uploadLabel');
+
+            fileInput.addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = evt => {
+                    const dataUrl = evt.target.result;
+                    preview.src = dataUrl;
+                    preview.style.display = 'block';
+                    uploadLabel.textContent = TRANSLATIONS[currentLang].uploadSelected;
+
+                    const commaIdx = dataUrl.indexOf(',');
+                    slipBase64 = dataUrl.slice(commaIdx + 1);
+                    slipMime = file.type;
+                    slipFilename = file.name;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function doSubmit(force) {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const ageRange = document.getElementById('ageRange').value;
+
+            if (!name) { showMsg('กรุณากรอกชื่อ-นามสกุล', 'warn'); return; }
+            if (!phone) { showMsg('กรุณากรอกเบอร์โทรศัพท์', 'warn'); return; }
+            if (!ageRange) { showMsg('กรุณาเลือกช่วงอายุ', 'warn'); return; }
+            if (!selectedType) { showMsg('กรุณาเลือกประเภทผู้ใช้บริการ', 'warn'); return; }
+
+            const isExternal = (selectedType === 'บุคคลทั่วไป' || selectedType === 'รายเดือนบุคคลภายนอก');
+            let faculty = isExternal ? 'บุคคลภายนอก' : document.getElementById('faculty').value;
+
+            if (!isExternal && !faculty) {
+                showMsg('กรุณาเลือกคณะ/หน่วยงาน', 'warn');
+                return;
+            }
+
+            const isMonthly = ['รายเดือนบุคคลภายนอก', 'รายเดือนนิสิต', 'รายเดือนบุคลากร'].includes(selectedType);
+            const memberId = document.getElementById('memberIdInput').value.trim();
+
+            if (isMonthly && !memberId && !phone) {
+                showMsg('กรุณาระบุรหัสสมาชิกหรือเบอร์โทรศัพท์สำหรับประเภทสมาชิกรายเดือน', 'warn');
+                return;
+            }
+
+            if (selectedPrice > 0 && !slipBase64) {
+                showMsg('กรุณาแนบสลิปการโอนเงิน', 'warn');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> กำลังบันทึกข้อมูล...';
+
+            const payload = {
+                name: name,
+                faculty: faculty,
+                phone: phone,
+                ageRange: ageRange,
+                type: selectedType,
+                memberId: memberId || phone,
+                slipBase64: slipBase64,
+                slipMime: slipMime,
+                slipFilename: slipFilename,
+                force: Boolean(force)
+            };
+
+            try {
+                const res = await callApi('submitEntry', { data: payload });
+                btn.disabled = false;
+                btn.innerHTML = '<span>' + (TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit + '</span>';
+
+                if (res.status === 'duplicate') {
+                    if (confirm(res.message)) {
+                        doSubmit(true);
+                    }
+                    return;
+                }
+
+                if (res.status === 'ok') {
+                    let successMsg = `เช็คอินสำเร็จเรียบร้อย ขอบคุณที่ใช้บริการ`;
+                    if (currentMode === 'daily') saveCheckinInfo();
+                    if (res.isMonthly && res.remaining !== null) {
+                        successMsg += ` (สิทธิ์คงเหลือ: ${res.remaining}/${res.totalLimit} ครั้ง)`;
+                    }
+                    showMsg(successMsg, 'ok');
+
+                    if (res.isMonthly && res.remaining !== null) {
+                        const badge = document.getElementById('cardMemberQuota');
+                        if (badge) {
+                            badge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
+                            badge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
+                        }
+                    }
+
+                    setTimeout(() => { resetForm(); }, 3500);
+                } else {
+                    showMsg(res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'err');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<span>' + (TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit + '</span>';
+                showMsg('เกิดข้อผิดพลาด: ' + err.message, 'err');
+            }
+        }
+
+        function showMsg(text, type) {
+            const box = document.getElementById('msgBox');
+            box.textContent = text;
+            box.className = 'msg ' + type;
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        const CHECKIN_LS_KEY = 'fc_last_checkin_info';
+
+        function saveCheckinInfo() {
+            try {
+                localStorage.setItem(CHECKIN_LS_KEY, JSON.stringify({
+                    name: document.getElementById('name').value,
+                    phone: document.getElementById('phone').value,
+                    ageRange: document.getElementById('ageRange').value,
+                    faculty: document.getElementById('faculty').value,
+                    type: selectedType
+                }));
+            } catch (e) {}
+        }
+
+        function loadCheckinInfo() {
+            try {
+                const raw = localStorage.getItem(CHECKIN_LS_KEY);
+                if (!raw) return;
+                const data = JSON.parse(raw);
+                if (data.name) document.getElementById('name').value = data.name;
+                if (data.phone) document.getElementById('phone').value = data.phone;
+                if (data.ageRange) setDropdownValue('ageRangeDropdown', data.ageRange);
+                if (data.faculty) setDropdownValue('facultyDropdown', data.faculty);
+                if (data.type) {
+                    const opt = document.querySelector(`#dailyTypeGrid .type-opt[data-type="${data.type}"]`);
+                    if (opt) opt.click();
+                }
+            } catch (e) {}
+        }
+
+        function resetForm() {
+            document.getElementById('name').value = '';
+            setDropdownValue('facultyDropdown', '');
+            document.getElementById('phone').value = '';
+            setDropdownValue('ageRangeDropdown', '');
+            document.getElementById('memberIdInput').value = '';
+            document.getElementById('slipFile').value = '';
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('preview').src = '';
+            document.getElementById('uploadLabel').textContent = TRANSLATIONS[currentLang].uploadDefault;
+            slipBase64 = '';
+            slipMime = '';
+            slipFilename = '';
+            verifiedMemberData = null;
+            document.getElementById('memberInfoCard').classList.remove('show');
+            handleFacultyVisibility();
+            updatePaymentView();
+        }
+
+        function bindPhoneAutoFill() {
+            const phoneInput = document.getElementById('phone');
+            let debounceTimer = null;
+            phoneInput.addEventListener('input', function () {
+                const val = this.value.trim();
+                clearTimeout(debounceTimer);
+                if (currentMode === 'daily' && val.length === 10) {
+                    debounceTimer = setTimeout(() => autoFillFromPhone(val), 400);
+                }
+            });
+        }
+
+        async function autoFillFromPhone(phone) {
+            try {
+                const res = await callApi('lookupLastDailyCheckin', { phone: phone });
+                if (res && res.found) {
+                    if (res.name) document.getElementById('name').value = res.name;
+                    if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
+                    if (res.faculty) setDropdownValue('facultyDropdown', res.faculty);
+                    if (res.type) {
+                        const opt = document.querySelector(`#dailyTypeGrid .type-opt[data-type="${res.type}"]`);
+                        if (opt) opt.click();
+                    }
+                    showMsg('พบข้อมูลเดิมของคุณ เติมให้อัตโนมัติแล้ว', 'ok');
+                }
+            } catch (err) {
+                console.error('autoFillFromPhone error:', err);
+            }
+        }
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
+
+    </script>
 </body>
+
 </html>
