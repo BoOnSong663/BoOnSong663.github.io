@@ -1,15 +1,1272 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>สมัครสมาชิก</title>
-  <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-    iframe { width: 100%; height: 100%; border: none; }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>สมัครสมาชิกฟิตเนส - Fitness Membership Sign Up</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --primary-bg: #ecfdf5;
+            --emerald-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            --card-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.98) 100%);
+            --text-title: #064e3b;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e2e8f0;
+            --border-focus: #10b981;
+            --radius-lg: 22px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --shadow-card: 0 20px 40px -10px rgba(16, 185, 129, 0.2), 0 8px 16px -4px rgba(0, 0, 0, 0.05);
+            --shadow-pop: 0 16px 36px -4px rgba(0, 0, 0, 0.16), 0 8px 16px -4px rgba(16, 185, 129, 0.1);
+        }
+
+        body {
+            font-family: 'Prompt', 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #064e3b 0%, #065f46 30%, #047857 70%, #059669 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(40px + env(safe-area-inset-bottom, 0px));
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: var(--card-gradient);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-lg);
+            padding: 30px 24px 34px;
+            box-shadow: var(--shadow-card), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            position: relative;
+            animation: fadeIn .35s ease-out;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lang-switch {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 999px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .lang-btn.active {
+            background: #fff;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border: 1px solid #a7f3d0;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+
+        .tier-card {
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            background: #fff;
+            transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 110px;
+        }
+
+        .tier-card:hover {
+            border-color: #a7f3d0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.12);
+        }
+
+        .tier-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
+            box-shadow: 0 10px 22px -4px rgba(16, 185, 129, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .tier-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .tier-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 4px;
+            line-height: 1.25;
+        }
+
+        .tier-price {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin: 2px 0;
+        }
+
+        .tier-unit {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .tier-quota {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 3px 6px;
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tier-card.selected .tier-quota {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .card-preview {
+            background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            color: #fff;
+            margin-bottom: 22px;
+            box-shadow: 0 12px 28px -6px rgba(4, 120, 87, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-preview::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .card-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .card-preview-brand {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #a7f3d0;
+            text-transform: uppercase;
+        }
+
+        .card-preview-type {
+            font-size: 11.5px;
+            padding: 3px 10px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-preview-name {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 2px;
+            letter-spacing: -0.2px;
+        }
+
+        .card-preview-sub {
+            font-size: 12px;
+            color: #d1fae5;
+            margin-bottom: 12px;
+        }
+
+        .card-preview-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 10px;
+        }
+
+        .card-preview-id {
+            font-family: monospace;
+            font-size: 13.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fef08a;
+        }
+
+        .card-preview-quota {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ecfdf5;
+        }
+
+        .field-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14.5px;
+            font-family: inherit;
+            background: #fff;
+            transition: all .2s ease;
+            color: var(--text-main);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.15);
+            background: #fff;
+        }
+
+        .c-dropdown {
+            position: relative;
+            user-select: none;
+            width: 100%;
+        }
+
+        .c-dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 14px;
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14.5px;
+            font-family: inherit;
+            color: var(--text-main);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s ease;
+            text-align: left;
+        }
+
+        .c-dropdown-btn:hover { border-color: #cbd5e1; }
+
+        .c-dropdown.open .c-dropdown-btn {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.15);
+        }
+
+        .c-dropdown-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .c-dropdown-arrow {
+            width: 16px;
+            height: 16px;
+            color: #64748b;
+            transition: transform .2s ease;
+            flex-shrink: 0;
+        }
+
+        .c-dropdown.open .c-dropdown-arrow {
+            transform: rotate(180deg);
+            color: var(--primary-dark);
+        }
+
+        .c-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 100%;
+            max-height: 260px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1.5px solid #d1fae5;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-pop);
+            z-index: 300;
+            padding: 6px;
+            display: none;
+            animation: dropFade .18s ease-out;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar { width: 5px; }
+        .c-dropdown-menu::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
+        .c-dropdown-menu::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
+        .c-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+        @keyframes dropFade {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .c-dropdown.open .c-dropdown-menu { display: block; }
+
+        .c-dropdown-item {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all .15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .c-dropdown-item:hover {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+        }
+
+        .c-dropdown-item.active {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        .c-dropdown-item.active::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .bank-info {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            background: #ecfdf5;
+            border: 1.5px dashed #a7f3d0;
+        }
+
+        .bank-info-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+        }
+
+        .bank-info-text {
+            font-size: 13.5px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .bank-info-text .acc-number {
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: 0.5px;
+        }
+
+        .upload-box {
+            border: 2px dashed #a7f3d0;
+            border-radius: var(--radius-md);
+            padding: 18px;
+            text-align: center;
+            margin-top: 6px;
+            cursor: pointer;
+            background: #f9fafb;
+            transition: all .2s ease;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: #ecfdf5;
+        }
+
+        .upload-box img {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-box input[type="file"] { display: none; }
+
+        .upload-label {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 13.5px;
+        }
+
+        button.submit {
+            width: 100%;
+            margin-top: 24px;
+            background: var(--emerald-gradient);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            transition: all .2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.submit:hover {
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+        }
+
+        button.submit:active { transform: translateY(1px); }
+
+        button.submit:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .msg {
+            margin-top: 14px;
+            padding: 13px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+            animation: fadeIn .2s;
+        }
+
+        .msg.ok {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+            border: 1px solid #a7f3d0;
+        }
+
+        .msg.err {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+            border: 1px solid #fecaca;
+        }
+
+        .msg.warn {
+            background: #fef3c7;
+            color: #92400e;
+            display: block;
+            border: 1px solid #fde68a;
+        }
+
+        .success-box {
+            text-align: center;
+            padding: 20px 10px;
+            display: none;
+            animation: fadeIn .3s ease-out;
+        }
+
+        .success-id-badge {
+            background: #ecfdf5;
+            border: 2px dashed #10b981;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-family: monospace;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-title);
+            margin: 18px 0;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-copy {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-copy:hover { background: #a7f3d0; }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-note a {
+            color: var(--primary-dark);
+            font-weight: 700;
+            text-decoration: none;
+        }
+    </style>
 </head>
+
 <body>
-  <iframe src="https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec?page=signup"></iframe>
+    <div class="container">
+        <div class="glass-card">
+            <!-- Language Switcher -->
+            <div class="lang-switch" id="langSwitch">
+                <button type="button" class="lang-btn active" data-lang="th">ไทย</button>
+                <button type="button" class="lang-btn" data-lang="en">EN</button>
+                <button type="button" class="lang-btn" data-lang="zh">中文</button>
+            </div>
+
+            <!-- Form Section -->
+            <div id="signupFormSection">
+                <div class="header">
+                    <div class="header-badge" id="headerBadge">
+                        <span>✨ สมัครสมาชิกออนไลน์</span>
+                    </div>
+                    <h1 id="pageTitle">สมัครสมาชิกฟิตเนส</h1>
+                    <div class="sub" id="pageSub">กรอกข้อมูลเพื่อรับรหัสสมาชิกและโควตาสิทธิ์เข้าใช้งาน</div>
+                </div>
+
+                <!-- Membership Tier Selection -->
+                <div class="field-group">
+                    <label id="lblPackage">เลือกแพ็กเกจสมาชิกรายเดือน *</label>
+                    <div class="tier-grid">
+                        <div class="tier-card" data-type="รายเดือนนิสิต">
+                            <div class="tier-title">นิสิต</div>
+                            <div class="tier-price">150 <span class="tier-unit">บาท</span></div>
+                            <div class="tier-quota">30 ครั้ง/เดือน</div>
+                        </div>
+                        <div class="tier-card" data-type="รายเดือนบุคลากร">
+                            <div class="tier-title">บุคลากร</div>
+                            <div class="tier-price">200 <span class="tier-unit">บาท</span></div>
+                            <div class="tier-quota">30 ครั้ง/เดือน</div>
+                        </div>
+                        <div class="tier-card selected" data-type="รายเดือนบุคคลภายนอก">
+                            <div class="tier-title">บุคคลภายนอก</div>
+                            <div class="tier-price">300 <span class="tier-unit">บาท</span></div>
+                            <div class="tier-quota">30 ครั้ง/เดือน</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Digital Card Preview -->
+                <div class="card-preview">
+                    <div class="card-preview-header">
+                        <div class="card-preview-brand">FITNESS CENTER</div>
+                        <div class="card-preview-type" id="previewTier">บุคคลภายนอก (รายเดือน)</div>
+                    </div>
+                    <div class="card-preview-name" id="previewName">ชื่อ - นามสกุล</div>
+                    <div class="card-preview-sub" id="previewFaculty">บุคคลภายนอก</div>
+                    <div class="card-preview-footer">
+                        <div class="card-preview-id" id="previewMemberId">MB-26-XXXX</div>
+                        <div class="card-preview-quota" id="previewQuota">30 ครั้ง / เดือน</div>
+                    </div>
+                </div>
+
+                <!-- Form Inputs -->
+                <div class="field-group">
+                    <label id="lblName">ชื่อ - นามสกุล *</label>
+                    <input type="text" id="name" placeholder="เช่น สมชาย ใจดี" oninput="updateCardPreview()">
+                </div>
+
+                <!-- Faculty Selection -->
+                <div class="field-group" id="facultyGroup" style="display:none;">
+                    <label id="lblFaculty">คณะ / หน่วยงาน *</label>
+                    <div class="c-dropdown" id="facultyDropdown">
+                        <input type="hidden" id="faculty" value="">
+                        <button type="button" class="c-dropdown-btn">
+                            <span class="c-dropdown-label">-- เลือกคณะ / หน่วยงาน --</span>
+                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label id="lblPhone">เบอร์โทรศัพท์ *</label>
+                    <input type="tel" id="phone" placeholder="08xxxxxxxx" maxlength="10">
+                </div>
+
+                <!-- Age Range Dropdown -->
+                <div class="field-group">
+                    <label id="lblAgeRange">ช่วงอายุ *</label>
+                    <div class="c-dropdown" id="ageRangeDropdown">
+                        <input type="hidden" id="ageRange" value="">
+                        <button type="button" class="c-dropdown-btn">
+                            <span class="c-dropdown-label">-- เลือกช่วงอายุ --</span>
+                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="c-dropdown-menu">
+                            <div class="c-dropdown-item active" data-val="">-- เลือกช่วงอายุ --</div>
+                            <div class="c-dropdown-item" data-val="13-17">13-17 ปี</div>
+                            <div class="c-dropdown-item" data-val="18-22">18-22 ปี</div>
+                            <div class="c-dropdown-item" data-val="23-29">23-29 ปี</div>
+                            <div class="c-dropdown-item" data-val="30-39">30-39 ปี</div>
+                            <div class="c-dropdown-item" data-val="40-49">40-49 ปี</div>
+                            <div class="c-dropdown-item" data-val="50-59">50-59 ปี</div>
+                            <div class="c-dropdown-item" data-val="60 ปีขึ้นไป">60 ปีขึ้นไป</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Info Box -->
+                <div class="bank-info" id="bankInfoBox">
+                    <div class="bank-info-title" id="bankInfoTitle">โอนเงินค่าสมัครเข้าบัญชีนี้ ก่อนแนบสลิป</div>
+                    <div class="bank-info-text" id="bankInfoText"></div>
+                </div>
+
+                <!-- Slip Upload Box -->
+                <div class="field-group" style="margin-top:16px;">
+                    <label id="lblSlip">แนบสลิปการโอนเงินค่าสมัคร *</label>
+                    <div class="upload-box" onclick="document.getElementById('slipFile').click()">
+                        <div class="upload-label" id="uploadLabel">แตะเพื่อเลือกรูปสลิป</div>
+                        <img id="preview" style="display:none;" alt="slip preview">
+                        <input type="file" id="slipFile" accept="image/*">
+                    </div>
+                </div>
+
+                <button type="button" class="submit" id="submitBtn" onclick="doSignup()">
+                    <span>ยืนยันการสมัครสมาชิก</span>
+                </button>
+
+                <div class="msg" id="msgBox"></div>
+            </div>
+
+            <!-- Success Section -->
+            <div class="success-box" id="successBox">
+                <div style="width:52px;height:52px;background:#d1fae5;color:#059669;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h2 style="font-size:20px;color:var(--text-title);font-weight:800;" id="successTitle">สมัครสมาชิกสำเร็จเรียบร้อย!</h2>
+                <p style="font-size:13.5px;color:var(--text-muted);margin-top:4px;" id="successSub">กรุณาบันทึกรหัสสมาชิกเพื่อใช้ในการเช็คอินเข้าฟิตเนส</p>
+
+                <div class="success-id-badge">
+                    <span id="finalMemberId">MB-26-0001</span>
+                    <button type="button" class="btn-copy" id="btnCopy" onclick="copyMemberId()">คัดลอก</button>
+                </div>
+
+                <p style="font-size:13px;color:#065f46;font-weight:600;margin-bottom:18px;" id="finalMemberQuota">ได้รับสิทธิ์การใช้งาน 30 ครั้ง</p>
+
+                <a href="index.html" id="btnGoCheckin" style="display:inline-block;padding:12px 24px;background:var(--emerald-gradient);color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(16,185,129,0.3);">
+                    ไปที่หน้าเช็คอิน
+                </a>
+            </div>
+
+            <div class="footer-note" id="footerNote">
+                <span id="footerNoteText">มีรหัสสมาชิกแล้ว?</span> <a href="index.html" id="footerNoteLink">เช็คอินที่นี่</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ⚙️ กำหนด URL Web App ของ Google Apps Script
+        // ==========================================
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyXXXXXXXXXXXXX/exec";
+
+        // API Fetch Bridge
+        async function callApi(action, params = {}) {
+            const response = await fetch(GAS_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action, ...params })
+            });
+            return await response.json();
+        }
+
+        const TRANSLATIONS = {
+            th: {
+                pageTitle: 'สมัครสมาชิกฟิตเนส',
+                pageSub: 'กรอกข้อมูลเพื่อรับรหัสสมาชิกและโควตาสิทธิ์เข้าใช้งาน',
+                lblPackage: 'เลือกแพ็กเกจสมาชิกรายเดือน *',
+                lblName: 'ชื่อ - นามสกุล *', phName: 'เช่น สมชาย ใจดี',
+                lblFaculty: 'คณะ / หน่วยงาน *', phFaculty: '-- เลือกคณะ / หน่วยงาน --',
+                lblPhone: 'เบอร์โทรศัพท์ *', phPhone: '08xxxxxxxx',
+                lblAgeRange: 'ช่วงอายุ *', phAgeRange: '-- เลือกช่วงอายุ --',
+                bankTitle: 'โอนเงินค่าสมัครเข้าบัญชีนี้ ก่อนแนบสลิป',
+                bankAccNoPrefix: 'เลขบัญชี:', bankAccNamePrefix: 'ชื่อบัญชี:',
+                lblSlip: 'แนบสลิปการโอนเงินค่าสมัคร *',
+                uploadDefault: 'แตะเพื่อเลือกรูปสลิป',
+                uploadSelected: 'เลือกรูปแล้ว (แตะเพื่อเปลี่ยน)',
+                btnSubmit: 'ยืนยันการสมัครสมาชิก',
+                footerNote: 'มีรหัสสมาชิกแล้ว?', footerLink: 'เช็คอินที่นี่',
+                headerBadge: '✨ สมัครสมาชิกออนไลน์',
+                cardFacultyExt: 'บุคคลภายนอก',
+                cardFacultyDefault: 'ไม่ได้ระบุคณะ',
+                copiedAlert: 'คัดลอกรหัสสมาชิกแล้ว: '
+            },
+            en: {
+                pageTitle: 'Fitness Membership',
+                pageSub: 'Sign up to receive your Member ID and monthly quota',
+                lblPackage: 'Select Monthly Package *',
+                lblName: 'Full Name *', phName: 'e.g. John Doe',
+                lblFaculty: 'Faculty / Organization *', phFaculty: '-- Select Faculty / Org --',
+                lblPhone: 'Phone Number *', phPhone: '08xxxxxxxx',
+                lblAgeRange: 'Age Range *', phAgeRange: '-- Select Age Range --',
+                bankTitle: 'Please transfer fee before attaching slip',
+                bankAccNoPrefix: 'Account No:', bankAccNamePrefix: 'Account Name:',
+                lblSlip: 'Attach Payment Slip *',
+                uploadDefault: 'Tap to select slip photo',
+                uploadSelected: 'Photo selected (Tap to change)',
+                btnSubmit: 'Confirm Sign Up',
+                footerNote: 'Already a member?', footerLink: 'Check-in here',
+                headerBadge: '✨ Online Registration',
+                cardFacultyExt: 'General Public',
+                cardFacultyDefault: 'No Faculty Specified',
+                copiedAlert: 'Member ID copied: '
+            },
+            zh: {
+                pageTitle: '注册健身房会员',
+                pageSub: '填写信息以获取会员编号与月度额度',
+                lblPackage: '选择月卡套餐 *',
+                lblName: '姓名 *', phName: '例如：张三',
+                lblFaculty: '学院 / 单位 *', phFaculty: '-- 请选择学院 / 单位 --',
+                lblPhone: '电话号码 *', phPhone: '08xxxxxxxx',
+                lblAgeRange: '年龄段 *', phAgeRange: '-- 请选择年龄段 --',
+                bankTitle: '请转账会员费至此账户后上传凭证',
+                bankAccNoPrefix: '银行账号:', bankAccNamePrefix: '账户姓名:',
+                lblSlip: '上传付款凭证 *',
+                uploadDefault: '点击选择凭证图片',
+                uploadSelected: '已选择凭证 (点击更换)',
+                btnSubmit: '确认注册',
+                footerNote: '已有会员账号？', footerLink: '前往签到',
+                headerBadge: '✨ 在线会员注册',
+                cardFacultyExt: '校外人士',
+                cardFacultyDefault: '未指定学院',
+                copiedAlert: '已复制会员编号：'
+            }
+        };
+
+        const TIER_TRANSLATIONS = {
+            th: {
+                'รายเดือนนิสิต': { title: 'นิสิต', cardTier: 'นิสิต (รายเดือน)', unit: 'บาท', quota: '30 ครั้ง' },
+                'รายเดือนบุคลากร': { title: 'บุคลากร', cardTier: 'บุคลากร (รายเดือน)', unit: 'บาท', quota: '30 ครั้ง' },
+                'รายเดือนบุคคลภายนอก': { title: 'บุคคลภายนอก', cardTier: 'บุคคลภายนอก (รายเดือน)', unit: 'บาท', quota: '30 ครั้ง' }
+            },
+            en: {
+                'รายเดือนนิสิต': { title: 'Student', cardTier: 'Student Monthly', unit: 'THB', quota: '30 Times' },
+                'รายเดือนบุคลากร': { title: 'Staff', cardTier: 'Staff Monthly', unit: 'THB', quota: '30 Times' },
+                'รายเดือนบุคคลภายนอก': { title: 'General', cardTier: 'General Monthly', unit: 'THB', quota: '30 Times' }
+            },
+            zh: {
+                'รายเดือนนิสิต': { title: '学生', cardTier: '学生月卡', unit: '泰铢', quota: '30 次' },
+                'รายเดือนบุคลากร': { title: '教职工', cardTier: '教工月卡', unit: '泰铢', quota: '30 次' },
+                'รายเดือนบุคคลภายนอก': { title: '校外人士', cardTier: '校外月卡', unit: '泰铢', quota: '30 次' }
+            }
+        };
+
+        const AGE_RANGE_TRANSLATIONS = {
+            th: { '': '-- เลือกช่วงอายุ --', '13-17': '13-17 ปี', '18-22': '18-22 ปี', '23-29': '23-29 ปี', '30-39': '30-39 ปี', '40-49': '40-49 ปี', '50-59': '50-59 ปี', '60 ปีขึ้นไป': '60 ปีขึ้นไป' },
+            en: { '': '-- Select Age Range --', '13-17': '13-17 Years', '18-22': '18-22 Years', '23-29': '23-29 Years', '30-39': '30-39 Years', '40-49': '40-49 Years', '50-59': '50-59 Years', '60 ปีขึ้นไป': '60+ Years' },
+            zh: { '': '-- 请选择年龄段 --', '13-17': '13-17 岁', '18-22': '18-22 岁', '23-29': '23-29 岁', '30-39': '30-39 岁', '40-49': '40-49 岁', '50-59': '50-59 岁', '60 ปีขึ้นไป': '60 岁以上' }
+        };
+
+        let currentLang = 'th';
+        let selectedType = 'รายเดือนบุคคลภายนอก';
+        let monthlyPrices = { 'รายเดือนนิสิต': 150, 'รายเดือนบุคลากร': 200, 'รายเดือนบุคคลภายนอก': 300 };
+        let monthlyQuotas = { 'รายเดือนนิสิต': 30, 'รายเดือนบุคลากร': 30, 'รายเดือนบุคคลภายนอก': 30 };
+        let slipBase64 = '';
+        let slipMime = '';
+        let slipFilename = '';
+        let rawFacultiesList = [];
+        let bankInfoData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCustomDropdowns();
+            bindTierEvents();
+            bindSlipEvents();
+            loadPrices();
+            loadFaculties();
+            loadBankInfo();
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentLang = btn.dataset.lang;
+                    applyLanguage(currentLang);
+                });
+            });
+
+            document.getElementById('faculty').addEventListener('change', () => {
+                updateCardPreview();
+            });
+        });
+
+        function initCustomDropdowns() {
+            document.querySelectorAll('.c-dropdown').forEach(dd => {
+                const btn = dd.querySelector('.c-dropdown-btn');
+                const menu = dd.querySelector('.c-dropdown-menu');
+                const hiddenInput = dd.querySelector('input[type="hidden"]');
+                const label = dd.querySelector('.c-dropdown-label');
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dd.classList.contains('open');
+                    document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
+                    if (!isOpen) dd.classList.add('open');
+                });
+
+                menu.addEventListener('click', (e) => {
+                    const item = e.target.closest('.c-dropdown-item');
+                    if (!item) return;
+                    e.stopPropagation();
+
+                    menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    const val = item.dataset.val !== undefined ? item.dataset.val : '';
+                    hiddenInput.value = val;
+                    label.textContent = item.textContent.trim();
+
+                    dd.classList.remove('open');
+                    hiddenInput.dispatchEvent(new Event('change'));
+                });
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
+            });
+        }
+
+        function setDropdownValue(ddId, val) {
+            const dd = document.getElementById(ddId);
+            if (!dd) return;
+            const input = dd.querySelector('input[type="hidden"]');
+            const label = dd.querySelector('.c-dropdown-label');
+            const items = dd.querySelectorAll('.c-dropdown-item');
+
+            let matched = false;
+            items.forEach(item => {
+                if (item.dataset.val === String(val)) {
+                    item.classList.add('active');
+                    label.textContent = item.textContent.trim();
+                    input.value = val;
+                    matched = true;
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            if (!matched && items.length > 0) {
+                items[0].classList.add('active');
+                label.textContent = items[0].textContent.trim();
+                input.value = items[0].dataset.val || '';
+            }
+        }
+
+        function setDropdownOptions(ddId, options, selectedVal) {
+            const dd = document.getElementById(ddId);
+            if (!dd) return;
+            const menu = dd.querySelector('.c-dropdown-menu');
+            menu.innerHTML = '';
+
+            options.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'c-dropdown-item';
+                div.dataset.val = opt.val;
+                div.textContent = opt.text;
+                menu.appendChild(div);
+            });
+
+            setDropdownValue(ddId, selectedVal !== undefined ? selectedVal : (options[0] ? options[0].val : ''));
+        }
+
+        function renderTierOptions() {
+            const trans = TIER_TRANSLATIONS[currentLang] || TIER_TRANSLATIONS.th;
+            document.querySelectorAll('.tier-card').forEach(card => {
+                const type = card.dataset.type;
+                if (type && trans[type]) {
+                    const t = trans[type];
+                    const p = monthlyPrices[type] !== undefined ? monthlyPrices[type] : '';
+                    const q = monthlyQuotas[type] !== undefined ? monthlyQuotas[type] : 30;
+
+                    card.querySelector('.tier-title').textContent = t.title;
+                    card.querySelector('.tier-price').innerHTML = `${p} <span class="tier-unit">${t.unit}</span>`;
+                    card.querySelector('.tier-quota').textContent = `${q} ${t.quota}` + (currentLang === 'zh' ? ' / 月' : currentLang === 'en' ? ' / Month' : '/เดือน');
+                }
+            });
+        }
+
+        function renderAgeRangeOptions() {
+            const ageTrans = AGE_RANGE_TRANSLATIONS[currentLang] || AGE_RANGE_TRANSLATIONS.th;
+            const currentVal = document.getElementById('ageRange').value;
+            const items = Object.keys(ageTrans).map(key => ({
+                val: key,
+                text: ageTrans[key]
+            }));
+            setDropdownOptions('ageRangeDropdown', items, currentVal);
+        }
+
+        function renderFacultyOptions() {
+            const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+            const currentVal = document.getElementById('faculty').value;
+
+            const items = [{ val: '', text: t.phFaculty }];
+            rawFacultiesList.forEach(item => {
+                const thName = item.th || (typeof item === 'string' ? item : '');
+                const enName = item.en || thName;
+
+                let displayText = thName;
+                if (currentLang === 'en') displayText = enName;
+                else if (currentLang === 'zh') displayText = `${enName} (${thName})`;
+
+                items.push({ val: thName, text: displayText });
+            });
+
+            setDropdownOptions('facultyDropdown', items, currentVal);
+        }
+
+        function renderBankInfo() {
+            if (!bankInfoData) return;
+            const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+            document.getElementById('bankInfoText').innerHTML =
+                `<div><strong>ธนาคาร:</strong> ${bankInfoData.bankName || ''}</div>` +
+                `<div>${t.bankAccNoPrefix} <span class="acc-number">${bankInfoData.accountNumber || ''}</span></div>` +
+                `<div>${t.bankAccNamePrefix} <strong>${bankInfoData.accountName || ''}</strong></div>`;
+        }
+
+        function applyLanguage(lang) {
+            const t = TRANSLATIONS[lang] || TRANSLATIONS.th;
+            document.getElementById('headerBadge').querySelector('span').textContent = t.headerBadge;
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('pageSub').textContent = t.pageSub;
+            document.getElementById('lblPackage').textContent = t.lblPackage;
+            document.getElementById('lblName').textContent = t.lblName;
+            document.getElementById('name').placeholder = t.phName;
+            document.getElementById('lblFaculty').textContent = t.lblFaculty;
+            document.getElementById('lblPhone').textContent = t.lblPhone;
+            document.getElementById('phone').placeholder = t.phPhone;
+            document.getElementById('lblAgeRange').textContent = t.lblAgeRange;
+            document.getElementById('bankInfoTitle').textContent = t.bankTitle;
+            document.getElementById('lblSlip').textContent = t.lblSlip;
+            document.getElementById('submitBtn').innerHTML = '<span>' + t.btnSubmit + '</span>';
+            document.getElementById('footerNoteText').textContent = t.footerNote;
+            document.getElementById('footerNoteLink').textContent = t.footerLink;
+
+            const uploadLbl = document.getElementById('uploadLabel');
+            if (!slipBase64) {
+                if (uploadLbl) uploadLbl.textContent = t.uploadDefault;
+            }
+
+            renderTierOptions();
+            renderAgeRangeOptions();
+            renderFacultyOptions();
+            renderBankInfo();
+            updateCardPreview();
+        }
+
+        async function loadFaculties() {
+            try {
+                const list = await callApi('getFaculties');
+                rawFacultiesList = list || [];
+                renderFacultyOptions();
+            } catch (err) {
+                console.error("loadFaculties error:", err);
+            }
+        }
+
+        async function loadPrices() {
+            try {
+                const prices = await callApi('getMonthlyPrices');
+                if (prices) {
+                    for (const k in prices) monthlyPrices[k] = Number(prices[k]);
+                    renderTierOptions();
+                }
+                const quotas = await callApi('getPublicQuotas');
+                if (quotas) {
+                    for (const k in quotas) monthlyQuotas[k] = Number(quotas[k]);
+                    renderTierOptions();
+                }
+            } catch (err) {
+                console.error("loadPrices error:", err);
+            }
+        }
+
+        async function loadBankInfo() {
+            try {
+                const info = await callApi('getBankInfo');
+                if (info && info.accountNumber) {
+                    bankInfoData = info;
+                    renderBankInfo();
+                }
+            } catch (err) {
+                console.error("loadBankInfo error:", err);
+            }
+        }
+
+        function bindTierEvents() {
+            document.querySelectorAll('.tier-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedType = card.dataset.type;
+                    updateCardPreview();
+                });
+            });
+        }
+
+        function updateCardPreview() {
+            const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+            const name = document.getElementById('name').value.trim() || t.lblName.replace(' *', '');
+            const facultyGroup = document.getElementById('facultyGroup');
+            const isExternal = (selectedType === 'รายเดือนบุคคลภายนอก');
+
+            if (isExternal) {
+                facultyGroup.style.display = 'none';
+                setDropdownValue('facultyDropdown', '');
+            } else {
+                facultyGroup.style.display = 'block';
+            }
+
+            const faculty = isExternal ? t.cardFacultyExt : (document.getElementById('faculty').value || t.cardFacultyDefault);
+            const tierTrans = TIER_TRANSLATIONS[currentLang] || TIER_TRANSLATIONS.th;
+
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewFaculty').textContent = faculty;
+            document.getElementById('previewTier').textContent = (tierTrans[selectedType] && tierTrans[selectedType].cardTier) || selectedType;
+            document.getElementById('previewQuota').textContent = (tierTrans[selectedType] ? tierTrans[selectedType].quota : '30 ครั้ง') + (currentLang === 'zh' ? ' / 月' : currentLang === 'en' ? ' / Month' : ' / เดือน');
+        }
+
+        function bindSlipEvents() {
+            const fileInput = document.getElementById('slipFile');
+            const preview = document.getElementById('preview');
+            const uploadLabel = document.getElementById('uploadLabel');
+
+            fileInput.addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = evt => {
+                    const dataUrl = evt.target.result;
+                    preview.src = dataUrl;
+                    preview.style.display = 'block';
+                    uploadLabel.textContent = (TRANSLATIONS[currentLang] || TRANSLATIONS.th).uploadSelected;
+
+                    const commaIdx = dataUrl.indexOf(',');
+                    slipBase64 = dataUrl.slice(commaIdx + 1);
+                    slipMime = file.type;
+                    slipFilename = file.name;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function doSignup() {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const ageRange = document.getElementById('ageRange').value;
+            const isExternal = (selectedType === 'รายเดือนบุคคลภายนอก');
+            let faculty = isExternal ? 'บุคคลภายนอก' : document.getElementById('faculty').value;
+
+            if (!name) { showMsg('กรุณากรอกชื่อ - นามสกุล', 'warn'); return; }
+            if (!isExternal && !faculty) { showMsg('กรุณาเลือกคณะ / หน่วยงาน', 'warn'); return; }
+            if (!phone) { showMsg('กรุณากรอกเบอร์โทรศัพท์', 'warn'); return; }
+            if (!ageRange) { showMsg('กรุณาเลือกช่วงอายุ', 'warn'); return; }
+            if (!slipBase64) { showMsg('กรุณาแนบสลิปการโอนเงินค่าสมัคร', 'warn'); return; }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> ' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '...';
+
+            const payload = {
+                name: name,
+                faculty: faculty,
+                phone: phone,
+                ageRange: ageRange,
+                type: selectedType,
+                slipBase64: slipBase64,
+                slipMime: slipMime,
+                slipFilename: slipFilename
+            };
+
+            try {
+                const res = await callApi('submitSignup', { data: payload });
+                btn.disabled = false;
+                btn.innerHTML = '<span>' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '</span>';
+
+                if (res && res.status === 'ok') {
+                    document.getElementById('signupFormSection').style.display = 'none';
+                    document.getElementById('successBox').style.display = 'block';
+                    document.getElementById('finalMemberId').textContent = res.memberId;
+                    document.getElementById('previewMemberId').textContent = res.memberId;
+                    document.getElementById('finalMemberQuota').textContent = `ได้รับสิทธิ์การใช้งาน ${res.totalLimit} ครั้ง (สิทธิ์คงเหลือ: ${res.remaining} ครั้ง)`;
+                } else {
+                    showMsg(res.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก', 'err');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<span>' + ((TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit) + '</span>';
+                showMsg('เกิดข้อผิดพลาด: ' + err.message, 'err');
+            }
+        }
+
+        function copyMemberId() {
+            const id = document.getElementById('finalMemberId').textContent;
+            const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+            navigator.clipboard.writeText(id).then(() => {
+                alert(t.copiedAlert + id);
+            }).catch(() => {
+                prompt(t.copiedAlert, id);
+            });
+        }
+
+        function showMsg(text, type) {
+            const box = document.getElementById('msgBox');
+            box.textContent = text;
+            box.className = 'msg ' + type;
+            box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
 </body>
+
 </html>
