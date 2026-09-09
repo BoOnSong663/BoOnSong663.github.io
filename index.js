@@ -3,7 +3,7 @@ export default {
     const url = new URL(request.url);
     let path = url.pathname;
 
-    // จัดการชื่อหน้าให้อัตโนมัติ (เข้าด้วย /admin หรือ /admin.html ก็ได้)
+    // จัดการชื่อหน้าให้อัตโนมัติ
     if (path === '/' || path === '/index' || path === '/customer.html') {
       path = '/index.html';
     } else if (path === '/signup') {
@@ -12,8 +12,8 @@ export default {
       path = '/admin.html';
     }
 
-    // ดึงไฟล์ HTML จาก GitHub ตาม Path ที่เรียก
-    const githubUrl = `https://raw.githubusercontent.com/BoOnSong663/fitness/main${path}`;
+    // ลิงก์ดึงไฟล์จาก GitHub Repo: BoOnSong663.github.io
+    const githubUrl = `https://raw.githubusercontent.com/BoOnSong663/BoOnSong663.github.io/main${path}`;
     const res = await fetch(githubUrl);
 
     if (!res.ok) {
