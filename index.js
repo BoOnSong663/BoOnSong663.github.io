@@ -12,12 +12,17 @@ export default {
       path = '/admin.html';
     }
 
-    // ลิงก์ดึงไฟล์จาก GitHub Repo: BoOnSong663.github.io
+    // ลิงก์ดึงไฟล์จาก GitHub Repo: BoOnSong663.github.io พร้อม Cloudflare Edge Cache
     const githubUrl = `https://raw.githubusercontent.com/BoOnSong663/BoOnSong663.github.io/main${path}`;
-    const res = await fetch(githubUrl);
+    const res = await fetch(githubUrl, {
+      cf: {
+        cacheTtl: 120,
+        cacheEverything: true
+      }
+    });
 
     if (!res.ok) {
-      return new Response(`ไม่พบหน้านี้ (404 Not Found): ${path}`, { 
+      return new Response(`ไม่พบหน้านี้ (404 Not Found): ${path}`, {
         status: 404,
         headers: { "content-type": "text/html;charset=UTF-8" }
       });
@@ -27,6 +32,7 @@ export default {
     return new Response(html, {
       headers: {
         "content-type": "text/html;charset=UTF-8",
+        "cache-control": "public, max-age=60, s-maxage=120",
       },
     });
   }
