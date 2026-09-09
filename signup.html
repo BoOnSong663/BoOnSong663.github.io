@@ -843,7 +843,7 @@
         // ==========================================
         // ⚙️ กำหนด URL Web App ของ Google Apps Script
         // ==========================================
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyXXXXXXXXXXXXX/exec";
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
 
         // Universal Google Apps Script Runner Bridge for Cloudflare
         const google = {
@@ -1315,7 +1315,7 @@
 
             const faculty = isExternal ? t.cardFacultyExt : (document.getElementById('faculty').value || t.cardFacultyDefault);
             const tierTrans = TIER_TRANSLATIONS[currentLang] || TIER_TRANSLATIONS.th;
-            const quota = monthlyQuotas[selectedType] !== undefined ? monthlyQuotas[selectedType] : 30;
+            const quota = (monthlyQuotas && monthlyQuotas[selectedType] !== undefined) ? monthlyQuotas[selectedType] : 30;
             const quotaUnit = (tierTrans[selectedType] && tierTrans[selectedType].quotaUnit) || 'ครั้ง';
             const perMonth = (currentLang === 'zh' ? ' / 月' : currentLang === 'en' ? ' / Month' : ' / เดือน');
 
