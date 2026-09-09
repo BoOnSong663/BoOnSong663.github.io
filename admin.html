@@ -2,15 +2,19 @@
 <html lang="th">
 
 <head>
+    <base target="_top">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>ระบบจัดการหลังบ้าน - Fitness Counter Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>ระบบจัดการหลังบ้าน - เคาน์เตอร์ฟิตเนส</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js & SheetJS (Excel) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -27,7 +31,7 @@
             --emerald-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
             --text-title: #064e3b;
             --text-main: #1f2937;
-            --text-muted: #6b7280;
+            --text-muted: #64748b;
             --border-color: #e2e8f0;
             --border-focus: #10b981;
             --radius-lg: 18px;
@@ -38,10 +42,25 @@
             --shadow-pop: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+        /* ================= GLOBAL CUSTOM SCROLLBAR ================= */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a7f3d0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
 
         body {
             font-family: 'Prompt', 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -51,6 +70,7 @@
             line-height: 1.5;
         }
 
+        /* ================= LOGIN SCREEN ================= */
         #loginScreen {
             min-height: 100vh;
             display: flex;
@@ -66,7 +86,7 @@
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 380px;
+            max-width: 360px;
             text-align: center;
             position: relative;
             animation: fadeIn .3s ease-out;
@@ -144,14 +164,15 @@
             min-height: 18px;
         }
 
+        /* ================= DASHBOARD SCREEN ================= */
         #dashScreen {
             display: none;
             max-width: 1200px;
             margin: 0 auto;
-            padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(60px + env(safe-area-inset-bottom, 0px));
-            width: 100%;
+            padding: 20px 16px 60px;
         }
 
+        /* Topbar */
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -181,171 +202,203 @@
         .topbar-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
+        }
+
+        /* Auto-Refresh Control Pill */
+        .auto-refresh-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #334155;
+            position: relative;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 1.8s infinite;
+        }
+
+        .pulse-dot.paused {
+            background: #94a3b8;
+            animation: none;
+            box-shadow: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
         }
 
         .btn-view-site {
-            text-decoration: none;
             font-size: 13px;
             font-weight: 700;
             color: var(--primary-dark);
-            padding: 8px 14px;
-            border-radius: var(--radius-sm);
+            text-decoration: none;
+            padding: 6px 12px;
             background: var(--primary-bg);
-            border: 1px solid #a7f3d0;
-            transition: all .2s;
+            border-radius: var(--radius-sm);
         }
-
-        .btn-view-site:hover { background: #d1fae5; }
 
         .btn-logout {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            padding: 8px 14px;
-            border-radius: var(--radius-sm);
             font-size: 13px;
+            color: #dc2626;
             font-weight: 700;
             cursor: pointer;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            background: #fee2e2;
+            border: none;
             font-family: inherit;
-            transition: all .2s;
         }
 
-        .btn-logout:hover { background: #fecaca; }
-
+        /* Navigation Tabs */
         .tabs {
             display: flex;
-            gap: 6px;
-            background: #fff;
-            padding: 6px;
-            border-radius: var(--radius-md);
+            gap: 8px;
             margin-bottom: 20px;
-            border: 1px solid var(--border-color);
             overflow-x: auto;
-            box-shadow: var(--shadow-card);
+            padding-bottom: 4px;
         }
 
         .tab-btn {
-            border: none;
-            background: transparent;
             padding: 10px 18px;
-            border-radius: var(--radius-sm);
-            font-family: inherit;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: #fff;
+            cursor: pointer;
             font-size: 13.5px;
             font-weight: 700;
-            color: #64748b;
-            cursor: pointer;
-            white-space: nowrap;
+            color: #475569;
             transition: all .2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
         }
 
-        .tab-btn.active {
+        .tab-btn:hover {
+            border-color: #a7f3d0;
             background: var(--primary-bg);
             color: var(--primary-dark);
         }
 
-        .panel { display: none; animation: fadeIn .2s ease-out; }
-        .panel.active { display: block; }
+        .tab-btn.active {
+            background: var(--emerald-gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+        }
 
+        .panel {
+            display: none;
+            animation: fadeIn .25s ease-out;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Filter Bars */
         .filters {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            margin-bottom: 20px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
-            background: #fff;
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card);
-            align-items: center;
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: var(--radius-md);
+            align-items: flex-end;
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow-card);
         }
 
-        .stat-val {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--text-title);
-            margin-top: 4px;
+        .fld {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 130px;
+            position: relative;
         }
 
-        .stat-lbl {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .table-card {
-            background: #fff;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13.5px;
-        }
-
-        th {
-            background: #f8fafc;
-            padding: 12px 16px;
+        .fld label {
+            font-size: 12px;
             font-weight: 700;
             color: #475569;
-            border-bottom: 1.5px solid var(--border-color);
-            white-space: nowrap;
         }
 
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #334155;
-            white-space: nowrap;
-        }
-
-        tr:hover td { background: #f8fafc; }
-
-        .btn-action {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12.5px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
+        .fld input,
+        .fld input[type="text"],
+        .fld input[type="tel"],
+        .fld input[type="number"],
+        .fld input[type="password"] {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-color);
+            font-size: 13.5px;
             font-family: inherit;
+            background: #f8fafc;
+            color: var(--text-main);
+            height: 38px;
+            box-sizing: border-box;
+            transition: all .2s ease;
         }
 
-        .btn-action.edit { background: #dbeafe; color: #1e40af; }
-        .btn-action.del { background: #fee2e2; color: #991b1b; }
-        .btn-action.add { background: var(--emerald-gradient); color: #fff; }
+        .fld input:focus,
+        .fld input[type="text"]:focus,
+        .fld input[type="tel"]:focus,
+        .fld input[type="number"]:focus,
+        .fld input[type="password"]:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
 
+        /* ========================================================
+           CUSTOM DROPDOWN & CUSTOM DATEPICKER STYLES
+           ======================================================== */
         .c-dropdown {
             position: relative;
             user-select: none;
-            min-width: 150px;
+            width: 100%;
         }
 
         .c-dropdown-btn {
@@ -354,8 +407,9 @@
             justify-content: space-between;
             gap: 8px;
             width: 100%;
-            padding: 9px 12px;
-            background: #fff;
+            height: 38px;
+            padding: 8px 12px;
+            background: #f8fafc;
             border: 1.5px solid var(--border-color);
             border-radius: var(--radius-sm);
             font-size: 13.5px;
@@ -363,37 +417,730 @@
             color: var(--text-main);
             font-weight: 600;
             cursor: pointer;
+            transition: all .2s ease;
+            white-space: nowrap;
+        }
+
+        .c-dropdown-btn:hover {
+            border-color: #cbd5e1;
+            background: #fff;
+        }
+
+        .c-dropdown.open .c-dropdown-btn {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .c-dropdown-arrow {
+            width: 14px;
+            height: 14px;
+            color: #64748b;
+            transition: transform .2s ease;
+            flex-shrink: 0;
+        }
+
+        .c-dropdown.open .c-dropdown-arrow {
+            transform: rotate(180deg);
+            color: var(--primary-dark);
         }
 
         .c-dropdown-menu {
             position: absolute;
-            top: calc(100% + 4px);
+            top: calc(100% + 5px);
             left: 0;
             min-width: 100%;
-            max-height: 220px;
+            width: max-content;
+            max-width: 320px;
+            max-height: 260px;
             overflow-y: auto;
             background: #ffffff;
             border: 1.5px solid #d1fae5;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius-md);
             box-shadow: var(--shadow-pop);
-            z-index: 300;
-            padding: 4px;
+            z-index: 250;
+            padding: 6px;
             display: none;
+            animation: dropFade .18s ease-out;
         }
 
-        .c-dropdown.open .c-dropdown-menu { display: block; }
+        /* Slim Emerald Scrollbar on Dropdowns */
+        .c-dropdown-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-thumb {
+            background: #a7f3d0;
+            border-radius: 4px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+
+        @keyframes dropFade {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .c-dropdown.open .c-dropdown-menu {
+            display: block;
+        }
 
         .c-dropdown-item {
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
             font-weight: 600;
+            color: #334155;
             cursor: pointer;
+            transition: all .15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .c-dropdown-item:hover {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+        }
+
+        .c-dropdown-item.active {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        .c-dropdown-item.active::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* Pill Dropdown Variation */
+        .c-dropdown-pill .c-dropdown-btn {
+            border: none;
+            background: transparent;
+            padding: 0 4px;
+            height: auto;
+            font-size: 12.5px;
+            color: var(--text-title);
+            font-weight: 700;
+        }
+
+        .c-dropdown-pill.open .c-dropdown-btn {
+            box-shadow: none;
+        }
+
+        /* Custom Datepicker */
+        .c-datepicker {
+            position: relative;
+            user-select: none;
+            width: 100%;
+        }
+
+        .c-datepicker-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            height: 38px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-family: inherit;
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .c-datepicker-btn:hover {
+            border-color: #cbd5e1;
+            background: #fff;
+        }
+
+        .c-datepicker.open .c-datepicker-btn {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .c-calendar-pop {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 280px;
+            background: #fff;
+            border: 1.5px solid #d1fae5;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-pop);
+            z-index: 260;
+            padding: 14px;
+            display: none;
+            animation: dropFade .18s ease-out;
+        }
+
+        .c-datepicker.open .c-calendar-pop {
+            display: block;
+        }
+
+        .cal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .cal-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+
+        .cal-nav-btn {
+            background: #f1f5f9;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            transition: all .15s;
+        }
+
+        .cal-nav-btn:hover {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+        }
+
+        .cal-grid-head {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .cal-grid-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .cal-day {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .cal-day:hover:not(.empty) {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+        }
+
+        .cal-day.today {
+            border: 1.5px solid var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .cal-day.selected {
+            background: var(--emerald-gradient) !important;
+            color: #fff !important;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+        }
+
+        .cal-day.empty {
+            cursor: default;
+        }
+
+        .cal-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .cal-quick-btn {
+            background: transparent;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .cal-quick-btn:hover {
+            background: var(--primary-bg);
+        }
+
+        .cal-quick-btn.clear {
+            color: #94a3b8;
+        }
+
+        .cal-quick-btn.clear:hover {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: var(--emerald-gradient);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 38px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-color);
+            background: #fff;
+            color: #334155;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 38px;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-excel {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: #fff;
+            border: none;
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13.5px;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 38px;
+        }
+
+        .btn-excel:hover {
+            opacity: 0.95;
+        }
+
+        /* Stat Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card .label {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-title);
+            margin-top: 6px;
+        }
+
+        .stat-card .subtext {
+            font-size: 12px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Tables & Data Wrappers */
+        .table-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .table-header-bar {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-title);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 1.5px solid var(--border-color);
+        }
+
+        th {
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 700;
+            color: #475569;
             white-space: nowrap;
         }
 
-        .c-dropdown-item:hover { background: var(--primary-bg); color: var(--primary-dark); }
-        .c-dropdown-item.active { background: var(--primary-bg); color: var(--primary-dark); font-weight: 700; }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge.orange {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .badge.purple {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .badge.red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.gray {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .quota-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 12px;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .quota-pill.empty {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: all .15s;
+        }
+
+        .action-btn.edit {
+            color: var(--primary-dark);
+            background: #ecfdf5;
+        }
+
+        .action-btn.add-quota {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .action-btn.delete {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        /* Settings Cards */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .settings-box {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+        }
+
+        .settings-box h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-title);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-box label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #374151;
+            margin: 12px 0 5px;
+        }
+
+        .settings-box input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-color);
+            font-size: 14px;
+            font-family: inherit;
+            background: #f8fafc;
+        }
+
+        .settings-box input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: #fff;
+        }
+
+        .settings-box .hint {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* Faculty Chip Manager */
+        .faculty-chips {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 0;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .faculty-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .faculty-chip .btn-del-chip {
+            cursor: pointer;
+            color: #94a3b8;
+            font-weight: 800;
+            font-size: 16px;
+            line-height: 1;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .faculty-chip .btn-del-chip:hover {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .add-faculty-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Modal dialogs */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 16px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn .2s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-head h3 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-title);
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
 
         .spinner {
             display: inline-block;
@@ -405,36 +1152,114 @@
             animation: spin .7s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Floating Toast Alert */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast-item {
+            background: #064e3b;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideUp .3s ease-out;
+            pointer-events: auto;
+            border: 1px solid #10b981;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Login Screen -->
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============ LOGIN SCREEN ============ -->
     <div id="loginScreen">
         <div class="login-card">
             <div class="login-icon">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
             </div>
             <h2>ระบบจัดการหลังบ้าน</h2>
-            <p>เคาน์เตอร์ฟิตเนส - ผู้ดูแลระบบ</p>
-            <input type="password" id="pwInput" placeholder="กรอกรหัสผ่านแอดมิน" onkeydown="if(event.key==='Enter') doLogin()">
-            <button type="button" onclick="doLogin()">เข้าสู่ระบบ</button>
+            <p>เคาน์เตอร์ฟิตเนส Fitness Center</p>
+            <input type="password" id="pwInput" placeholder="รหัสผ่านแอดมิน"
+                onkeydown="if(event.key==='Enter')doLogin()">
+            <button id="loginBtn" onclick="doLogin()">เข้าสู่ระบบ</button>
             <div class="login-err" id="loginErr"></div>
         </div>
     </div>
 
-    <!-- Dashboard Screen -->
+    <!-- ============ MAIN DASHBOARD ============ -->
     <div id="dashScreen">
         <header class="topbar">
             <div class="topbar-brand">
-                <div class="brand-title">⚙️ ระบบจัดการหลังบ้านฟิตเนส</div>
+                <span class="brand-title">ระบบจัดการหลังบ้านฟิตเนส</span>
             </div>
             <div class="topbar-actions">
+                <!-- Auto Refresh Control Pill with Custom Select -->
+                <div class="auto-refresh-control" id="autoRefreshPill">
+                    <span class="pulse-dot" id="refreshDot"></span>
+                    <span>อัปเดตอัตโนมัติ:</span>
+                    <div class="c-dropdown c-dropdown-pill" id="autoRefreshDropdown">
+                        <input type="hidden" id="autoRefreshInterval" value="10">
+                        <button type="button" class="c-dropdown-btn">
+                            <span class="c-dropdown-label">ทุก 10 วินาที</span>
+                            <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="c-dropdown-menu">
+                            <div class="c-dropdown-item active" data-val="10">ทุก 10 วินาที</div>
+                            <div class="c-dropdown-item" data-val="15">ทุก 15 วินาที</div>
+                            <div class="c-dropdown-item" data-val="30">ทุก 30 วินาที</div>
+                            <div class="c-dropdown-item" data-val="60">ทุก 1 นาที</div>
+                            <div class="c-dropdown-item" data-val="0">ปิดอัปเดตอัตโนมัติ</div>
+                        </div>
+                    </div>
+                </div>
                 <a class="btn-view-site" href="index.html" target="_blank">หน้าเช็คอิน</a>
                 <a class="btn-view-site" href="signup.html" target="_blank">หน้าสมัคร</a>
                 <button class="btn-logout" onclick="doLogout()">ออกจากระบบ</button>
@@ -452,161 +1277,973 @@
 
         <!-- ================= TAB 1: DASHBOARD ================= -->
         <div class="panel active" id="dashTab">
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <div class="stat-lbl">จำนวนการเช็คอินทั้งหมด</div>
-                    <div class="stat-val" id="dTotalCount">0</div>
+            <div class="filters">
+                <div class="fld">
+                    <label>ปี</label>
+                    <div class="c-dropdown" id="dYearDropdown">
+                        <input type="hidden" id="dYear" value="2026">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">2026</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">ยอดรายรับทั้งหมด</div>
-                    <div class="stat-val" id="dTotalRev">0 ฿</div>
+                <div class="fld">
+                    <label>มุมมอง</label>
+                    <div class="c-dropdown" id="dScopeDropdown">
+                        <input type="hidden" id="dScope" value="day">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">รายวัน</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu">
+                            <div class="c-dropdown-item active" data-val="day">รายวัน</div>
+                            <div class="c-dropdown-item" data-val="month">รายเดือน</div>
+                            <div class="c-dropdown-item" data-val="year">ทั้งปี</div>
+                        </div>
+                    </div>
                 </div>
+                <div class="fld" id="dMonthWrap">
+                    <label>เดือน</label>
+                    <div class="c-dropdown" id="dMonthDropdown">
+                        <input type="hidden" id="dMonth" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ม.ค.</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+                <div class="fld" id="dDayWrap">
+                    <label>วันที่</label>
+                    <div class="c-datepicker" id="dDayPicker">
+                        <input type="hidden" id="dDay" value="">
+                        <button type="button" class="c-datepicker-btn"><span
+                                class="c-datepicker-label">เลือกวันที่</span><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg></button>
+                        <div class="c-calendar-pop"></div>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="loadDashboard()">โหลดข้อมูล</button>
+                <button class="btn-excel" onclick="quickExportToday()">ส่งออก Excel วันนี้</button>
             </div>
-            <div class="table-card" style="padding:20px;">
-                <h3 style="margin-bottom:14px;color:var(--text-title);">สถิติแยกตามประเภทผู้ใช้</h3>
-                <div id="dByTypeStats"></div>
+
+            <div class="cards" id="statCards"></div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:20px;">
+                <div class="table-card">
+                    <div class="table-header-bar">
+                        <div class="table-title">สรุปตามประเภทผู้ใช้บริการ</div>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="typeTable">
+                            <thead>
+                                <tr>
+                                    <th>ประเภท</th>
+                                    <th>จำนวนคน</th>
+                                    <th>รายได้ (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header-bar">
+                        <div class="table-title">สรุปตามช่วงอายุ</div>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="ageTable">
+                            <thead>
+                                <tr>
+                                    <th>ช่วงอายุ</th>
+                                    <th>จำนวนคน</th>
+                                    <th>รายได้ (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- ================= TAB 2: CHECKIN LIST ================= -->
+        <!-- ================= TAB 2: CHECK-IN LIST ================= -->
         <div class="panel" id="listTab">
             <div class="filters">
-                <input type="text" id="lSearch" placeholder="🔍 ค้นหาชื่อ/เบอร์/คณะ..." style="padding:8px 12px;border:1.5px solid var(--border-color);border-radius:var(--radius-sm);font-family:inherit;" oninput="loadEntries()">
-                <button class="btn-action add" onclick="loadEntries()">รีเฟรชข้อมูล</button>
+                <div class="fld">
+                    <label>ปี</label>
+                    <div class="c-dropdown" id="lYearDropdown">
+                        <input type="hidden" id="lYear" value="2026">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">2026</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+                <div class="fld">
+                    <label>เดือน</label>
+                    <div class="c-dropdown" id="lMonthDropdown">
+                        <input type="hidden" id="lMonth" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทั้งหมด</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+                <div class="fld">
+                    <label>วันที่</label>
+                    <div class="c-datepicker" id="lDayPicker">
+                        <input type="hidden" id="lDay" value="">
+                        <button type="button" class="c-datepicker-btn"><span
+                                class="c-datepicker-label">เลือกวันที่</span><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg></button>
+                        <div class="c-calendar-pop"></div>
+                    </div>
+                </div>
+                <div class="fld" style="min-width:160px;">
+                    <label>ประเภท</label>
+                    <div class="c-dropdown" id="lTypeDropdown">
+                        <input type="hidden" id="lType" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทั้งหมด</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu">
+                            <div class="c-dropdown-item active" data-val="">ทั้งหมด</div>
+                            <div class="c-dropdown-item" data-val="นิสิต">นิสิต</div>
+                            <div class="c-dropdown-item" data-val="บุคลากร">บุคลากร</div>
+                            <div class="c-dropdown-item" data-val="บุคคลทั่วไป">บุคคลทั่วไป</div>
+                            <div class="c-dropdown-item" data-val="นิสิตคณะวิทยาศาสตร์การกีฬา">นิสิตวิทย์กีฬา</div>
+                            <div class="c-dropdown-item" data-val="บุคลากรคณะวิทยาศาสตร์การกีฬา">บุคลากรวิทย์กีฬา</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนนิสิต">สมาชิก (นิสิต)</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนบุคลากร">สมาชิก (บุคลากร)</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนบุคคลภายนอก">สมาชิก (บุคคลภายนอก)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fld">
+                    <label>ช่วงอายุ</label>
+                    <div class="c-dropdown" id="lAgeRangeDropdown">
+                        <input type="hidden" id="lAgeRange" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทั้งหมด</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+                <div class="fld" style="flex:1;min-width:180px;"><label>ค้นหา (ชื่อ/เบอร์/คณะ/รหัสสมาชิก)</label><input
+                        type="text" id="lSearch" placeholder="พิมพ์คำค้นหา..."></div>
+                <button class="btn-primary" onclick="loadEntries()">ค้นหา</button>
+                <button class="btn-excel" onclick="exportEntriesToExcel()">ส่งออก Excel หน้านี้</button>
             </div>
+
             <div class="table-card">
-                <div class="table-responsive">
+                <div class="table-header-bar">
+                    <div class="table-title">รายการเช็คอิน <span id="entriesCount"
+                            style="font-size:13px;color:var(--text-muted);font-weight:600;"></span></div>
+                    <button class="btn-secondary" onclick="loadEntries()"
+                        style="padding:6px 12px;height:32px;font-size:12.5px;">รีเฟรช</button>
+                </div>
+                <div class="table-wrap">
                     <table id="entriesTable">
                         <thead>
                             <tr>
                                 <th>ลำดับ</th>
-                                <th>วัน-เวลา</th>
-                                <th>ชื่อ-นามสกุล</th>
+                                <th>วันที่-เวลา</th>
+                                <th>ชื่อ - นามสกุล</th>
+                                <th>ช่วงอายุ</th>
                                 <th>คณะ / หน่วยงาน</th>
                                 <th>เบอร์โทร</th>
                                 <th>ประเภท</th>
-                                <th>ค่าบริการ</th>
+                                <th>ราคา</th>
+                                <th>รหัสสมาชิก</th>
                                 <th>สลิป</th>
                                 <th>จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="entriesBody">
-                            <tr><td colspan="9" style="text-align:center;padding:20px;">กำลังโหลดข้อมูล...</td></tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ================= TAB 3: MEMBERS ================= -->
+        <!-- ================= TAB 3: MEMBER MANAGEMENT ================= -->
         <div class="panel" id="memberTab">
             <div class="filters">
-                <input type="text" id="mSearch" placeholder="🔍 ค้นหารหัสสมาชิก/ชื่อ/เบอร์..." style="padding:8px 12px;border:1.5px solid var(--border-color);border-radius:var(--radius-sm);font-family:inherit;" oninput="loadMembers()">
-                <button class="btn-action add" onclick="loadMembers()">รีเฟรชสมาชิก</button>
+                <div class="fld" style="flex:1;min-width:200px;">
+                    <label>ค้นหาสมาชิก (รหัสสมาชิก / ชื่อ / เบอร์โทร / คณะ)</label>
+                    <input type="text" id="mSearch" placeholder="พิมพ์คำค้นหา..." oninput="filterMembersTable()">
+                </div>
+                <div class="fld" style="min-width:180px;">
+                    <label>ประเภทสมาชิก</label>
+                    <div class="c-dropdown" id="mTypeFilterDropdown">
+                        <input type="hidden" id="mTypeFilter" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทั้งหมด</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu">
+                            <div class="c-dropdown-item active" data-val="">ทั้งหมด</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนนิสิต">รายเดือนนิสิต</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนบุคลากร">รายเดือนบุคลากร</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนบุคคลภายนอก">รายเดือนบุคคลภายนอก</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="openMemberModal(null)">+ เพิ่มสมาชิกใหม่</button>
+                <button class="btn-secondary" onclick="loadMembers()">รีเฟรช</button>
+                <button class="btn-excel" onclick="exportMembersToExcel()">ส่งออก Excel รายชื่อสมาชิก</button>
             </div>
+
             <div class="table-card">
-                <div class="table-responsive">
+                <div class="table-header-bar">
+                    <div class="table-title">รายชื่อสมาชิกทั้งหมด <span id="membersCount"
+                            style="font-size:13px;color:var(--text-muted);font-weight:600;"></span></div>
+                </div>
+                <div class="table-wrap">
                     <table id="membersTable">
                         <thead>
                             <tr>
                                 <th>รหัสสมาชิก</th>
-                                <th>ชื่อ-นามสกุล</th>
-                                <th>เบอร์โทร</th>
+                                <th>ชื่อ - นามสกุล</th>
                                 <th>คณะ / หน่วยงาน</th>
+                                <th>เบอร์โทร</th>
                                 <th>ประเภท</th>
-                                <th>โควตา</th>
-                                <th>ใช้ไป</th>
+                                <th>ใช้ไปแล้ว / สิทธิ์ทั้งหมด</th>
                                 <th>คงเหลือ</th>
                                 <th>วันที่สมัคร</th>
                                 <th>จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="membersBody">
-                            <tr><td colspan="10" style="text-align:center;padding:20px;">กำลังโหลดรายชื่อสมาชิก...</td></tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ================= TAB 4: EXPORT ================= -->
+        <!-- ================= TAB 4: EXPORT EXCEL ================= -->
         <div class="panel" id="exportTab">
-            <div class="table-card" style="padding:24px;">
-                <h3 style="margin-bottom:12px;color:var(--text-title);">ดาวน์โหลดรายงานข้อมูล Excel</h3>
-                <p style="color:var(--text-muted);font-size:13.5px;margin-bottom:18px;">ส่งออกข้อมูลรายการเช็คอินและข้อมูลสมาชิกเป็นไฟล์ Excel (.xlsx)</p>
-                <button class="btn-action add" onclick="exportToExcel()" style="padding:10px 20px;font-size:14px;">📊 ดาวน์โหลด Excel ทันที</button>
+            <div class="settings-box" style="max-width:560px;margin:0 auto;">
+                <h3>ส่งออกข้อมูลเป็นไฟล์ Excel (.xlsx) รายวัน / ช่วงเวลา</h3>
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+                    ส่งออกข้อมูลเช็คอินพร้อมคอลัมน์ <strong>ชื่อ, อายุ, คณะ, เบอร์โทร, ประเภท, ราคา, รหัสสมาชิก</strong>
+                    ในรูปแบบไฟล์ Excel (.xlsx) ที่เปิดใช้งานได้ทันที
+                </p>
+
+                <div class="fld" style="margin-bottom:14px;">
+                    <label>ปี</label>
+                    <div class="c-dropdown" id="expYearDropdown">
+                        <input type="hidden" id="expYear" value="2026">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">2026</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+                <div class="fld" style="margin-bottom:14px;">
+                    <label>ระบุวันที่ (สำหรับส่งออกรายวันเฉพาะวันนั้น)</label>
+                    <div class="c-datepicker" id="expDayPicker">
+                        <input type="hidden" id="expDay" value="">
+                        <button type="button" class="c-datepicker-btn"><span
+                                class="c-datepicker-label">เลือกวันที่</span><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg></button>
+                        <div class="c-calendar-pop"></div>
+                    </div>
+                </div>
+                <div class="fld" style="margin-bottom:14px;">
+                    <label>เดือน (หากต้องการส่งออกทั้งเดือน)</label>
+                    <div class="c-dropdown" id="expMonthDropdown">
+                        <input type="hidden" id="expMonth" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทุกเดือน</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu"></div>
+                    </div>
+                </div>
+                <div class="fld" style="margin-bottom:14px;">
+                    <label>ประเภทผู้ใช้บริการ</label>
+                    <div class="c-dropdown" id="expTypeDropdown">
+                        <input type="hidden" id="expType" value="">
+                        <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทั้งหมด</span><svg
+                                class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg></button>
+                        <div class="c-dropdown-menu">
+                            <div class="c-dropdown-item active" data-val="">ทั้งหมด</div>
+                            <div class="c-dropdown-item" data-val="นิสิต">นิสิต</div>
+                            <div class="c-dropdown-item" data-val="บุคลากร">บุคลากร</div>
+                            <div class="c-dropdown-item" data-val="บุคคลทั่วไป">บุคคลทั่วไป</div>
+                            <div class="c-dropdown-item" data-val="นิสิตคณะวิทยาศาสตร์การกีฬา">นิสิตวิทย์กีฬา</div>
+                            <div class="c-dropdown-item" data-val="บุคลากรคณะวิทยาศาสตร์การกีฬา">บุคลากรวิทย์กีฬา</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนนิสิต">สมาชิกรายเดือน (นิสิต)</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนบุคลากร">สมาชิกรายเดือน (บุคลากร)</div>
+                            <div class="c-dropdown-item" data-val="รายเดือนบุคคลภายนอก">สมาชิกรายเดือน (บุคคลภายนอก)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                    <button class="btn-excel" onclick="doExportExcel()" style="flex:1;justify-content:center;">
+                        ดาวน์โหลดไฟล์ Excel (.xlsx)
+                    </button>
+                    <button class="btn-secondary" onclick="doExportCSV()" style="flex:1;justify-content:center;">
+                        ดาวน์โหลด CSV
+                    </button>
+                </div>
+                <div id="expMsg" style="margin-top:12px;font-size:13px;font-weight:600;text-align:center;"></div>
             </div>
         </div>
 
         <!-- ================= TAB 5: SETTINGS ================= -->
         <div class="panel" id="settingsTab">
-            <div class="table-card" style="padding:24px;">
-                <h3 style="margin-bottom:14px;color:var(--text-title);">เปลี่ยนรหัสผ่านแอดมิน</h3>
-                <div style="max-width:320px;">
-                    <input type="password" id="newAdminPw" placeholder="รหัสผ่านใหม่" style="width:100%;padding:10px 12px;border:1.5px solid var(--border-color);border-radius:var(--radius-sm);margin-bottom:10px;font-family:inherit;">
-                    <button class="btn-action add" onclick="doChangePassword()">บันทึกรหัสผ่าน</button>
+            <div class="settings-grid">
+                <!-- Faculty Manager -->
+                <div class="settings-box">
+                    <h3>จัดการรายชื่อคณะ / หน่วยงาน (ไทย & อังกฤษ)</h3>
+                    <p style="font-size:12.5px;color:var(--text-muted);">
+                        รายชื่อคณะจะแสดงใน Dropdown ทั้งภาษาไทยและภาษาอังกฤษ
+                    </p>
+
+                    <div class="faculty-chips" id="facultyChipsContainer"></div>
+
+                    <div class="add-faculty-form">
+                        <input type="text" id="newFacultyThInput" placeholder="ชื่อคณะ (ภาษาไทย)">
+                        <input type="text" id="newFacultyEnInput" placeholder="Faculty Name (English)">
+                    </div>
+                    <button class="btn-primary" style="margin-top:8px;width:100%;justify-content:center;"
+                        onclick="addFacultyChip()">+ เพิ่มคณะใหม่</button>
+
+                    <button class="btn-primary"
+                        style="margin-top:14px;width:100%;justify-content:center;background:linear-gradient(135deg,#059669,#047857);"
+                        onclick="saveFacultiesToServer()">
+                        บันทึกรายชื่อคณะ
+                    </button>
+                    <div id="facultySaveMsg"
+                        style="margin-top:8px;font-size:12.5px;font-weight:700;color:var(--primary-dark);text-align:center;">
+                    </div>
+                </div>
+
+                <!-- Prices & Quotas -->
+                <div class="settings-box">
+                    <h3>ราคาและโควตาสมาชิกเริ่มต้น</h3>
+
+                    <label>ราคารายวัน: บุคคลทั่วไป (บาท)</label>
+                    <input type="number" id="priceExt">
+
+                    <label>ราคารายวัน: นิสิต (บาท)</label>
+                    <input type="number" id="priceStu">
+
+                    <label>ราคารายวัน: บุคลากร (บาท)</label>
+                    <input type="number" id="priceStaff">
+
+                    <h4 style="margin:16px 0 6px;color:var(--text-title);font-size:13.5px;">ค่าสมัคร &
+                        โควตาสมาชิกรายเดือน</h4>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label>สมัคร: นิสิต (บาท)</label>
+                            <input type="number" id="priceMonthlyStu">
+                        </div>
+                        <div>
+                            <label>โควตา (ครั้ง/รอบ)</label>
+                            <input type="number" id="quotaMonthlyStu">
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label>สมัคร: บุคลากร (บาท)</label>
+                            <input type="number" id="priceMonthlyStaff">
+                        </div>
+                        <div>
+                            <label>โควตา (ครั้ง/รอบ)</label>
+                            <input type="number" id="quotaMonthlyStaff">
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label>สมัคร: บุคคลภายนอก (บาท)</label>
+                            <input type="number" id="priceMonthlyExt">
+                        </div>
+                        <div>
+                            <label>โควตา (ครั้ง/รอบ)</label>
+                            <input type="number" id="quotaMonthlyExt">
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="margin-top:18px;width:100%;justify-content:center;"
+                        onclick="savePricesAndQuotas()">
+                        บันทึกราคาและโควตา
+                    </button>
+                    <div id="priceSaveMsg"
+                        style="margin-top:8px;font-size:12.5px;font-weight:700;color:var(--primary-dark);text-align:center;">
+                    </div>
+                </div>
+
+                <!-- Bank Info -->
+                <div class="settings-box">
+                    <h3>ข้อมูลบัญชีธนาคารสำหรับรับโอน</h3>
+                    <label>ชื่อธนาคาร</label>
+                    <input type="text" id="bankName" placeholder="เช่น ธนาคารกรุงไทย">
+
+                    <label>เลขที่บัญชี</label>
+                    <input type="text" id="bankAccountNumber" placeholder="เช่น 000-0-00000-0">
+                    <div class="hint">ระบบจะเก็บเลข 0 นำหน้าไว้เสมอ ไม่ถูกตัดทอน</div>
+
+                    <label>ชื่อบัญชี</label>
+                    <input type="text" id="bankAccountName" placeholder="ชื่อบัญชีฟิตเนส">
+
+                    <button class="btn-primary" style="margin-top:18px;width:100%;justify-content:center;"
+                        onclick="saveBankSettings()">
+                        บันทึกข้อมูลบัญชีธนาคาร
+                    </button>
+                    <div id="bankSaveMsg"
+                        style="margin-top:8px;font-size:12.5px;font-weight:700;color:var(--primary-dark);text-align:center;">
+                    </div>
+
+                    <hr style="margin:20px 0;border:none;border-top:1px solid var(--border-color);">
+
+                    <h3>เปลี่ยนรหัสผ่านหลังบ้าน</h3>
+                    <label>รหัสผ่านใหม่</label>
+                    <input type="password" id="newAdminPw" placeholder="กรอกรหัสผ่านใหม่">
+                    <button class="btn-secondary" style="margin-top:12px;width:100%;justify-content:center;"
+                        onclick="saveAdminPw()">
+                        บันทึกรหัสผ่านใหม่
+                    </button>
+                    <div id="pwSaveMsg"
+                        style="margin-top:8px;font-size:12.5px;font-weight:700;color:var(--primary-dark);text-align:center;">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ============ MEMBER ADD/EDIT MODAL ============ -->
+    <div class="modal-overlay" id="memberModal">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 id="modalMemberTitle">เพิ่มสมาชิกใหม่</h3>
+                <button class="modal-close" onclick="closeMemberModal()">✕</button>
+            </div>
+            <input type="hidden" id="modalMemberId">
+
+            <div class="fld" style="margin-bottom:14px;">
+                <label>ชื่อ - นามสกุล *</label>
+                <input type="text" id="modalName" placeholder="เช่น สมชาย ใจดี">
+            </div>
+
+            <div class="fld" style="margin-bottom:14px;">
+                <label>เบอร์โทรศัพท์ *</label>
+                <input type="tel" id="modalPhone" placeholder="08xxxxxxxx">
+            </div>
+
+            <div class="fld" style="margin-bottom:14px;">
+                <label>คณะ / หน่วยงาน</label>
+                <div class="c-dropdown" id="modalFacultyDropdown">
+                    <input type="hidden" id="modalFaculty" value="">
+                    <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">-- เลือกคณะ / หน่วยงาน
+                            --</span><svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg></button>
+                    <div class="c-dropdown-menu"></div>
+                </div>
+            </div>
+
+            <div class="fld" style="margin-bottom:14px;">
+                <label>ช่วงอายุ</label>
+                <div class="c-dropdown" id="modalAgeRangeDropdown">
+                    <input type="hidden" id="modalAgeRange" value="">
+                    <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">-- เลือกช่วงอายุ
+                            --</span><svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg></button>
+                    <div class="c-dropdown-menu">
+                        <div class="c-dropdown-item active" data-val="">-- เลือกช่วงอายุ --</div>
+                        <div class="c-dropdown-item" data-val="13-17">13-17 ปี</div>
+                        <div class="c-dropdown-item" data-val="18-22">18-22 ปี</div>
+                        <div class="c-dropdown-item" data-val="23-29">23-29 ปี</div>
+                        <div class="c-dropdown-item" data-val="30-39">30-39 ปี</div>
+                        <div class="c-dropdown-item" data-val="40-49">40-49 ปี</div>
+                        <div class="c-dropdown-item" data-val="50-59">50-59 ปี</div>
+                        <div class="c-dropdown-item" data-val="60 ปีขึ้นไป">60 ปีขึ้นไป</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fld" style="margin-bottom:14px;">
+                <label>ประเภทสมาชิก *</label>
+                <div class="c-dropdown" id="modalTypeDropdown">
+                    <input type="hidden" id="modalType" value="รายเดือนนิสิต">
+                    <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">รายเดือนนิสิต</span><svg
+                            class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg></button>
+                    <div class="c-dropdown-menu">
+                        <div class="c-dropdown-item active" data-val="รายเดือนนิสิต">รายเดือนนิสิต</div>
+                        <div class="c-dropdown-item" data-val="รายเดือนบุคลากร">รายเดือนบุคลากร</div>
+                        <div class="c-dropdown-item" data-val="รายเดือนบุคคลภายนอก">รายเดือนบุคคลภายนอก</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+                <div class="fld">
+                    <label>สิทธิ์ทั้งหมด (ครั้ง)</label>
+                    <input type="number" id="modalTotalLimit" value="30">
+                </div>
+                <div class="fld">
+                    <label>ใช้ไปแล้ว (ครั้ง)</label>
+                    <input type="number" id="modalUsedCount" value="0">
+                </div>
+            </div>
+
+            <div class="fld" style="margin-bottom:14px;">
+                <label>หมายเหตุ / บันทึก</label>
+                <input type="text" id="modalNotes" placeholder="เช่น บันทึกเพิ่มเติม">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeMemberModal()">ยกเลิก</button>
+                <button class="btn-primary" onclick="saveMemberData()">บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ QUICK ADD QUOTA MODAL ============ -->
+    <div class="modal-overlay" id="quotaModal">
+        <div class="modal-card" style="max-width:420px;">
+            <div class="modal-head">
+                <h3 id="quotaModalTitle">เติมสิทธิ์การใช้งานสมาชิก</h3>
+                <button class="modal-close" onclick="closeQuotaModal()">✕</button>
+            </div>
+
+            <div
+                style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;">
+                <div style="font-size:12px;color:#065f46;font-weight:700;margin-bottom:2px;">ข้อมูลสมาชิก</div>
+                <div style="font-size:15px;font-weight:800;color:var(--text-title);" id="quotaMemberName">สมชาย ใจดี
+                </div>
+                <div style="font-size:12.5px;color:#047857;margin-top:2px;" id="quotaMemberId">MB-26-0001</div>
+            </div>
+
+            <input type="hidden" id="quotaTargetMemberId">
+
+            <div class="fld" style="margin-bottom:12px;">
+                <label>จำนวนครั้งที่ต้องการเพิ่ม (ครั้ง) *</label>
+                <input type="number" id="quotaAddAmount" value="30" min="1" placeholder="เช่น 30"
+                    onkeydown="if(event.key==='Enter')confirmAddQuota()">
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:18px;">
+                <button type="button" class="action-btn"
+                    style="flex:1;background:#f8fafc;color:#334155;border:1.5px solid #e2e8f0;padding:7px 0;font-weight:700;border-radius:var(--radius-sm);"
+                    onclick="document.getElementById('quotaAddAmount').value=10;">+10</button>
+                <button type="button" class="action-btn"
+                    style="flex:1;background:#f8fafc;color:#334155;border:1.5px solid #e2e8f0;padding:7px 0;font-weight:700;border-radius:var(--radius-sm);"
+                    onclick="document.getElementById('quotaAddAmount').value=20;">+20</button>
+                <button type="button" class="action-btn"
+                    style="flex:1;background:#ecfdf5;color:#065f46;border:1.5px solid #a7f3d0;padding:7px 0;font-weight:800;border-radius:var(--radius-sm);"
+                    onclick="document.getElementById('quotaAddAmount').value=30;">+30</button>
+                <button type="button" class="action-btn"
+                    style="flex:1;background:#f8fafc;color:#334155;border:1.5px solid #e2e8f0;padding:7px 0;font-weight:700;border-radius:var(--radius-sm);"
+                    onclick="document.getElementById('quotaAddAmount').value=50;">+50</button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeQuotaModal()">ยกเลิก</button>
+                <button class="btn-primary" id="btnConfirmAddQuota"
+                    onclick="confirmAddQuota()">ยืนยันเติมสิทธิ์</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SCRIPTS ============ -->
     <script>
         // ==========================================
-        // ⚙️ 
+        // ⚙️ กำหนด URL Web App ของ Google Apps Script
         // ==========================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
 
-        // API Fetch Bridge
-        async function callApi(action, params = {}) {
-            const response = await fetch(GAS_API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action, ...params })
-            });
-            return await response.json();
+        // Universal Google Apps Script Runner Bridge for Cloudflare
+        const google = {
+            script: {
+                run: {
+                    _successHandler: null,
+                    _failureHandler: null,
+                    withSuccessHandler(fn) {
+                        const proxy = Object.create(this);
+                        proxy._successHandler = fn;
+                        return proxy;
+                    },
+                    withFailureHandler(fn) {
+                        const proxy = Object.create(this);
+                        proxy._failureHandler = fn;
+                        return proxy;
+                    },
+                    async _call(action, params = {}) {
+                        try {
+                            const res = await fetch(GAS_API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                body: JSON.stringify({ action, ...params })
+                            });
+                            const json = await res.json();
+                            if (this._successHandler) this._successHandler(json);
+                            return json;
+                        } catch (err) {
+                            if (this._failureHandler) this._failureHandler(err);
+                            else console.error(`API Error in ${action}:`, err);
+                        }
+                    },
+                    checkAdminPassword(pw) { return this._call('checkAdminPassword', { password: pw }); },
+                    listAvailableYears() { return this._call('listAvailableYears'); },
+                    getDashboardSummary(token, scope, filters) { return this._call('getDashboardSummary', { token, scope, filters }); },
+                    getEntries(token, filters) { return this._call('getEntries', { token, filters }); },
+                    deleteEntry(token, year, rowIndex) { return this._call('deleteEntry', { token, year, rowIndex }); },
+                    getExportData(token, filters) { return this._call('getExportData', { token, filters }); },
+                    getMembers(token, filters) { return this._call('getMembers', { token, filters }); },
+                    saveMember(token, memberData) { return this._call('saveMember', { token, memberData }); },
+                    adjustMemberQuota(token, memberId, addAmount) { return this._call('adjustMemberQuota', { token, memberId, addAmount }); },
+                    deleteMember(token, memberId) { return this._call('deleteMember', { token, memberId }); },
+                    getPricesForAdmin(token) { return this._call('getPricesForAdmin', { token }); },
+                    updatePrices(token, prices) { return this._call('updatePrices', { token, prices }); },
+                    getMemberQuotasForAdmin(token) { return this._call('getMemberQuotasForAdmin', { token }); },
+                    updateMemberQuotas(token, quotas) { return this._call('updateMemberQuotas', { token, quotas }); },
+                    changeAdminPassword(token, newPassword) { return this._call('changeAdminPassword', { token, newPassword }); },
+                    getBankInfoForAdmin(token) { return this._call('getBankInfoForAdmin', { token }); },
+                    updateBankInfo(token, bankData) { return this._call('updateBankInfo', { token, bankData }); },
+                    getFacultiesForAdmin(token) { return this._call('getFacultiesForAdmin', { token }); },
+                    saveFaculties(token, facultiesList) { return this._call('saveFaculties', { token, facultiesList }); }
+                }
+            }
+        };
+
+        const THAI_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        const THAI_FULL_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+        const AGE_RANGES = ['13-17', '18-22', '23-29', '30-39', '40-49', '50-59', '60 ปีขึ้นไป'];
+        let TOKEN = sessionStorage.getItem('fc_admin_token') || '';
+        let currentYear = new Date().getFullYear();
+        let allMembersData = [];
+        let allEntriesData = [];
+        let currentFacultiesList = [];
+        let autoRefreshTimer = null;
+        let isFetching = false;
+        let lastEntriesCount = null;
+        let lastMembersCount = null;
+
+        function getLocalDateString(d) {
+            const date = d || new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
-        let TOKEN = sessionStorage.getItem('fc_admin_token') || '';
-
-        document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
+            initTabs();
+            initCustomDropdowns();
+            initCustomDatepickers();
+            populateDateFilters();
             if (TOKEN) {
                 showDashboard();
             }
-
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-                    btn.classList.add('active');
-                    const tabId = btn.dataset.tab;
-                    const p = document.getElementById(tabId);
-                    if (p) p.classList.add('active');
-                });
-            });
         });
 
-        async function doLogin() {
+        // ================= CUSTOM DROPDOWN ENGINE =================
+        function initCustomDropdowns() {
+            document.addEventListener('click', e => {
+                const isDropdown = e.target.closest('.c-dropdown');
+                document.querySelectorAll('.c-dropdown.open').forEach(d => {
+                    if (d !== isDropdown) d.classList.remove('open');
+                });
+
+                const isDatepicker = e.target.closest('.c-datepicker');
+                document.querySelectorAll('.c-datepicker.open').forEach(dp => {
+                    if (dp !== isDatepicker) dp.classList.remove('open');
+                });
+            });
+
+            bindDropdownEvents(document);
+        }
+
+        function bindDropdownEvents(root) {
+            root.querySelectorAll('.c-dropdown').forEach(dropdown => {
+                const btn = dropdown.querySelector('.c-dropdown-btn');
+                const menu = dropdown.querySelector('.c-dropdown-menu');
+                const input = dropdown.querySelector('input[type="hidden"]');
+                const label = dropdown.querySelector('.c-dropdown-label');
+
+                if (btn && !btn.dataset.bound) {
+                    btn.dataset.bound = 'true';
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        // Close other dropdowns first
+                        document.querySelectorAll('.c-dropdown.open').forEach(d => {
+                            if (d !== dropdown) d.classList.remove('open');
+                        });
+                        dropdown.classList.toggle('open');
+                    });
+                }
+
+                if (menu && !menu.dataset.bound) {
+                    menu.dataset.bound = 'true';
+                    menu.addEventListener('click', e => {
+                        const item = e.target.closest('.c-dropdown-item');
+                        if (!item) return;
+                        const val = item.dataset.val !== undefined ? item.dataset.val : item.textContent.trim();
+                        const text = item.textContent.trim();
+
+                        menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+
+                        if (input) {
+                            input.value = val;
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        if (label) label.textContent = text;
+                        dropdown.classList.remove('open');
+
+                        // Callbacks
+                        if (dropdown.id === 'dScopeDropdown') toggleScopeInputs();
+                        if (dropdown.id === 'autoRefreshDropdown') changeAutoRefreshInterval();
+                        if (dropdown.id === 'mTypeFilterDropdown') filterMembersTable();
+                        if (dropdown.id === 'dYearDropdown' || dropdown.id === 'dMonthDropdown') loadDashboard();
+                        if (dropdown.id === 'lYearDropdown' || dropdown.id === 'lMonthDropdown' || dropdown.id === 'lTypeDropdown' || dropdown.id === 'lAgeRangeDropdown') loadEntries();
+                    });
+                }
+            });
+        }
+
+        function setDropdownOptions(dropdownId, items, defaultVal) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.c-dropdown-menu');
+            const input = dropdown.querySelector('input[type="hidden"]');
+            const label = dropdown.querySelector('.c-dropdown-label');
+
+            menu.innerHTML = '';
+            items.forEach((it, idx) => {
+                const val = (it.val !== undefined) ? it.val : it;
+                const text = it.text || it;
+                const isAct = String(val) === String(defaultVal) || (!defaultVal && idx === 0);
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'c-dropdown-item' + (isAct ? ' active' : '');
+                itemDiv.dataset.val = val;
+                itemDiv.textContent = text;
+                menu.appendChild(itemDiv);
+
+                if (isAct) {
+                    if (input) input.value = val;
+                    if (label) label.textContent = text;
+                }
+            });
+        }
+
+        function setDropdownValue(dropdownId, val) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.c-dropdown-menu');
+            const input = dropdown.querySelector('input[type="hidden"]');
+            const label = dropdown.querySelector('.c-dropdown-label');
+
+            const item = menu.querySelector(`.c-dropdown-item[data-val="${val}"]`);
+            if (item) {
+                menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                if (input) input.value = val;
+                if (label) label.textContent = item.textContent.trim();
+            }
+        }
+
+        // ================= CUSTOM DATEPICKER ENGINE =================
+        const datepickerStates = {};
+
+        function initCustomDatepickers() {
+            document.querySelectorAll('.c-datepicker').forEach(dp => {
+                const id = dp.id;
+                const now = new Date();
+                datepickerStates[id] = {
+                    year: now.getFullYear(),
+                    month: now.getMonth(),
+                    selected: ''
+                };
+
+                const btn = dp.querySelector('.c-datepicker-btn');
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    dp.classList.toggle('open');
+                    if (dp.classList.contains('open')) {
+                        renderCalendar(id);
+                    }
+                });
+            });
+        }
+
+        function renderCalendar(dpId) {
+            const dp = document.getElementById(dpId);
+            if (!dp) return;
+            const pop = dp.querySelector('.c-calendar-pop');
+            const state = datepickerStates[dpId];
+            const currentSelected = dp.querySelector('input[type="hidden"]').value;
+
+            const year = state.year;
+            const month = state.month;
+            const monthName = THAI_FULL_MONTHS[month];
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const todayStr = getLocalDateString();
+
+            let html = `
+                <div class="cal-header">
+                    <button type="button" class="cal-nav-btn" onclick="navCalMonth('${dpId}', -1)">‹</button>
+                    <div class="cal-title">${monthName} ${year}</div>
+                    <button type="button" class="cal-nav-btn" onclick="navCalMonth('${dpId}', 1)">›</button>
+                </div>
+                <div class="cal-grid-head">
+                    <div>อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div>
+                </div>
+                <div class="cal-grid-days">
+            `;
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                html += '<div class="cal-day empty"></div>';
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isSelected = (dStr === currentSelected);
+                const isToday = (dStr === todayStr);
+
+                let cls = 'cal-day';
+                if (isSelected) cls += ' selected';
+                else if (isToday) cls += ' today';
+
+                html += `<div class="${cls}" onclick="pickDate('${dpId}', '${dStr}')">${d}</div>`;
+            }
+
+            html += `
+                </div>
+                <div class="cal-footer">
+                    <button type="button" class="cal-quick-btn clear" onclick="pickDate('${dpId}', '')">ล้างค่า</button>
+                    <button type="button" class="cal-quick-btn" onclick="pickDate('${dpId}', '${todayStr}')">วันนี้</button>
+                </div>
+            `;
+
+            pop.innerHTML = html;
+        }
+
+        function navCalMonth(dpId, delta) {
+            const state = datepickerStates[dpId];
+            state.month += delta;
+            if (state.month > 11) {
+                state.month = 0;
+                state.year += 1;
+            } else if (state.month < 0) {
+                state.month = 11;
+                state.year -= 1;
+            }
+            renderCalendar(dpId);
+        }
+
+        function pickDate(dpId, dateStr) {
+            const dp = document.getElementById(dpId);
+            if (!dp) return;
+            const input = dp.querySelector('input[type="hidden"]');
+            const label = dp.querySelector('.c-datepicker-label');
+
+            input.value = dateStr;
+            if (dateStr) {
+                const parts = dateStr.split('-');
+                const dayNum = parseInt(parts[2], 10);
+                const mIdx = parseInt(parts[1], 10) - 1;
+                label.textContent = `${dayNum} ${THAI_MONTHS[mIdx]} ${parts[0]}`;
+            } else {
+                label.textContent = 'เลือกวันที่ (ทั้งหมด)';
+            }
+
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            dp.classList.remove('open');
+
+            if (dpId === 'dDayPicker') loadDashboard();
+            if (dpId === 'lDayPicker') loadEntries();
+        }
+
+        function setDatePickerValue(dpId, dateStr) {
+            pickDate(dpId, dateStr);
+            if (dateStr) {
+                const parts = dateStr.split('-');
+                if (datepickerStates[dpId]) {
+                    datepickerStates[dpId].year = parseInt(parts[0], 10);
+                    datepickerStates[dpId].month = parseInt(parts[1], 10) - 1;
+                }
+            }
+        }
+
+        // ================= AUTH =================
+        function doLogin() {
             const pw = document.getElementById('pwInput').value;
             const err = document.getElementById('loginErr');
             err.textContent = '';
 
-            try {
-                const ok = await callApi('checkAdminPassword', { password: pw });
-                if (ok) {
-                    TOKEN = pw;
-                    sessionStorage.setItem('fc_admin_token', pw);
-                    showDashboard();
-                } else {
-                    err.textContent = 'รหัสผ่านไม่ถูกต้อง';
-                }
-            } catch (e) {
-                err.textContent = 'ข้อผิดพลาด: ' + e.message;
-            }
+            google.script.run
+                .withSuccessHandler(ok => {
+                    if (ok) {
+                        TOKEN = pw;
+                        sessionStorage.setItem('fc_admin_token', pw);
+                        showDashboard();
+                    } else {
+                        err.textContent = 'รหัสผ่านไม่ถูกต้อง';
+                    }
+                })
+                .withFailureHandler(e => { err.textContent = 'ข้อผิดพลาด: ' + e.message; })
+                .checkAdminPassword(pw);
         }
 
         function doLogout() {
             TOKEN = '';
             sessionStorage.removeItem('fc_admin_token');
+            stopAutoRefresh();
             document.getElementById('dashScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('pwInput').value = '';
@@ -615,153 +2252,846 @@
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashScreen').style.display = 'block';
+
+            loadYears();
+            loadFacultiesList();
             loadDashboard();
             loadEntries();
             loadMembers();
+            loadPricesAndSettings();
+            startAutoRefresh();
         }
 
-        async function loadDashboard() {
-            try {
-                const summary = await callApi('getDashboardSummary', { token: TOKEN });
-                if (summary) {
-                    document.getElementById('dTotalCount').textContent = (summary.totalCount || 0) + ' คน';
-                    document.getElementById('dTotalRev').textContent = (summary.totalRevenue || 0).toLocaleString() + ' ฿';
+        // ================= AUTO REFRESH SYSTEM =================
+        function startAutoRefresh() {
+            stopAutoRefresh();
+            const intervalSec = Number(document.getElementById('autoRefreshInterval').value) || 10;
+            const dot = document.getElementById('refreshDot');
 
-                    let typeHtml = '<table style="width:100%;"><thead><tr><th>ประเภท</th><th>จำนวนคน</th><th>รายรับ</th></tr></thead><tbody>';
-                    for (const t in summary.byType) {
-                        typeHtml += `<tr><td>${t}</td><td>${summary.byType[t].count} คน</td><td>${summary.byType[t].revenue} ฿</td></tr>`;
+            if (intervalSec <= 0) {
+                dot.className = 'pulse-dot paused';
+                return;
+            }
+
+            dot.className = 'pulse-dot';
+            autoRefreshTimer = setInterval(() => {
+                triggerAutoSync();
+            }, intervalSec * 1000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshTimer) {
+                clearInterval(autoRefreshTimer);
+                autoRefreshTimer = null;
+            }
+        }
+
+        function changeAutoRefreshInterval() {
+            startAutoRefresh();
+        }
+
+        function triggerAutoSync() {
+            if (isFetching || !TOKEN) return;
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (!activeTab) return;
+            const tabId = activeTab.dataset.tab;
+
+            if (tabId === 'dashTab') {
+                loadDashboard(true);
+            } else if (tabId === 'listTab') {
+                const searchInput = document.getElementById('lSearch');
+                if (document.activeElement !== searchInput) {
+                    loadEntries(true);
+                }
+            } else if (tabId === 'memberTab') {
+                const modal = document.getElementById('memberModal');
+                const memberSearch = document.getElementById('mSearch');
+                if (!modal.classList.contains('show') && document.activeElement !== memberSearch) {
+                    loadMembers(true);
+                }
+            }
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast-item';
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ================= TABS =================
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+                    btn.classList.add('active');
+                    const tabId = btn.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+
+                    if (tabId === 'dashTab') loadDashboard();
+                    if (tabId === 'listTab') loadEntries();
+                    if (tabId === 'memberTab') loadMembers();
+                    if (tabId === 'settingsTab') loadPricesAndSettings();
+                });
+            });
+        }
+
+        function populateDateFilters() {
+            const todayStr = getLocalDateString();
+            setDatePickerValue('dDayPicker', todayStr);
+            setDatePickerValue('lDayPicker', '');
+            setDatePickerValue('expDayPicker', todayStr);
+
+            const mOptions = [{ val: '', text: 'ทั้งหมด / ทุกเดือน' }];
+            THAI_MONTHS.forEach((m, idx) => {
+                mOptions.push({ val: String(idx + 1), text: m });
+            });
+
+            const curMonth = String(new Date().getMonth() + 1);
+            setDropdownOptions('dMonthDropdown', mOptions.slice(1), curMonth);
+            setDropdownOptions('lMonthDropdown', mOptions, '');
+            setDropdownOptions('expMonthDropdown', mOptions, '');
+
+            const ageOptions = [{ val: '', text: 'ทั้งหมด' }];
+            AGE_RANGES.forEach(a => {
+                ageOptions.push({ val: a, text: a + ' ปี' });
+            });
+            setDropdownOptions('lAgeRangeDropdown', ageOptions, '');
+        }
+
+        function loadYears() {
+            google.script.run
+                .withSuccessHandler(years => {
+                    const yList = (years && years.length > 0) ? years : [String(currentYear)];
+                    const yOptions = yList.map(y => ({ val: String(y), text: String(y) }));
+                    setDropdownOptions('dYearDropdown', yOptions, String(currentYear));
+                    setDropdownOptions('lYearDropdown', yOptions, String(currentYear));
+                    setDropdownOptions('expYearDropdown', yOptions, String(currentYear));
+                })
+                .listAvailableYears();
+        }
+
+        function toggleScopeInputs() {
+            const scope = document.getElementById('dScope').value;
+            document.getElementById('dDayWrap').style.display = scope === 'day' ? 'flex' : 'none';
+            document.getElementById('dMonthWrap').style.display = scope === 'year' ? 'none' : 'flex';
+        }
+
+        // ================= DASHBOARD SUMMARY =================
+        function loadDashboard(silent) {
+            const year = document.getElementById('dYear').value || currentYear;
+            const scope = document.getElementById('dScope').value;
+            const month = document.getElementById('dMonth').value;
+            const day = document.getElementById('dDay').value;
+
+            if (!silent) isFetching = true;
+
+            google.script.run
+                .withSuccessHandler(summary => {
+                    isFetching = false;
+                    renderStatCards(summary);
+                    renderTypeTable(summary.byType);
+                    renderAgeTable(summary.byAgeRange);
+                })
+                .withFailureHandler(err => {
+                    isFetching = false;
+                    if (!silent) alert('โหลดแดชบอร์ดไม่สำเร็จ: ' + err.message);
+                })
+                .getDashboardSummary(TOKEN, scope, { year: year, month: month, day: day });
+        }
+
+        function renderStatCards(summary) {
+            const container = document.getElementById('statCards');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="label">จำนวนผู้ใช้บริการรวม</div>
+                    <div class="value">${(summary.totalCount || 0).toLocaleString()} <span style="font-size:16px;font-weight:600;color:var(--text-muted);">คน</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">รายได้รวม</div>
+                    <div class="value">${(summary.totalRevenue || 0).toLocaleString()} <span style="font-size:16px;font-weight:600;color:var(--text-muted);">บาท</span></div>
+                </div>
+            `;
+        }
+
+        function renderTypeTable(byType) {
+            const tbody = document.querySelector('#typeTable tbody');
+            tbody.innerHTML = '';
+            for (const t in byType) {
+                const item = byType[t];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${t}</strong></td>
+                    <td>${item.count.toLocaleString()} คน</td>
+                    <td>${item.revenue.toLocaleString()} บาท</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function renderAgeTable(byAge) {
+            const tbody = document.querySelector('#ageTable tbody');
+            tbody.innerHTML = '';
+            for (const a in byAge) {
+                const item = byAge[a];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${a}</strong></td>
+                    <td>${item.count.toLocaleString()} คน</td>
+                    <td>${item.revenue.toLocaleString()} บาท</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        // ================= CHECK-IN ENTRIES LIST =================
+        function loadEntries(silent) {
+            const year = document.getElementById('lYear').value || currentYear;
+            const month = document.getElementById('lMonth').value;
+            const day = document.getElementById('lDay').value;
+            const type = document.getElementById('lType').value;
+            const ageRange = document.getElementById('lAgeRange').value;
+            const search = document.getElementById('lSearch').value;
+
+            const tbody = document.querySelector('#entriesTable tbody');
+            if (!silent) {
+                isFetching = true;
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;"><span class="spinner" style="border-color:#10b981;border-top-color:transparent;"></span> กำลังโหลดข้อมูล...</td></tr>';
+            }
+
+            google.script.run
+                .withSuccessHandler(rows => {
+                    isFetching = false;
+                    const newRows = rows || [];
+
+                    if (lastEntriesCount !== null && newRows.length > lastEntriesCount) {
+                        const diff = newRows.length - lastEntriesCount;
+                        showToast(`มีรายการเช็คอินใหม่เพิ่มขึ้น ${diff} รายการ`);
                     }
-                    typeHtml += '</tbody></table>';
-                    document.getElementById('dByTypeStats').innerHTML = typeHtml;
+                    lastEntriesCount = newRows.length;
+
+                    allEntriesData = newRows;
+                    document.getElementById('entriesCount').textContent = `(พบ ${allEntriesData.length} รายการ)`;
+                    renderEntriesTable(allEntriesData);
+                })
+                .withFailureHandler(err => {
+                    isFetching = false;
+                    if (!silent) {
+                        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#dc2626;padding:20px;">เกิดข้อผิดพลาด: ${err.message}</td></tr>`;
+                    }
+                })
+                .getEntries(TOKEN, {
+                    year: year, month: month, day: day, type: type, ageRange: ageRange, search: search
+                });
+        }
+
+        function renderEntriesTable(rows) {
+            const tbody = document.querySelector('#entriesTable tbody');
+            tbody.innerHTML = '';
+
+            if (!rows || rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">ไม่พบรายการเช็คอินตามเงื่อนไขที่เลือก</td></tr>';
+                return;
+            }
+
+            rows.forEach((r, idx) => {
+                const tr = document.createElement('tr');
+                const timePart = r.timestamp ? new Date(r.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
+                const slipLink = r.slipUrl ? `<a href="${r.slipUrl}" target="_blank" style="color:var(--primary-dark);font-weight:700;text-decoration:none;">ดูสลิป</a>` : '-';
+                const memberTag = r.memberId ? `<span class="badge blue">${r.memberId}</span>` : '-';
+
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${r.date} ${timePart}</td>
+                    <td><strong>${r.name}</strong></td>
+                    <td><span class="badge gray">${r.ageRange || '-'}</span></td>
+                    <td>${r.faculty || '-'}</td>
+                    <td>${r.phone || '-'}</td>
+                    <td><span class="badge green">${r.type}</span></td>
+                    <td>${r.price > 0 ? r.price + ' บาท' : '<span style="color:#059669;font-weight:700;">ฟรี</span>'}</td>
+                    <td>${memberTag}</td>
+                    <td>${slipLink}</td>
+                    <td>
+                        <button class="action-btn delete" onclick="deleteEntryRow(${r.rowIndex}, '${r.name}')">ลบ</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteEntryRow(rowIndex, name) {
+            if (!confirm(`ยืนยันการลบรายการเช็คอินของ "${name}" หรือไม่?`)) return;
+            const year = document.getElementById('lYear').value || currentYear;
+
+            google.script.run
+                .withSuccessHandler(res => {
+                    if (res && res.status === 'ok') {
+                        loadEntries();
+                    } else {
+                        alert('ลบไม่สำเร็จ: ' + (res.message || ''));
+                    }
+                })
+                .deleteEntry(TOKEN, year, rowIndex);
+        }
+
+        // ================= MEMBER MANAGEMENT =================
+        function loadMembers(silent) {
+            const tbody = document.querySelector('#membersTable tbody');
+            if (!silent) {
+                isFetching = true;
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;"><span class="spinner" style="border-color:#10b981;border-top-color:transparent;"></span> กำลังโหลดข้อมูลสมาชิก...</td></tr>';
+            }
+
+            google.script.run
+                .withSuccessHandler(list => {
+                    isFetching = false;
+                    const newList = list || [];
+
+                    if (lastMembersCount !== null && newList.length > lastMembersCount) {
+                        const diff = newList.length - lastMembersCount;
+                        showToast(`มีสมาชิกใหม่สมัครเข้ามา ${diff} คน`);
+                    }
+                    lastMembersCount = newList.length;
+
+                    allMembersData = newList;
+                    filterMembersTable();
+                })
+                .withFailureHandler(err => {
+                    isFetching = false;
+                    if (!silent) {
+                        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#dc2626;padding:20px;">เกิดข้อผิดพลาด: ${err.message}</td></tr>`;
+                    }
+                })
+                .getMembers(TOKEN, {});
+        }
+
+        function filterMembersTable() {
+            const search = document.getElementById('mSearch').value.trim().toLowerCase();
+            const typeFilter = document.getElementById('mTypeFilter').value;
+
+            const filtered = allMembersData.filter(m => {
+                if (typeFilter && m.type !== typeFilter) return false;
+                if (search) {
+                    const match = m.memberId.toLowerCase().includes(search) ||
+                        m.name.toLowerCase().includes(search) ||
+                        m.phone.toLowerCase().includes(search) ||
+                        m.faculty.toLowerCase().includes(search);
+                    if (!match) return false;
                 }
-            } catch (err) {
-                console.error("loadDashboard error:", err);
-            }
+                return true;
+            });
+
+            document.getElementById('membersCount').textContent = `(ทั้งหมด ${filtered.length} คน)`;
+            renderMembersTable(filtered);
         }
 
-        async function loadEntries() {
-            const search = (document.getElementById('lSearch') ? document.getElementById('lSearch').value : '').trim();
-            const tbody = document.getElementById('entriesBody');
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;">กำลังค้นหา...</td></tr>';
+        function renderMembersTable(list) {
+            const tbody = document.querySelector('#membersTable tbody');
+            tbody.innerHTML = '';
 
-            try {
-                const list = await callApi('getEntries', { token: TOKEN, filters: { search: search } });
-                if (!list || list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;">ไม่พบข้อมูล</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = list.map((r, idx) => `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td>${r.date || ''}</td>
-                        <td><strong>${r.name || ''}</strong></td>
-                        <td>${r.faculty || '-'}</td>
-                        <td>${r.phone || '-'}</td>
-                        <td>${r.type || ''}</td>
-                        <td>${r.price || 0} ฿</td>
-                        <td>${r.slipUrl ? `<a href="${r.slipUrl}" target="_blank" style="color:var(--primary-dark);font-weight:700;">ดูสลิป</a>` : '-'}</td>
-                        <td>
-                            <button class="btn-action del" onclick="doDeleteEntry(${new Date().getFullYear()}, ${r.rowIndex})">ลบ</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="9" style="color:red;text-align:center;">ข้อผิดพลาด: ${err.message}</td></tr>`;
+            if (!list || list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">ไม่พบข้อมูลสมาชิก</td></tr>';
+                return;
             }
+
+            list.forEach(m => {
+                const tr = document.createElement('tr');
+                const isOutOfQuota = m.remaining <= 0;
+                const quotaPillClass = isOutOfQuota ? 'quota-pill empty' : 'quota-pill';
+
+                tr.innerHTML = `
+                    <td><strong style="color:var(--text-title);">${m.memberId}</strong></td>
+                    <td><strong>${m.name}</strong></td>
+                    <td>${m.faculty || '-'}</td>
+                    <td>${m.phone || '-'}</td>
+                    <td><span class="badge blue">${m.type}</span></td>
+                    <td>${m.usedCount} / ${m.totalLimit} ครั้ง</td>
+                    <td><span class="${quotaPillClass}">${m.remaining} ครั้ง</span></td>
+                    <td>${m.registeredDate || '-'}</td>
+                    <td>
+                        <div style="display:flex;gap:6px;">
+                            <button class="action-btn add-quota" onclick="quickAddQuota('${m.memberId}', '${m.name}')">+ เติมรอบ</button>
+                            <button class="action-btn edit" onclick="editMember('${m.memberId}')">แก้ไข</button>
+                            <button class="action-btn delete" onclick="deleteMemberItem('${m.memberId}', '${m.name}')">ลบ</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
-        async function doDeleteEntry(year, rowIndex) {
-            if (!confirm('ยืนยันการลบรายการนี้?')) return;
-            try {
-                await callApi('deleteEntry', { token: TOKEN, year: year, rowIndex: rowIndex });
-                loadEntries();
-                loadDashboard();
-            } catch (err) {
-                alert('ลบไม่สำเร็จ: ' + err.message);
-            }
+        function openMemberModal(member) {
+            document.getElementById('modalMemberTitle').textContent = member ? 'แก้ไขข้อมูลสมาชิก' : 'เพิ่มสมาชิกใหม่';
+            document.getElementById('modalMemberId').value = member ? member.memberId : '';
+            document.getElementById('modalName').value = member ? member.name : '';
+            document.getElementById('modalPhone').value = member ? member.phone : '';
+            document.getElementById('modalTotalLimit').value = member ? member.totalLimit : 30;
+            document.getElementById('modalUsedCount').value = member ? member.usedCount : 0;
+            document.getElementById('modalNotes').value = member ? member.notes : '';
+
+            setDropdownValue('modalTypeDropdown', member ? member.type : 'รายเดือนนิสิต');
+            setDropdownValue('modalAgeRangeDropdown', member ? (member.ageRange || '') : '');
+
+            const facultyOptions = [{ val: '', text: '-- เลือกคณะ / หน่วยงาน --' }, { val: 'บุคคลภายนอก', text: 'บุคคลภายนอก' }];
+            currentFacultiesList.forEach(item => {
+                const thName = item.th || (typeof item === 'string' ? item : '');
+                const enName = item.en || thName;
+                facultyOptions.push({ val: thName, text: `${thName} / ${enName}` });
+            });
+
+            setDropdownOptions('modalFacultyDropdown', facultyOptions, member ? member.faculty : '');
+
+            document.getElementById('memberModal').classList.add('show');
         }
 
-        async function loadMembers() {
-            const search = (document.getElementById('mSearch') ? document.getElementById('mSearch').value : '').trim();
-            const tbody = document.getElementById('membersBody');
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;">กำลังโหลด...</td></tr>';
-
-            try {
-                const list = await callApi('getMembers', { token: TOKEN, filters: { search: search } });
-                if (!list || list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;">ไม่พบสมาชิก</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = list.map(m => `
-                    <tr>
-                        <td><strong>${m.memberId}</strong></td>
-                        <td>${m.name}</td>
-                        <td>${m.phone}</td>
-                        <td>${m.faculty || '-'}</td>
-                        <td>${m.type}</td>
-                        <td>${m.totalLimit}</td>
-                        <td>${m.usedCount}</td>
-                        <td><strong style="color:${m.remaining <= 0 ? 'red' : 'green'}">${m.remaining}</strong></td>
-                        <td>${m.registeredDate || '-'}</td>
-                        <td>
-                            <button class="btn-action edit" onclick="addQuota('${m.memberId}')">+ เพิ่ม 30</button>
-                            <button class="btn-action del" onclick="doDeleteMember('${m.memberId}')">ลบ</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="10" style="color:red;text-align:center;">ข้อผิดพลาด: ${err.message}</td></tr>`;
-            }
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('show');
         }
 
-        async function addQuota(memberId) {
-            if (!confirm(`เพิ่มโควตา 30 ครั้ง ให้รหัส ${memberId}?`)) return;
-            try {
-                await callApi('adjustMemberQuota', { token: TOKEN, memberId: memberId, addAmount: 30 });
-                loadMembers();
-            } catch (err) {
-                alert('เกิดข้อผิดพลาด: ' + err.message);
-            }
+        function editMember(memberId) {
+            const m = allMembersData.find(x => x.memberId === memberId);
+            if (m) openMemberModal(m);
         }
 
-        async function doDeleteMember(memberId) {
-            if (!confirm(`ยืนยันการลบสมาชิก ${memberId}?`)) return;
-            try {
-                await callApi('deleteMember', { token: TOKEN, memberId: memberId });
-                loadMembers();
-            } catch (err) {
-                alert('เกิดข้อผิดพลาด: ' + err.message);
+        function saveMemberData() {
+            const memberId = document.getElementById('modalMemberId').value;
+            const name = document.getElementById('modalName').value.trim();
+            const phone = document.getElementById('modalPhone').value.trim();
+            const faculty = document.getElementById('modalFaculty').value;
+            const type = document.getElementById('modalType').value;
+            const totalLimit = Number(document.getElementById('modalTotalLimit').value) || 30;
+            const usedCount = Number(document.getElementById('modalUsedCount').value) || 0;
+            const notes = document.getElementById('modalNotes').value.trim();
+            const ageRange = document.getElementById('modalAgeRange').value;
+
+            if (!name || !phone) {
+                alert('กรุณากรอกชื่อและเบอร์โทรศัพท์');
+                return;
             }
+
+            const payload = {
+                memberId: memberId,
+                name: name,
+                phone: phone,
+                faculty: (type === 'รายเดือนบุคคลภายนอก' && !faculty) ? 'บุคคลภายนอก' : faculty,
+                type: type,
+                totalLimit: totalLimit,
+                usedCount: usedCount,
+                remaining: Math.max(0, totalLimit - usedCount),
+                notes: notes,
+                ageRange: ageRange
+            };
+
+            google.script.run
+                .withSuccessHandler(res => {
+                    if (res && res.status === 'ok') {
+                        closeMemberModal();
+                        loadMembers();
+                    } else {
+                        alert('บันทึกไม่สำเร็จ: ' + (res.message || ''));
+                    }
+                })
+                .saveMember(TOKEN, payload);
         }
 
-        async function doChangePassword() {
-            const newPw = document.getElementById('newAdminPw').value.trim();
-            if (!newPw) { alert('กรุณาระบุรหัสผ่านใหม่'); return; }
-            try {
-                await callApi('changeAdminPassword', { token: TOKEN, newPassword: newPw });
-                TOKEN = newPw;
-                sessionStorage.setItem('fc_admin_token', newPw);
-                document.getElementById('newAdminPw').value = '';
-                alert('เปลี่ยนรหัสผ่านสำเร็จ!');
-            } catch (err) {
-                alert('เปลี่ยนรหัสผ่านไม่สำเร็จ: ' + err.message);
-            }
+        function quickAddQuota(memberId, name) {
+            document.getElementById('quotaTargetMemberId').value = memberId;
+            document.getElementById('quotaMemberName').textContent = name;
+            document.getElementById('quotaMemberId').textContent = 'รหัสสมาชิก: ' + memberId;
+            document.getElementById('quotaAddAmount').value = 30;
+            document.getElementById('quotaModal').classList.add('show');
+            setTimeout(() => {
+                const inp = document.getElementById('quotaAddAmount');
+                if (inp) { inp.focus(); inp.select(); }
+            }, 100);
         }
 
-        async function exportToExcel() {
-            try {
-                const data = await callApi('getExportData', { token: TOKEN });
-                if (!data || data.length === 0) { alert('ไม่มีข้อมูลสำหรับส่งออก'); return; }
+        function closeQuotaModal() {
+            document.getElementById('quotaModal').classList.remove('show');
+        }
 
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "CheckinData");
-                XLSX.writeFile(wb, `Fitness_Checkin_${new Date().toISOString().slice(0, 10)}.xlsx`);
-            } catch (err) {
-                alert('ส่งออกไม่สำเร็จ: ' + err.message);
+        function confirmAddQuota() {
+            const memberId = document.getElementById('quotaTargetMemberId').value;
+            const name = document.getElementById('quotaMemberName').textContent;
+            const add = Number(document.getElementById('quotaAddAmount').value);
+
+            if (!add || isNaN(add) || add <= 0) {
+                alert('กรุณาระบุจำนวนครั้งที่มากกว่า 0');
+                return;
             }
+
+            const btn = document.getElementById('btnConfirmAddQuota');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...';
+
+            google.script.run
+                .withSuccessHandler(res => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    if (res && res.status === 'ok') {
+                        closeQuotaModal();
+                        showToast(`เพิ่มสิทธิ์ให้คุณ "${name}" เรียบร้อย (สิทธิ์คงเหลือใหม่: ${res.remaining}/${res.totalLimit} ครั้ง)`);
+                        loadMembers();
+                    } else {
+                        alert('ไม่สำเร็จ: ' + (res.message || ''));
+                    }
+                })
+                .withFailureHandler(err => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    alert('เกิดข้อผิดพลาด: ' + err.message);
+                })
+                .adjustMemberQuota(TOKEN, memberId, Number(add));
+        }
+
+        function deleteMemberItem(memberId, name) {
+            if (!confirm(`ยืนยันการลบสมาชิก "${name}" (${memberId}) หรือไม่?`)) return;
+            google.script.run
+                .withSuccessHandler(res => {
+                    if (res && res.status === 'ok') {
+                        loadMembers();
+                    } else {
+                        alert('ลบไม่สำเร็จ: ' + (res.message || ''));
+                    }
+                })
+                .deleteMember(TOKEN, memberId);
+        }
+
+        // ================= EXCEL & CSV EXPORT =================
+        function quickExportToday() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const year = todayStr.split('-')[0];
+
+            google.script.run
+                .withSuccessHandler(rows => {
+                    exportDataToExcelFile(rows, `Fitness_Checkin_${todayStr}`);
+                })
+                .getExportData(TOKEN, { year: year, day: todayStr });
+        }
+
+        function exportEntriesToExcel() {
+            if (!allEntriesData || allEntriesData.length === 0) {
+                alert('ไม่มีข้อมูลสำหรับส่งออก');
+                return;
+            }
+            const dateStr = document.getElementById('lDay').value || new Date().toISOString().split('T')[0];
+            exportDataToExcelFile(allEntriesData, `Fitness_Checkin_${dateStr}`);
+        }
+
+        function doExportExcel() {
+            const year = document.getElementById('expYear').value || currentYear;
+            const day = document.getElementById('expDay').value;
+            const month = document.getElementById('expMonth').value;
+            const type = document.getElementById('expType').value;
+            const msgEl = document.getElementById('expMsg');
+            msgEl.textContent = 'กำลังดึงข้อมูลและสร้างไฟล์ Excel...';
+
+            google.script.run
+                .withSuccessHandler(rows => {
+                    msgEl.textContent = `ส่งออกสำเร็จ (${rows.length} รายการ)`;
+                    const filename = `Fitness_Checkin_${day || ('Year' + year + (month ? '_M' + month : ''))}`;
+                    exportDataToExcelFile(rows, filename);
+                })
+                .withFailureHandler(err => {
+                    msgEl.textContent = 'ข้อผิดพลาด: ' + err.message;
+                })
+                .getExportData(TOKEN, { year: year, day: day, month: month, type: type });
+        }
+
+        function exportDataToExcelFile(rows, filename) {
+            if (!rows || rows.length === 0) {
+                alert('ไม่พบข้อมูลสำหรับสร้างไฟล์ Excel');
+                return;
+            }
+
+            const wsData = [
+                ['ลำดับ', 'วันที่-เวลา', 'ชื่อ - นามสกุล', 'ช่วงอายุ', 'คณะ / หน่วยงาน', 'เบอร์โทรศัพท์', 'ประเภทผู้ใช้บริการ', 'ค่าบริการ (บาท)', 'รหัสสมาชิก (Member ID)', 'ลิงก์สลิป']
+            ];
+
+            rows.forEach((r, idx) => {
+                const timeStr = r.timestamp ? new Date(r.timestamp).toLocaleTimeString('th-TH') : '';
+                wsData.push([
+                    idx + 1,
+                    `${r.date} ${timeStr}`.trim(),
+                    r.name || '',
+                    r.ageRange || '',
+                    r.faculty || '',
+                    r.phone ? `'${r.phone}` : '',
+                    r.type || '',
+                    r.price || 0,
+                    r.memberId || '',
+                    r.slipUrl || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+            ws['!cols'] = [
+                { wch: 6 },
+                { wch: 18 },
+                { wch: 24 },
+                { wch: 12 },
+                { wch: 28 },
+                { wch: 14 },
+                { wch: 20 },
+                { wch: 14 },
+                { wch: 18 },
+                { wch: 30 }
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'รายการเช็คอิน');
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+        }
+
+        function exportMembersToExcel() {
+            if (!allMembersData || allMembersData.length === 0) {
+                alert('ไม่มีข้อมูลสมาชิกสำหรับส่งออก');
+                return;
+            }
+
+            const wsData = [
+                ['ลำดับ', 'รหัสสมาชิก', 'ชื่อ - นามสกุล', 'ช่วงอายุ', 'คณะ / หน่วยงาน', 'เบอร์โทรศัพท์', 'ประเภทสมาชิก', 'สิทธิ์ทั้งหมด (ครั้ง)', 'ใช้ไปแล้ว (ครั้ง)', 'คงเหลือ (ครั้ง)', 'วันที่สมัคร', 'หมายเหตุ']
+            ];
+
+            allMembersData.forEach((m, idx) => {
+                wsData.push([
+                    idx + 1,
+                    m.memberId,
+                    m.name,
+                    m.ageRange || '',
+                    m.faculty || '',
+                    m.phone ? `'${m.phone}` : '',
+                    m.type,
+                    m.totalLimit,
+                    m.usedCount,
+                    m.remaining,
+                    m.registeredDate,
+                    m.notes || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = [
+                { wch: 6 }, { wch: 16 }, { wch: 24 }, { wch: 12 }, { wch: 28 }, { wch: 14 }, { wch: 20 },
+                { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 24 }
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'รายชื่อสมาชิก');
+            XLSX.writeFile(wb, `Fitness_Members_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function doExportCSV() {
+            const year = document.getElementById('expYear').value || currentYear;
+            const day = document.getElementById('expDay').value;
+            const month = document.getElementById('expMonth').value;
+            const type = document.getElementById('expType').value;
+
+            google.script.run
+                .withSuccessHandler(rows => {
+                    let csv = '\uFEFF';
+                    csv += '"ลำดับ","วันที่","ชื่อ-นามสกุล","ช่วงอายุ","คณะ/หน่วยงาน","เบอร์โทร","ประเภท","ราคา","รหัสสมาชิก"\n';
+                    rows.forEach((r, idx) => {
+                        csv += `"${idx + 1}","${r.date}","${(r.name || '').replace(/"/g, '""')}","${r.ageRange || ''}","${(r.faculty || '').replace(/"/g, '""')}","${r.phone || ''}","${r.type || ''}","${r.price || 0}","${r.memberId || ''}"\n`;
+                    });
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Fitness_Checkin_${day || ('Year' + year)}.csv`;
+                    a.click();
+                })
+                .getExportData(TOKEN, { year: year, day: day, month: month, type: type });
+        }
+
+        // ================= FACULTY MANAGEMENT =================
+        function loadFacultiesList() {
+            google.script.run
+                .withSuccessHandler(list => {
+                    currentFacultiesList = list || [];
+                    renderFacultyChips();
+                })
+                .getFaculties();
+        }
+
+        function renderFacultyChips() {
+            const container = document.getElementById('facultyChipsContainer');
+            container.innerHTML = '';
+            currentFacultiesList.forEach((item, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'faculty-chip';
+                const thName = item.th || (typeof item === 'string' ? item : '');
+                const enName = item.en || thName;
+                chip.innerHTML = `
+                    <div>
+                        <strong>${thName}</strong>
+                        <div style="font-size:11.5px;color:var(--text-muted);">${enName}</div>
+                    </div>
+                    <span class="btn-del-chip" onclick="removeFacultyChip(${idx})">✕</span>
+                `;
+                container.appendChild(chip);
+            });
+        }
+
+        function addFacultyChip() {
+            const thInput = document.getElementById('newFacultyThInput');
+            const enInput = document.getElementById('newFacultyEnInput');
+            const thVal = thInput.value.trim();
+            const enVal = enInput.value.trim() || thVal;
+
+            if (!thVal) {
+                alert('กรุณากรอกชื่อคณะภาษาไทย');
+                return;
+            }
+
+            const exists = currentFacultiesList.some(f => (f.th === thVal || f === thVal));
+            if (exists) {
+                alert('มีชื่อคณะนี้ในรายการแล้ว');
+                return;
+            }
+
+            currentFacultiesList.push({ th: thVal, en: enVal });
+            thInput.value = '';
+            enInput.value = '';
+            renderFacultyChips();
+        }
+
+        function removeFacultyChip(idx) {
+            currentFacultiesList.splice(idx, 1);
+            renderFacultyChips();
+        }
+
+        function saveFacultiesToServer() {
+            const msg = document.getElementById('facultySaveMsg');
+            msg.textContent = 'กำลังบันทึก...';
+
+            google.script.run
+                .withSuccessHandler(res => {
+                    if (res && res.status === 'ok') {
+                        msg.textContent = 'บันทึกรายชื่อคณะเรียบร้อย';
+                        setTimeout(() => msg.textContent = '', 3000);
+                    } else {
+                        msg.textContent = (res.message || 'บันทึกไม่สำเร็จ');
+                    }
+                })
+                .saveFaculties(TOKEN, currentFacultiesList);
+        }
+
+        // ================= SETTINGS (PRICES, QUOTAS, BANK, PW) =================
+        function loadPricesAndSettings() {
+            google.script.run
+                .withSuccessHandler(prices => {
+                    if (prices) {
+                        document.getElementById('priceExt').value = prices['บุคคลทั่วไป'] || 50;
+                        document.getElementById('priceStu').value = prices['นิสิต'] || 20;
+                        document.getElementById('priceStaff').value = prices['บุคลากร'] || 30;
+                        document.getElementById('priceMonthlyStu').value = prices['รายเดือนนิสิต'] || 150;
+                        document.getElementById('priceMonthlyStaff').value = prices['รายเดือนบุคลากร'] || 200;
+                        document.getElementById('priceMonthlyExt').value = prices['รายเดือนบุคคลภายนอก'] || 300;
+                    }
+                })
+                .getPricesForAdmin(TOKEN);
+
+            google.script.run
+                .withSuccessHandler(quotas => {
+                    if (quotas) {
+                        document.getElementById('quotaMonthlyStu').value = quotas['รายเดือนนิสิต'] || 30;
+                        document.getElementById('quotaMonthlyStaff').value = quotas['รายเดือนบุคลากร'] || 30;
+                        document.getElementById('quotaMonthlyExt').value = quotas['รายเดือนบุคคลภายนอก'] || 30;
+                    }
+                })
+                .getMemberQuotasForAdmin(TOKEN);
+
+            google.script.run
+                .withSuccessHandler(bank => {
+                    if (bank) {
+                        document.getElementById('bankName').value = bank.bankName || '';
+                        document.getElementById('bankAccountNumber').value = bank.accountNumber || '';
+                        document.getElementById('bankAccountName').value = bank.accountName || '';
+                    }
+                })
+                .getBankInfoForAdmin(TOKEN);
+        }
+
+        function savePricesAndQuotas() {
+            const msg = document.getElementById('priceSaveMsg');
+            msg.textContent = 'กำลังบันทึก...';
+
+            const prices = {
+                'บุคคลทั่วไป': Number(document.getElementById('priceExt').value),
+                'นิสิต': Number(document.getElementById('priceStu').value),
+                'บุคลากร': Number(document.getElementById('priceStaff').value),
+                'รายเดือนนิสิต': Number(document.getElementById('priceMonthlyStu').value),
+                'รายเดือนบุคลากร': Number(document.getElementById('priceMonthlyStaff').value),
+                'รายเดือนบุคคลภายนอก': Number(document.getElementById('priceMonthlyExt').value)
+            };
+
+            const quotas = {
+                'รายเดือนนิสิต': Number(document.getElementById('quotaMonthlyStu').value),
+                'รายเดือนบุคลากร': Number(document.getElementById('quotaMonthlyStaff').value),
+                'รายเดือนบุคคลภายนอก': Number(document.getElementById('quotaMonthlyExt').value)
+            };
+
+            google.script.run
+                .withSuccessHandler(() => {
+                    google.script.run
+                        .withSuccessHandler(() => {
+                            msg.textContent = 'บันทึกราคาและโควตาสำเร็จ';
+                            setTimeout(() => msg.textContent = '', 3000);
+                        })
+                        .updateMemberQuotas(TOKEN, quotas);
+                })
+                .updatePrices(TOKEN, prices);
+        }
+
+        function saveBankSettings() {
+            const msg = document.getElementById('bankSaveMsg');
+            msg.textContent = 'กำลังบันทึก...';
+
+            const payload = {
+                bankName: document.getElementById('bankName').value.trim(),
+                accountNumber: document.getElementById('bankAccountNumber').value.trim(),
+                accountName: document.getElementById('bankAccountName').value.trim()
+            };
+
+            google.script.run
+                .withSuccessHandler(() => {
+                    msg.textContent = 'บันทึกข้อมูลบัญชีเรียบร้อย';
+                    setTimeout(() => msg.textContent = '', 3000);
+                })
+                .updateBankInfo(TOKEN, payload);
+        }
+
+        function saveAdminPw() {
+            const pw = document.getElementById('newAdminPw').value;
+            const msg = document.getElementById('pwSaveMsg');
+            if (!pw) {
+                msg.textContent = 'กรุณากรอกรหัสผ่านใหม่';
+                return;
+            }
+            msg.textContent = 'กำลังบันทึก...';
+
+            google.script.run
+                .withSuccessHandler(() => {
+                    TOKEN = pw;
+                    sessionStorage.setItem('fc_admin_token', pw);
+                    msg.textContent = 'เปลี่ยนรหัสผ่านเรียบร้อย';
+                    document.getElementById('newAdminPw').value = '';
+                    setTimeout(() => msg.textContent = '', 3000);
+                })
+                .changeAdminPassword(TOKEN, pw);
         }
     </script>
 </body>
