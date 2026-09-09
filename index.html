@@ -2,13 +2,16 @@
 <html lang="th">
 
 <head>
+    <base target="_top">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>เช็คอินฟิตเนส - Fitness Center Check-in</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -40,20 +43,18 @@
             font-family: 'Prompt', 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(145deg, #064e3b 0%, #065f46 25%, #047857 60%, #059669 100%);
             min-height: 100vh;
-            min-height: -webkit-fill-available;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(40px + env(safe-area-inset-bottom, 0px));
+            padding: 24px 16px 50px;
             color: var(--text-main);
             line-height: 1.5;
         }
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 480px;
             position: relative;
-            margin: 0 auto;
         }
 
         .glass-card {
@@ -66,12 +67,18 @@
             border: 1px solid rgba(255, 255, 255, 0.9);
             position: relative;
             animation: fadeIn .35s ease-out;
-            width: 100%;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .lang-switch {
@@ -299,6 +306,9 @@
             background: #fff;
         }
 
+        /* ========================================================
+           CUSTOM EMERALD THEMED DROPDOWN (NO BROWSER POPUP)
+           ======================================================== */
         .c-dropdown {
             position: relative;
             user-select: none;
@@ -370,17 +380,40 @@
             animation: dropFade .18s ease-out;
         }
 
-        .c-dropdown-menu::-webkit-scrollbar { width: 5px; }
-        .c-dropdown-menu::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
-        .c-dropdown-menu::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
-        .c-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10b981; }
-
-        @keyframes dropFade {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Slim Emerald Scrollbar */
+        .c-dropdown-menu::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .c-dropdown.open .c-dropdown-menu { display: block; }
+        .c-dropdown-menu::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-thumb {
+            background: #a7f3d0;
+            border-radius: 4px;
+        }
+
+        .c-dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+
+        @keyframes dropFade {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .c-dropdown.open .c-dropdown-menu {
+            display: block;
+        }
 
         .c-dropdown-item {
             padding: 10px 14px;
@@ -445,7 +478,9 @@
             background: var(--primary-bg);
         }
 
-        .type-opt:active { transform: scale(0.98); }
+        .type-opt:active {
+            transform: scale(0.98);
+        }
 
         .type-opt.selected {
             border-color: var(--primary);
@@ -467,7 +502,9 @@
             margin-top: 3px;
         }
 
-        .type-opt .price-tag.free { color: #059669; }
+        .type-opt .price-tag.free {
+            color: #059669;
+        }
 
         .bank-info {
             margin-top: 14px;
@@ -521,7 +558,9 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .upload-box input[type="file"] { display: none; }
+        .upload-box input[type="file"] {
+            display: none;
+        }
 
         .upload-label {
             color: var(--primary-dark);
@@ -565,7 +604,9 @@
             transform: translateY(-1px);
         }
 
-        button.submit:active { transform: translateY(1px); }
+        button.submit:active {
+            transform: translateY(1px);
+        }
 
         button.submit:disabled {
             background: #cbd5e1;
@@ -628,7 +669,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .footer-note {
@@ -688,7 +731,8 @@
 
             <!-- Member ID Verification Box -->
             <div class="member-lookup-box" id="memberLookupBox">
-                <label id="lblMemberId" style="color:var(--text-title);margin-bottom:6px;">รหัสสมาชิก หรือ เบอร์โทรศัพท์ (Member ID / Phone)</label>
+                <label id="lblMemberId" style="color:var(--text-title);margin-bottom:6px;">รหัสสมาชิก หรือ เบอร์โทรศัพท์
+                    (Member ID / Phone)</label>
                 <div class="member-search-row">
                     <input type="text" id="memberIdInput" placeholder="เช่น 08xxxxxxxx หรือ MB-26-0001"
                         onkeydown="if(event.key==='Enter'){event.preventDefault();verifyMember();}">
@@ -760,14 +804,15 @@
                 </div>
             </div>
 
-            <!-- Faculty Selection -->
+            <!-- Faculty Selection with Custom Themed Dropdown -->
             <div class="field-group" id="facultyFieldGroup" style="display:none;margin-top:15px;">
                 <label id="lblFaculty">คณะ / หน่วยงาน *</label>
                 <div class="c-dropdown" id="facultyDropdown">
                     <input type="hidden" id="faculty" value="">
                     <button type="button" class="c-dropdown-btn">
                         <span class="c-dropdown-label">-- เลือกคณะ / หน่วยงาน --</span>
-                        <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
@@ -780,14 +825,15 @@
                 <input type="tel" id="phone" placeholder="08xxxxxxxx" maxlength="10">
             </div>
 
-            <!-- Age Range -->
+            <!-- Age Range with Custom Themed Dropdown -->
             <div class="field-group">
                 <label id="lblAgeRange">ช่วงอายุ *</label>
                 <div class="c-dropdown" id="ageRangeDropdown">
                     <input type="hidden" id="ageRange" value="">
                     <button type="button" class="c-dropdown-btn">
                         <span class="c-dropdown-label">-- เลือกช่วงอายุ --</span>
-                        <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
@@ -846,15 +892,50 @@
         // ==========================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
 
-        // API Fetch Bridge
-        async function callApi(action, params = {}) {
-            const response = await fetch(GAS_API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action, ...params })
-            });
-            return await response.json();
-        }
+        // Universal Google Apps Script Runner Bridge for Cloudflare
+        const google = {
+            script: {
+                run: {
+                    _successHandler: null,
+                    _failureHandler: null,
+                    withSuccessHandler(fn) {
+                        const proxy = Object.create(this);
+                        proxy._successHandler = fn;
+                        return proxy;
+                    },
+                    withFailureHandler(fn) {
+                        const proxy = Object.create(this);
+                        proxy._failureHandler = fn;
+                        return proxy;
+                    },
+                    async _call(action, params = {}) {
+                        try {
+                            const res = await fetch(GAS_API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                body: JSON.stringify({ action, ...params })
+                            });
+                            const json = await res.json();
+                            if (this._successHandler) this._successHandler(json);
+                            return json;
+                        } catch (err) {
+                            if (this._failureHandler) this._failureHandler(err);
+                            else console.error(`API Error in ${action}:`, err);
+                        }
+                    },
+                    getPublicPrices() { return this._call('getPublicPrices'); },
+                    getMonthlyPrices() { return this._call('getMonthlyPrices'); },
+                    getPublicQuotas() { return this._call('getPublicQuotas'); },
+                    getBankInfo() { return this._call('getBankInfo'); },
+                    getFaculties() { return this._call('getFaculties'); },
+                    lookupMember(query) { return this._call('lookupMember', { query }); },
+                    lookupLastDailyCheckin(phone) { return this._call('lookupLastDailyCheckin', { phone }); },
+                    checkIfSubmittedToday(phone) { return this._call('checkIfSubmittedToday', { phone }); },
+                    submitEntry(data) { return this._call('submitEntry', { data }); },
+                    submitSignup(data) { return this._call('submitSignup', { data }); }
+                }
+            }
+        };
 
         const TRANSLATIONS = {
             th: {
@@ -886,78 +967,78 @@
                 modeDaily: 'Daily Pass',
                 modeMember: 'Member Check-in',
                 lblName: 'Full Name *', phName: 'e.g. John Doe',
-                lblFaculty: 'Faculty / Organization *', phFaculty: '-- Select Faculty / Org --',
+                lblFaculty: 'Faculty / Organization *', phFaculty: '-- Select Faculty / Organization --',
                 lblPhone: 'Phone Number *', phPhone: '08xxxxxxxx',
                 lblAgeRange: 'Age Range *', phAgeRange: '-- Select Age Range --',
                 lblUserType: 'User Type *',
-                lblMemberType: 'Monthly Membership Type *',
+                lblMemberType: 'Membership Tier *',
                 lblMemberId: 'Member ID or Phone Number', phMemberId: 'e.g. 08xxxxxxxx or MB-26-0001',
                 btnLookup: 'Verify',
-                bankTitle: 'Please transfer before attaching slip',
+                bankTitle: 'Transfer to this bank account before attaching slip',
                 bankAccNoPrefix: 'Account No:', bankAccNamePrefix: 'Account Name:',
-                labelSlip: 'Attach Payment Slip *',
-                uploadDefault: 'Tap to select slip photo',
-                uploadSelected: 'Photo selected (Tap to change)',
-                freeNoteText: 'Free admission for this category, no slip required.',
-                btnSubmit: 'Submit Check-in',
-                signupNote: 'Need a membership package?',
+                labelSlip: 'Payment Slip *',
+                uploadDefault: 'Tap to upload slip',
+                uploadSelected: 'Slip selected (Tap to change)',
+                freeNoteText: 'Free of charge, no slip required',
+                btnSubmit: 'Check In',
+                signupNote: 'Want to become a member?',
                 signupLink: 'Sign up here'
             },
             zh: {
-                pageTitle: '健身房签到系统',
-                pageSub: '请填写您的信息以登记入场',
-                modeDaily: '普通用户 / 单次',
+                pageTitle: '健身房签到',
+                pageSub: '请填写您的信息进行签到',
+                modeDaily: '日常访客',
                 modeMember: '会员签到',
                 lblName: '姓名 *', phName: '例如：张三',
-                lblFaculty: '学院 / 单位 *', phFaculty: '-- 请选择学院 / 单位 --',
+                lblFaculty: '院系 /部门 *', phFaculty: '-- 请选择院系 / 部门 --',
                 lblPhone: '电话号码 *', phPhone: '08xxxxxxxx',
                 lblAgeRange: '年龄段 *', phAgeRange: '-- 请选择年龄段 --',
                 lblUserType: '用户类型 *',
-                lblMemberType: '月卡会员类型 *',
-                lblMemberId: '会员编号或电话号码', phMemberId: '例如：08xxxxxxxx 或 MB-26-0001',
-                btnLookup: '验证',
-                bankTitle: '请转账至此账户后上传凭证',
-                bankAccNoPrefix: '银行账号:', bankAccNamePrefix: '账户姓名:',
-                labelSlip: '上传付款凭证 *',
-                uploadDefault: '点击选择凭证图片',
+                lblMemberType: '会员类型 *',
+                lblMemberId: '会员卡号或手机号 (Member ID / Phone)', phMemberId: '例如 08xxxxxxxx 或 MB-26-0001',
+                btnLookup: '查询',
+                bankTitle: '请在上传凭证前转账至此账户',
+                bankAccNoPrefix: '账号:', bankAccNamePrefix: '户名:',
+                labelSlip: '付款凭证 *',
+                uploadDefault: '点击上传凭证',
                 uploadSelected: '已选择凭证 (点击更换)',
-                freeNoteText: '该类型免费入场，无需上传凭证。',
+                freeNoteText: '本类型免费，无需上传凭证',
                 btnSubmit: '确认签到',
-                signupNote: '想成为会员享受更多权益？',
-                signupLink: '点击此处注册会员'
+                signupNote: '想办理会员吗？',
+                signupLink: '在此注册'
             }
         };
 
         const USER_TYPE_TRANSLATIONS = {
             th: {
-                'นิสิต': 'นิสิต',
-                'บุคลากร': 'บุคลากร',
-                'บุคคลทั่วไป': 'บุคคลทั่วไป',
-                'นิสิตคณะวิทยาศาสตร์การกีฬา': 'นิสิตวิทย์กีฬา',
-                'บุคลากรคณะวิทยาศาสตร์การกีฬา': 'บุคลากรวิทย์กีฬา',
-                'รายเดือนนิสิต': 'สมาชิก (นิสิต)',
-                'รายเดือนบุคลากร': 'สมาชิก (บุคลากร)',
-                'รายเดือนบุคคลภายนอก': 'สมาชิก (บุคคลภายนอก)'
+                'นิสิต': { label: 'นิสิต' },
+                'บุคลากร': { label: 'บุคลากร' },
+                'บุคคลทั่วไป': { label: 'บุคคลทั่วไป' },
+                'นิสิตคณะวิทยาศาสตร์การกีฬา': { label: 'นิสิตวิทย์กีฬา' },
+                'บุคลากรคณะวิทยาศาสตร์การกีฬา': { label: 'บุคลากรวิทย์กีฬา' },
+                'รายเดือนนิสิต': { label: 'สมาชิก (นิสิต)' },
+                'รายเดือนบุคลากร': { label: 'สมาชิก (บุคลากร)' },
+                'รายเดือนบุคคลภายนอก': { label: 'สมาชิก (บุคคลภายนอก)' }
             },
             en: {
-                'นิสิต': 'Student',
-                'บุคลากร': 'Staff',
-                'บุคคลทั่วไป': 'General Public',
-                'นิสิตคณะวิทยาศาสตร์การกีฬา': 'Sports Sci Student',
-                'บุคลากรคณะวิทยาศาสตร์การกีฬา': 'Sports Sci Staff',
-                'รายเดือนนิสิต': 'Member (Student)',
-                'รายเดือนบุคลากร': 'Member (Staff)',
-                'รายเดือนบุคคลภายนอก': 'Member (General)'
+                'นิสิต': { label: 'Student' },
+                'บุคลากร': { label: 'Staff' },
+                'บุคคลทั่วไป': { label: 'General Public' },
+                'นิสิตคณะวิทยาศาสตร์การกีฬา': { label: 'Sport Sci Student' },
+                'บุคลากรคณะวิทยาศาสตร์การกีฬา': { label: 'Sport Sci Staff' },
+                'รายเดือนนิสิต': { label: 'Member (Student)' },
+                'รายเดือนบุคลากร': { label: 'Member (Staff)' },
+                'รายเดือนบุคคลภายนอก': { label: 'Member (Public)' }
             },
             zh: {
-                'นิสิต': '学生',
-                'บุคลากร': '教职工',
-                'บุคคลทั่วไป': '校外人士',
-                'นิสิตคณะวิทยาศาสตร์การกีฬา': '体育学院学生',
-                'บุคลากรคณะวิทยาศาสตร์การกีฬา': '体育学院教工',
-                'รายเดือนนิสิต': '月卡会员 (学生)',
-                'รายเดือนบุคลากร': '月卡会员 (教工)',
-                'รายเดือนบุคคลภายนอก': '月卡会员 (校外)'
+                'นิสิต': { label: '学生' },
+                'บุคลากร': { label: '教职工' },
+                'บุคคลทั่วไป': { label: '普通访客' },
+                'นิสิตคณะวิทยาศาสตร์การกีฬา': { label: '体育学院学生' },
+                'บุคลากรคณะวิทยาศาสตร์การกีฬา': { label: '体育学院教工' },
+                'รายเดือนนิสิต': { label: '会员 (学生)' },
+                'รายเดือนบุคลากร': { label: '会员 (教工)' },
+                'รายเดือนบุคคลภายนอก': { label: '会员 (校外人士)' }
             }
         };
 
@@ -974,13 +1055,13 @@
             },
             en: {
                 '': '-- Select Age Range --',
-                '13-17': '13-17 Years',
-                '18-22': '18-22 Years',
-                '23-29': '23-29 Years',
-                '30-39': '30-39 Years',
-                '40-49': '40-49 Years',
-                '50-59': '50-59 Years',
-                '60 ปีขึ้นไป': '60+ Years'
+                '13-17': '13-17 yrs',
+                '18-22': '18-22 yrs',
+                '23-29': '23-29 yrs',
+                '30-39': '30-39 yrs',
+                '40-49': '40-49 yrs',
+                '50-59': '50-59 yrs',
+                '60 ปีขึ้นไป': '60+ yrs'
             },
             zh: {
                 '': '-- 请选择年龄段 --',
@@ -998,124 +1079,153 @@
         let currentMode = 'daily';
         let selectedType = 'บุคคลทั่วไป';
         let selectedPrice = 50;
+        let currentPrices = {
+            'บุคคลทั่วไป': 50,
+            'นิสิต': 20,
+            'บุคลากร': 30,
+            'นิสิตคณะวิทยาศาสตร์การกีฬา': 0,
+            'บุคลากรคณะวิทยาศาสตร์การกีฬา': 0,
+            'รายเดือนนิสิต': 0,
+            'รายเดือนบุคลากร': 0,
+            'รายเดือนบุคคลภายนอก': 0
+        };
         let slipBase64 = '';
         let slipMime = '';
         let slipFilename = '';
-        let currentPrices = {};
-        let rawFacultiesList = [];
         let verifiedMemberData = null;
+        let rawFacultiesList = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
+            initLanguage();
             initCustomDropdowns();
+            loadFaculties();
+            loadPrices();
+            loadBankInfo();
             bindTypeEvents();
             bindSlipEvents();
-            bindPhoneAutoFill();
-            loadPrices();
-            loadFaculties();
-            loadBankInfo();
             loadCheckinInfo();
+            handleFacultyVisibility();
+            updatePaymentView();
+            applyLanguage(currentLang);
+        });
 
+        // ================= CUSTOM DROPDOWN ENGINE =================
+        function initCustomDropdowns() {
+            document.addEventListener('click', e => {
+                const isDropdown = e.target.closest('.c-dropdown');
+                document.querySelectorAll('.c-dropdown.open').forEach(d => {
+                    if (d !== isDropdown) d.classList.remove('open');
+                });
+            });
+
+            bindDropdownEvents(document);
+        }
+
+        function bindDropdownEvents(root) {
+            root.querySelectorAll('.c-dropdown').forEach(dropdown => {
+                const btn = dropdown.querySelector('.c-dropdown-btn');
+                const menu = dropdown.querySelector('.c-dropdown-menu');
+                const input = dropdown.querySelector('input[type="hidden"]');
+                const label = dropdown.querySelector('.c-dropdown-label');
+
+                if (btn && !btn.dataset.bound) {
+                    btn.dataset.bound = 'true';
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        // Close other dropdowns first
+                        document.querySelectorAll('.c-dropdown.open').forEach(d => {
+                            if (d !== dropdown) d.classList.remove('open');
+                        });
+                        dropdown.classList.toggle('open');
+                    });
+                }
+
+                if (menu && !menu.dataset.bound) {
+                    menu.dataset.bound = 'true';
+                    menu.addEventListener('click', e => {
+                        const item = e.target.closest('.c-dropdown-item');
+                        if (!item) return;
+                        const val = item.dataset.val !== undefined ? item.dataset.val : item.textContent.trim();
+                        const text = item.textContent.trim();
+
+                        menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+
+                        if (input) {
+                            input.value = val;
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        if (label) label.textContent = text;
+                        dropdown.classList.remove('open');
+                    });
+                }
+            });
+        }
+
+        function setDropdownOptions(dropdownId, items, defaultVal) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.c-dropdown-menu');
+            const input = dropdown.querySelector('input[type="hidden"]');
+            const label = dropdown.querySelector('.c-dropdown-label');
+
+            menu.innerHTML = '';
+            items.forEach((it, idx) => {
+                const val = (it.val !== undefined) ? it.val : it;
+                const text = it.text || it;
+                const isAct = String(val) === String(defaultVal) || (!defaultVal && idx === 0);
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'c-dropdown-item' + (isAct ? ' active' : '');
+                itemDiv.dataset.val = val;
+                itemDiv.textContent = text;
+                menu.appendChild(itemDiv);
+
+                if (isAct) {
+                    if (input) input.value = val;
+                    if (label) label.textContent = text;
+                }
+            });
+        }
+
+        function setDropdownValue(dropdownId, val) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.c-dropdown-menu');
+            const input = dropdown.querySelector('input[type="hidden"]');
+            const label = dropdown.querySelector('.c-dropdown-label');
+
+            const item = menu.querySelector(`.c-dropdown-item[data-val="${val}"]`);
+            if (item) {
+                menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                if (input) input.value = val;
+                if (label) label.textContent = item.textContent.trim();
+            }
+        }
+
+        function initLanguage() {
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    currentLang = btn.dataset.lang;
+                    currentLang = btn.dataset.lang || 'th';
                     applyLanguage(currentLang);
                 });
             });
-        });
-
-        function initCustomDropdowns() {
-            document.querySelectorAll('.c-dropdown').forEach(dd => {
-                const btn = dd.querySelector('.c-dropdown-btn');
-                const menu = dd.querySelector('.c-dropdown-menu');
-                const hiddenInput = dd.querySelector('input[type="hidden"]');
-                const label = dd.querySelector('.c-dropdown-label');
-
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isOpen = dd.classList.contains('open');
-                    document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
-                    if (!isOpen) dd.classList.add('open');
-                });
-
-                menu.addEventListener('click', (e) => {
-                    const item = e.target.closest('.c-dropdown-item');
-                    if (!item) return;
-                    e.stopPropagation();
-
-                    menu.querySelectorAll('.c-dropdown-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-
-                    const val = item.dataset.val !== undefined ? item.dataset.val : '';
-                    hiddenInput.value = val;
-                    label.textContent = item.textContent.trim();
-
-                    dd.classList.remove('open');
-                    hiddenInput.dispatchEvent(new Event('change'));
-                });
-            });
-
-            document.addEventListener('click', () => {
-                document.querySelectorAll('.c-dropdown.open').forEach(d => d.classList.remove('open'));
-            });
-        }
-
-        function setDropdownValue(ddId, val) {
-            const dd = document.getElementById(ddId);
-            if (!dd) return;
-            const input = dd.querySelector('input[type="hidden"]');
-            const label = dd.querySelector('.c-dropdown-label');
-            const items = dd.querySelectorAll('.c-dropdown-item');
-
-            let matched = false;
-            items.forEach(item => {
-                if (item.dataset.val === String(val)) {
-                    item.classList.add('active');
-                    label.textContent = item.textContent.trim();
-                    input.value = val;
-                    matched = true;
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            if (!matched && items.length > 0) {
-                items[0].classList.add('active');
-                label.textContent = items[0].textContent.trim();
-                input.value = items[0].dataset.val || '';
-            }
-        }
-
-        function setDropdownOptions(ddId, options, selectedVal) {
-            const dd = document.getElementById(ddId);
-            if (!dd) return;
-            const menu = dd.querySelector('.c-dropdown-menu');
-            menu.innerHTML = '';
-
-            options.forEach(opt => {
-                const div = document.createElement('div');
-                div.className = 'c-dropdown-item';
-                div.dataset.val = opt.val;
-                div.textContent = opt.text;
-                menu.appendChild(div);
-            });
-
-            setDropdownValue(ddId, selectedVal !== undefined ? selectedVal : (options[0] ? options[0].val : ''));
         }
 
         function renderTypeOptions() {
             const typeTrans = USER_TYPE_TRANSLATIONS[currentLang] || USER_TYPE_TRANSLATIONS.th;
             document.querySelectorAll('.type-opt').forEach(opt => {
                 const typeKey = opt.dataset.type;
-                if (typeKey) {
+                if (typeTrans[typeKey]) {
                     const labelEl = opt.querySelector('.opt-label');
                     const priceEl = opt.querySelector('.price-tag');
-                    if (labelEl && typeTrans[typeKey]) {
-                        labelEl.textContent = typeTrans[typeKey];
-                    }
+                    if (labelEl) labelEl.textContent = typeTrans[typeKey].label;
                     if (priceEl) {
-                        const price = currentPrices[typeKey] !== undefined ? currentPrices[typeKey] : Number(opt.dataset.price);
+                        const price = currentPrices[typeKey] !== undefined ? currentPrices[typeKey] : (Number(opt.dataset.price) || 0);
+                        opt.dataset.price = price;
                         if (typeKey.startsWith('รายเดือน')) {
                             priceEl.textContent = (currentLang === 'en') ? 'Free Check-in' : (currentLang === 'zh' ? '免费签到' : 'เช็คอินฟรี');
                             priceEl.className = 'price-tag free';
@@ -1131,24 +1241,23 @@
             });
         }
 
-        async function loadPrices() {
-            try {
-                const prices = await callApi('getPublicPrices');
-                if (prices) {
-                    for (const k in prices) {
-                        currentPrices[k] = Number(prices[k]);
+        function loadPrices() {
+            google.script.run
+                .withSuccessHandler(prices => {
+                    if (prices) {
+                        for (const k in prices) {
+                            currentPrices[k] = Number(prices[k]);
+                        }
+                        renderTypeOptions();
+                        const currentSelected = document.querySelector('.type-opt.selected');
+                        if (currentSelected) {
+                            const p = currentPrices[selectedType] !== undefined ? currentPrices[selectedType] : Number(currentSelected.dataset.price);
+                            selectedPrice = selectedType.startsWith('รายเดือน') ? 0 : (p || 0);
+                        }
+                        updatePaymentView();
                     }
-                    renderTypeOptions();
-                    const currentSelected = document.querySelector('.type-opt.selected');
-                    if (currentSelected) {
-                        const p = currentPrices[selectedType] !== undefined ? currentPrices[selectedType] : Number(currentSelected.dataset.price);
-                        selectedPrice = selectedType.startsWith('รายเดือน') ? 0 : (p || 0);
-                    }
-                    updatePaymentView();
-                }
-            } catch (err) {
-                console.error("loadPrices error:", err);
-            }
+                })
+                .getPublicPrices();
         }
 
         function renderAgeRangeOptions() {
@@ -1219,14 +1328,13 @@
             }
         }
 
-        async function loadFaculties() {
-            try {
-                const list = await callApi('getFaculties');
-                rawFacultiesList = list || [];
-                renderFacultyOptions();
-            } catch (err) {
-                console.error("loadFaculties error:", err);
-            }
+        function loadFaculties() {
+            google.script.run
+                .withSuccessHandler(list => {
+                    rawFacultiesList = list || [];
+                    renderFacultyOptions();
+                })
+                .getFaculties();
         }
 
         function renderFacultyOptions() {
@@ -1264,19 +1372,18 @@
             }
         }
 
-        async function loadBankInfo() {
-            try {
-                const info = await callApi('getBankInfo');
-                if (info && info.accountNumber) {
-                    const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
-                    document.getElementById('bankInfoText').innerHTML =
-                        `<div><strong>ธนาคาร:</strong> ${info.bankName || ''}</div>` +
-                        `<div>${t.bankAccNoPrefix} <span class="acc-number">${info.accountNumber}</span></div>` +
-                        `<div>${t.bankAccNamePrefix} <strong>${info.accountName || ''}</strong></div>`;
-                }
-            } catch (err) {
-                console.error("loadBankInfo error:", err);
-            }
+        function loadBankInfo() {
+            google.script.run
+                .withSuccessHandler(info => {
+                    if (info && info.accountNumber) {
+                        const t = TRANSLATIONS[currentLang] || TRANSLATIONS.th;
+                        document.getElementById('bankInfoText').innerHTML =
+                            `<div><strong>ธนาคาร:</strong> ${info.bankName || ''}</div>` +
+                            `<div>${t.bankAccNoPrefix} <span class="acc-number">${info.accountNumber}</span></div>` +
+                            `<div>${t.bankAccNamePrefix} <strong>${info.accountName || ''}</strong></div>`;
+                    }
+                })
+                .getBankInfo();
         }
 
         function bindTypeEvents() {
@@ -1318,7 +1425,7 @@
             }
         }
 
-        async function verifyMember() {
+        function verifyMember() {
             const q = document.getElementById('memberIdInput').value.trim() || document.getElementById('phone').value.trim();
             if (!q) {
                 showMsg('กรุณากรอกรหัสสมาชิกหรือเบอร์โทรศัพท์', 'warn');
@@ -1330,54 +1437,58 @@
             btn.innerHTML = '<span class="spinner"></span>';
             btn.disabled = true;
 
-            try {
-                const res = await callApi('lookupMember', { query: q });
-                btn.textContent = originalText;
-                btn.disabled = false;
+            google.script.run
+                .withSuccessHandler(res => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
 
-                if (res && res.found) {
-                    verifiedMemberData = res;
-                    document.getElementById('memberIdInput').value = res.memberId;
+                    if (res && res.found) {
+                        verifiedMemberData = res;
+                        document.getElementById('memberIdInput').value = res.memberId;
 
-                    if (res.name) document.getElementById('name').value = res.name;
-                    if (res.phone) document.getElementById('phone').value = res.phone;
-                    if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
+                        if (res.name) document.getElementById('name').value = res.name;
+                        if (res.phone) document.getElementById('phone').value = res.phone;
+                        if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
 
-                    if (res.type) {
-                        document.querySelectorAll('#memberTypeGrid .type-opt').forEach(opt => {
-                            if (opt.dataset.type === res.type) opt.click();
-                        });
+                        if (res.type) {
+                            document.querySelectorAll('#memberTypeGrid .type-opt').forEach(opt => {
+                                if (opt.dataset.type === res.type) {
+                                    opt.click();
+                                }
+                            });
+                        }
+
+                        if (res.faculty && res.faculty !== 'บุคคลภายนอก') {
+                            setDropdownValue('facultyDropdown', res.faculty);
+                        }
+
+                        const card = document.getElementById('memberInfoCard');
+                        const nameTag = document.getElementById('cardMemberName');
+                        const quotaBadge = document.getElementById('cardMemberQuota');
+                        const detailsText = document.getElementById('cardMemberDetails');
+
+                        nameTag.textContent = res.name + ' (' + res.memberId + ')';
+                        quotaBadge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
+                        quotaBadge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
+
+                        detailsText.innerHTML = `ประเภท: <strong>${res.type}</strong>` +
+                            (res.faculty && res.faculty !== 'บุคคลภายนอก' ? ` • คณะ: <strong>${res.faculty}</strong>` : '') +
+                            (res.remaining <= 0 ? '<br><span style="color:#dc2626;font-weight:700;">สิทธิ์การใช้งานครบกำหนดแล้ว กรุณาต่ออายุสมาชิก</span>' : '');
+
+                        card.classList.add('show');
+                        showMsg(`พบสมาชิก ${res.name} (คงเหลือ ${res.remaining} ครั้ง)`, 'ok');
+                    } else {
+                        verifiedMemberData = null;
+                        document.getElementById('memberInfoCard').classList.remove('show');
+                        showMsg(res.message || 'ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัสอีกครั้ง', 'err');
                     }
-
-                    if (res.faculty && res.faculty !== 'บุคคลภายนอก') {
-                        setDropdownValue('facultyDropdown', res.faculty);
-                    }
-
-                    const card = document.getElementById('memberInfoCard');
-                    const nameTag = document.getElementById('cardMemberName');
-                    const quotaBadge = document.getElementById('cardMemberQuota');
-                    const detailsText = document.getElementById('cardMemberDetails');
-
-                    nameTag.textContent = res.name + ' (' + res.memberId + ')';
-                    quotaBadge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
-                    quotaBadge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
-
-                    detailsText.innerHTML = `ประเภท: <strong>${res.type}</strong>` +
-                        (res.faculty && res.faculty !== 'บุคคลภายนอก' ? ` • คณะ: <strong>${res.faculty}</strong>` : '') +
-                        (res.remaining <= 0 ? '<br><span style="color:#dc2626;font-weight:700;">สิทธิ์การใช้งานครบกำหนดแล้ว กรุณาต่ออายุสมาชิก</span>' : '');
-
-                    card.classList.add('show');
-                    showMsg(`พบสมาชิก ${res.name} (คงเหลือ ${res.remaining} ครั้ง)`, 'ok');
-                } else {
-                    verifiedMemberData = null;
-                    document.getElementById('memberInfoCard').classList.remove('show');
-                    showMsg(res.message || 'ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัสอีกครั้ง', 'err');
-                }
-            } catch (err) {
-                btn.textContent = originalText;
-                btn.disabled = false;
-                showMsg('เกิดข้อผิดพลาดในการตรวจสอบ: ' + err.message, 'err');
-            }
+                })
+                .withFailureHandler(err => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    showMsg('เกิดข้อผิดพลาดในการตรวจสอบ: ' + err.message, 'err');
+                })
+                .lookupMember(q);
         }
 
         function bindSlipEvents() {
@@ -1405,7 +1516,7 @@
             });
         }
 
-        async function doSubmit(force) {
+        function doSubmit(force) {
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const ageRange = document.getElementById('ageRange').value;
@@ -1453,43 +1564,47 @@
                 force: Boolean(force)
             };
 
-            try {
-                const res = await callApi('submitEntry', { data: payload });
-                btn.disabled = false;
-                btn.innerHTML = '<span>' + (TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit + '</span>';
+            google.script.run
+                .withSuccessHandler(res => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>' + (TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit + '</span>';
 
-                if (res.status === 'duplicate') {
-                    if (confirm(res.message)) {
-                        doSubmit(true);
-                    }
-                    return;
-                }
-
-                if (res.status === 'ok') {
-                    let successMsg = `เช็คอินสำเร็จเรียบร้อย ขอบคุณที่ใช้บริการ`;
-                    if (currentMode === 'daily') saveCheckinInfo();
-                    if (res.isMonthly && res.remaining !== null) {
-                        successMsg += ` (สิทธิ์คงเหลือ: ${res.remaining}/${res.totalLimit} ครั้ง)`;
-                    }
-                    showMsg(successMsg, 'ok');
-
-                    if (res.isMonthly && res.remaining !== null) {
-                        const badge = document.getElementById('cardMemberQuota');
-                        if (badge) {
-                            badge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
-                            badge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
+                    if (res.status === 'duplicate') {
+                        if (confirm(res.message)) {
+                            doSubmit(true);
                         }
+                        return;
                     }
 
-                    setTimeout(() => { resetForm(); }, 3500);
-                } else {
-                    showMsg(res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'err');
-                }
-            } catch (err) {
-                btn.disabled = false;
-                btn.innerHTML = '<span>' + (TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit + '</span>';
-                showMsg('เกิดข้อผิดพลาด: ' + err.message, 'err');
-            }
+                    if (res.status === 'ok') {
+                        let successMsg = `เช็คอินสำเร็จเรียบร้อย ขอบคุณที่ใช้บริการ`;
+                        if (currentMode === 'daily') saveCheckinInfo();
+                        if (res.isMonthly && res.remaining !== null) {
+                            successMsg += ` (สิทธิ์คงเหลือ: ${res.remaining}/${res.totalLimit} ครั้ง)`;
+                        }
+                        showMsg(successMsg, 'ok');
+
+                        if (res.isMonthly && res.remaining !== null) {
+                            const badge = document.getElementById('cardMemberQuota');
+                            if (badge) {
+                                badge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
+                                badge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
+                            }
+                        }
+
+                        setTimeout(() => {
+                            resetForm();
+                        }, 3500);
+                    } else {
+                        showMsg(res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'err');
+                    }
+                })
+                .withFailureHandler(err => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>' + (TRANSLATIONS[currentLang] || TRANSLATIONS.th).btnSubmit + '</span>';
+                    showMsg('เกิดข้อผิดพลาด: ' + err.message, 'err');
+                })
+                .submitEntry(payload);
         }
 
         function showMsg(text, type) {
@@ -1498,7 +1613,6 @@
             box.className = 'msg ' + type;
             box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-
         const CHECKIN_LS_KEY = 'fc_last_checkin_info';
 
         function saveCheckinInfo() {
@@ -1510,7 +1624,7 @@
                     faculty: document.getElementById('faculty').value,
                     type: selectedType
                 }));
-            } catch (e) {}
+            } catch (e) { /* localStorage ใช้ไม่ได้ เช่น โหมด private ก็แค่ข้ามไป */ }
         }
 
         function loadCheckinInfo() {
@@ -1520,15 +1634,14 @@
                 const data = JSON.parse(raw);
                 if (data.name) document.getElementById('name').value = data.name;
                 if (data.phone) document.getElementById('phone').value = data.phone;
-                if (data.ageRange) setDropdownValue('ageRangeDropdown', data.ageRange);
-                if (data.faculty) setDropdownValue('facultyDropdown', data.faculty);
+                if (data.ageRange) document.getElementById('ageRange').value = data.ageRange;
+                if (data.faculty) document.getElementById('faculty').value = data.faculty;
                 if (data.type) {
                     const opt = document.querySelector(`#dailyTypeGrid .type-opt[data-type="${data.type}"]`);
                     if (opt) opt.click();
                 }
-            } catch (e) {}
+            } catch (e) { /* ไม่มีข้อมูลเก่า ก็ปล่อยฟอร์มว่างตามปกติ */ }
         }
-
         function resetForm() {
             document.getElementById('name').value = '';
             setDropdownValue('facultyDropdown', '');
@@ -1560,24 +1673,23 @@
             });
         }
 
-        async function autoFillFromPhone(phone) {
-            try {
-                const res = await callApi('lookupLastDailyCheckin', { phone: phone });
-                if (res && res.found) {
-                    if (res.name) document.getElementById('name').value = res.name;
-                    if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
-                    if (res.faculty) setDropdownValue('facultyDropdown', res.faculty);
-                    if (res.type) {
-                        const opt = document.querySelector(`#dailyTypeGrid .type-opt[data-type="${res.type}"]`);
-                        if (opt) opt.click();
+        function autoFillFromPhone(phone) {
+            google.script.run
+                .withSuccessHandler(res => {
+                    if (res && res.found) {
+                        if (res.name) document.getElementById('name').value = res.name;
+                        if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
+                        if (res.faculty) setDropdownValue('facultyDropdown', res.faculty);
+                        if (res.type) {
+                            const opt = document.querySelector(`#dailyTypeGrid .type-opt[data-type="${res.type}"]`);
+                            if (opt) opt.click();
+                        }
+                        showMsg('พบข้อมูลเดิมของคุณ เติมให้อัตโนมัติแล้ว', 'ok');
                     }
-                    showMsg('พบข้อมูลเดิมของคุณ เติมให้อัตโนมัติแล้ว', 'ok');
-                }
-            } catch (err) {
-                console.error('autoFillFromPhone error:', err);
-            }
+                })
+                .withFailureHandler(err => console.error('autoFillFromPhone error:', err))
+                .lookupLastDailyCheckin(phone);
         }
-
     </script>
 </body>
 
