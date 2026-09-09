@@ -895,45 +895,36 @@
         // Universal Google Apps Script Runner Bridge for Cloudflare
         const google = {
             script: {
-                run: {
-                    _successHandler: null,
-                    _failureHandler: null,
-                    withSuccessHandler(fn) {
-                        const proxy = Object.create(this);
-                        proxy._successHandler = fn;
-                        return proxy;
-                    },
-                    withFailureHandler(fn) {
-                        const proxy = Object.create(this);
-                        proxy._failureHandler = fn;
-                        return proxy;
-                    },
-                    async _call(action, params = {}) {
-                        try {
-                            const res = await fetch(GAS_API_URL, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                body: JSON.stringify({ action, ...params })
-                            });
-                            const json = await res.json();
-                            if (this._successHandler) this._successHandler(json);
-                            return json;
-                        } catch (err) {
-                            if (this._failureHandler) this._failureHandler(err);
-                            else console.error(`API Error in ${action}:`, err);
-                        }
-                    },
-                    getPublicPrices() { return this._call('getPublicPrices'); },
-                    getMonthlyPrices() { return this._call('getMonthlyPrices'); },
-                    getPublicQuotas() { return this._call('getPublicQuotas'); },
-                    getBankInfo() { return this._call('getBankInfo'); },
-                    getFaculties() { return this._call('getFaculties'); },
-                    lookupMember(query) { return this._call('lookupMember', { query }); },
-                    lookupLastDailyCheckin(phone) { return this._call('lookupLastDailyCheckin', { phone }); },
-                    checkIfSubmittedToday(phone) { return this._call('checkIfSubmittedToday', { phone }); },
-                    submitEntry(data) { return this._call('submitEntry', { data }); },
-                    submitSignup(data) { return this._call('submitSignup', { data }); }
-                }
+                run: (function() {
+                    function createRunner(successFn, failureFn) {
+                        return new Proxy({}, {
+                            get(target, prop) {
+                                if (prop === 'withSuccessHandler') {
+                                    return function(fn) { return createRunner(fn, failureFn); };
+                                }
+                                if (prop === 'withFailureHandler') {
+                                    return function(fn) { return createRunner(successFn, fn); };
+                                }
+                                return function(...args) {
+                                    fetch(GAS_API_URL, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                        body: JSON.stringify({ action: prop, args: args })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (successFn) successFn(data);
+                                    })
+                                    .catch(err => {
+                                        if (failureFn) failureFn(err);
+                                        else console.error(`API Error in ${prop}:`, err);
+                                    });
+                                };
+                            }
+                        });
+                    }
+                    return createRunner();
+                })()
             }
         };
 
