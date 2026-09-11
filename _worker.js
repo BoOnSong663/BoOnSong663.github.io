@@ -86,7 +86,13 @@ async function handleGasProxy(request, ctx) {
     });
   } catch (err) {
     clearTimeout(timer);
-    return new Response(JSON.stringify({ status: 'error', message: 'GAS unreachable: ' + err.message }), {
+    const isTimeout = err.name === 'AbortError';
+    return new Response(JSON.stringify({ 
+      status: 'error', 
+      message: isTimeout 
+        ? 'เชื่อมต่อช้าเกินไป กรุณาลองใหม่อีกครั้ง' 
+        : 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่' 
+    }), {
       status: 502, headers: { 'content-type': 'application/json' }
     });
   }
