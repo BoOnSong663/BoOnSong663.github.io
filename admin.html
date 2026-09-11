@@ -34,12 +34,26 @@
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --border-focus: #10b981;
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --radius-lg: 10px;
+            --radius-md: 8px;
+            --radius-sm: 6px;
+            --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.07);
             --shadow-lg: 0 20px 35px -5px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
             --shadow-pop: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+            /* --- Skote-style layout tokens --- */
+            --sidebar-w: 250px;
+            --sidebar-bg: #232a3b;
+            --sidebar-bg-2: #1c2233;
+            --sidebar-text: #a6b0cf;
+            --sidebar-text-active: #ffffff;
+            --topbar-h: 70px;
+            --icon-blue: #556ee6;
+            --icon-blue-bg: #e5e9fb;
+            --icon-orange: #f1b44c;
+            --icon-orange-bg: #fdf3e2;
+            --icon-teal: #50a5f1;
+            --icon-teal-bg: #e5f1fd;
         }
 
         /* ================= GLOBAL CUSTOM SCROLLBAR ================= */
@@ -164,33 +178,164 @@
             min-height: 18px;
         }
 
-        /* ================= DASHBOARD SCREEN ================= */
+        /* ================= DASHBOARD SCREEN (Skote-style shell) ================= */
         #dashScreen {
             display: none;
-            max-width: 1200px;
+            min-height: 100vh;
+            background: #f4f6fb;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* -------- Sidebar (dark, fixed) -------- */
+        .sidebar {
+            width: var(--sidebar-w);
+            flex-shrink: 0;
+            background: var(--sidebar-bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 120;
+        }
+
+        .sidebar-brand {
+            height: var(--topbar-h);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 22px;
+            background: var(--sidebar-bg-2);
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: var(--emerald-gradient);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.25;
+        }
+
+        .sidebar-brand .brand-sub {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 500;
+            color: var(--sidebar-text);
+            margin-top: 1px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sidebar-nav-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #5b6690;
+            text-transform: uppercase;
+            padding: 8px 22px 10px;
+        }
+
+        /* Tab buttons re-styled as vertical sidebar nav items (class kept for JS: .tab-btn) */
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 11px 22px;
+            border: none;
+            background: transparent;
+            color: var(--sidebar-text);
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
+            border-left: 3px solid transparent;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+
+        .tab-btn .tab-ico {
+            font-size: 15px;
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+            opacity: .9;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: rgba(16, 185, 129, 0.12);
+            border-left-color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* -------- Main content column -------- */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .page-body {
+            max-width: 1280px;
+            width: 100%;
             margin: 0 auto;
-            padding: 20px 16px 60px;
+            padding: 22px 24px 60px;
         }
 
         /* Topbar */
         .topbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             background: #fff;
-            padding: 16px 22px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-card);
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            height: var(--topbar-h);
+            padding: 0 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
             flex-wrap: wrap;
             gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .topbar-brand {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-right: auto;
         }
 
         .brand-title {
@@ -275,44 +420,7 @@
             font-family: inherit;
         }
 
-        /* Navigation Tabs */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .tab-btn {
-            padding: 10px 18px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            background: #fff;
-            cursor: pointer;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #475569;
-            transition: all .2s;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: inherit;
-        }
-
-        .tab-btn:hover {
-            border-color: #a7f3d0;
-            background: var(--primary-bg);
-            color: var(--primary-dark);
-        }
-
-        .tab-btn.active {
-            background: var(--emerald-gradient);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
-        }
+        /* Navigation Tabs container is now the .sidebar-nav (see above). Panels below. */
 
         .panel {
             display: none;
@@ -794,12 +902,16 @@
 
         .stat-card {
             background: #fff;
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            box-shadow: var(--shadow-card);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
             border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
         }
 
         .stat-card .label {
@@ -811,10 +923,10 @@
         }
 
         .stat-card .value {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--text-title);
-            margin-top: 6px;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 8px;
         }
 
         .stat-card .subtext {
@@ -822,6 +934,19 @@
             color: var(--primary-dark);
             font-weight: 600;
             margin-top: 2px;
+        }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
         }
 
         /* Tables & Data Wrappers */
@@ -1204,6 +1329,62 @@
                 transform: translateY(0);
             }
         }
+
+        /* ================= RESPONSIVE: collapse sidebar on small screens ================= */
+        @media (max-width: 960px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .sidebar-brand {
+                flex-shrink: 0;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 8px 6px;
+                gap: 4px;
+            }
+
+            .sidebar-nav-label {
+                display: none;
+            }
+
+            .tab-btn {
+                width: auto;
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                padding: 10px 14px;
+                border-radius: 6px 6px 0 0;
+            }
+
+            .tab-btn.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--primary);
+            }
+
+            .app-wrapper {
+                flex-direction: column;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-body {
+                padding: 16px 14px 40px;
+            }
+
+            .topbar {
+                height: auto;
+                padding: 12px 14px;
+            }
+        }
     </style>
 </head>
 
@@ -1233,10 +1414,35 @@
 
     <!-- ============ MAIN DASHBOARD ============ -->
     <div id="dashScreen">
-        <header class="topbar">
-            <div class="topbar-brand">
-                <span class="brand-title">ระบบจัดการหลังบ้านฟิตเนส</span>
+      <div class="app-wrapper">
+
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </span>
+                <div>
+                    <span class="brand-title">FITNESS ADMIN</span>
+                    <span class="brand-sub">ระบบจัดการหลังบ้าน</span>
+                </div>
             </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-label">เมนูหลัก</div>
+                <button class="tab-btn active" data-tab="dashTab"><span class="tab-ico">🏠</span><span>แดชบอร์ดสรุป</span></button>
+                <button class="tab-btn" data-tab="listTab"><span class="tab-ico">🗒️</span><span>รายการเช็คอิน</span></button>
+                <button class="tab-btn" data-tab="memberTab"><span class="tab-ico">👥</span><span>จัดการสมาชิก</span></button>
+                <button class="tab-btn" data-tab="exportTab"><span class="tab-ico">📤</span><span>ส่งออก Excel / ข้อมูล</span></button>
+                <button class="tab-btn" data-tab="settingsTab"><span class="tab-ico">⚙️</span><span>ตั้งค่าระบบ</span></button>
+            </nav>
+        </aside>
+
+        <div class="main-content">
+        <header class="topbar">
             <div class="topbar-actions">
                 <!-- Auto Refresh Control Pill with Custom Select -->
                 <div class="auto-refresh-control" id="autoRefreshPill">
@@ -1266,15 +1472,7 @@
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="dashTab">แดชบอร์ดสรุป</button>
-            <button class="tab-btn" data-tab="listTab">รายการเช็คอิน</button>
-            <button class="tab-btn" data-tab="memberTab">จัดการสมาชิก</button>
-            <button class="tab-btn" data-tab="exportTab">ส่งออก Excel / ข้อมูล</button>
-            <button class="tab-btn" data-tab="settingsTab">ตั้งค่าระบบ</button>
-        </div>
-
+        <div class="page-body">
         <!-- ================= TAB 1: DASHBOARD ================= -->
         <div class="panel active" id="dashTab">
             <div class="filters">
@@ -1752,6 +1950,9 @@
                 </div>
             </div>
         </div>
+        </div> <!-- /.page-body -->
+        </div> <!-- /.main-content -->
+      </div> <!-- /.app-wrapper -->
     </div>
 
     <!-- ============ MEMBER ADD/EDIT MODAL ============ -->
@@ -2415,12 +2616,18 @@
             const container = document.getElementById('statCards');
             container.innerHTML = `
                 <div class="stat-card">
-                    <div class="label">จำนวนผู้ใช้บริการรวม</div>
-                    <div class="value">${(summary.totalCount || 0).toLocaleString()} <span style="font-size:16px;font-weight:600;color:var(--text-muted);">คน</span></div>
+                    <div>
+                        <div class="label">จำนวนผู้ใช้บริการรวม</div>
+                        <div class="value">${(summary.totalCount || 0).toLocaleString()} <span style="font-size:16px;font-weight:600;color:var(--text-muted);">คน</span></div>
+                    </div>
+                    <span class="stat-icon">👤</span>
                 </div>
                 <div class="stat-card">
-                    <div class="label">รายได้รวม</div>
-                    <div class="value">${(summary.totalRevenue || 0).toLocaleString()} <span style="font-size:16px;font-weight:600;color:var(--text-muted);">บาท</span></div>
+                    <div>
+                        <div class="label">รายได้รวม</div>
+                        <div class="value">${(summary.totalRevenue || 0).toLocaleString()} <span style="font-size:16px;font-weight:600;color:var(--text-muted);">บาท</span></div>
+                    </div>
+                    <span class="stat-icon" style="background:var(--icon-orange-bg);color:#b7791f;">💰</span>
                 </div>
             `;
         }
