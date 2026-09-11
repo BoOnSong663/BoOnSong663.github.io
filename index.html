@@ -893,32 +893,50 @@
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
 
         // Universal Google Apps Script Runner Bridge for Cloudflare
+        const GAS_TIMEOUT_MS = 10000;   // timeout 10 วิ
+        const GAS_MAX_RETRIES = 2;      // ลองใหม่อีก 2 ครั้ง (รวมครั้งแรกเป็น 3)
+        
+        function fetchWithTimeout(url, options, timeoutMs) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { ...options, signal: controller.signal })
+                .finally(() => clearTimeout(timer));
+        }
+        
+        async function callGAS(action, args, attempt = 0) {
+            try {
+                const res = await fetchWithTimeout(GAS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action, args })
+                }, GAS_TIMEOUT_MS);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return await res.json();
+            } catch (err) {
+                if (attempt < GAS_MAX_RETRIES) {
+                    const delay = 800 * Math.pow(2, attempt); // 800ms, 1600ms
+                    await new Promise(r => setTimeout(r, delay));
+                    return callGAS(action, args, attempt + 1);
+                }
+                throw err;
+            }
+        }
+        
         const google = {
             script: {
-                run: (function() {
+                run: (function () {
                     function createRunner(successFn, failureFn) {
                         return new Proxy({}, {
                             get(target, prop) {
-                                if (prop === 'withSuccessHandler') {
-                                    return function(fn) { return createRunner(fn, failureFn); };
-                                }
-                                if (prop === 'withFailureHandler') {
-                                    return function(fn) { return createRunner(successFn, fn); };
-                                }
-                                return function(...args) {
-                                    fetch(GAS_API_URL, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                        body: JSON.stringify({ action: prop, args: args })
-                                    })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if (successFn) successFn(data);
-                                    })
-                                    .catch(err => {
-                                        if (failureFn) failureFn(err);
-                                        else console.error(`API Error in ${prop}:`, err);
-                                    });
+                                if (prop === 'withSuccessHandler') return fn => createRunner(fn, failureFn);
+                                if (prop === 'withFailureHandler') return fn => createRunner(successFn, fn);
+                                return function (...args) {
+                                    callGAS(prop, args)
+                                        .then(data => { if (successFn) successFn(data); })
+                                        .catch(err => {
+                                            if (failureFn) failureFn(err);
+                                            else console.error(`API Error in ${prop}:`, err);
+                                        });
                                 };
                             }
                         });
