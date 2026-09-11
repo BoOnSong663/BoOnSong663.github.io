@@ -2389,12 +2389,13 @@
 
         // ================= DASHBOARD SUMMARY =================
         function loadDashboard(silent) {
+            if (isFetching) return;
             const year = document.getElementById('dYear').value || currentYear;
             const scope = document.getElementById('dScope').value;
             const month = document.getElementById('dMonth').value;
             const day = document.getElementById('dDay').value;
 
-            if (!silent) isFetching = true;
+            isFetching = true;
 
             google.script.run
                 .withSuccessHandler(summary => {
@@ -2456,16 +2457,16 @@
 
         // ================= CHECK-IN ENTRIES LIST =================
         function loadEntries(silent) {
+            if (isFetching) return;
             const year = document.getElementById('lYear').value || currentYear;
             const month = document.getElementById('lMonth').value;
             const day = document.getElementById('lDay').value;
             const type = document.getElementById('lType').value;
             const ageRange = document.getElementById('lAgeRange').value;
             const search = document.getElementById('lSearch').value;
-
+            isFetching = true;
             const tbody = document.querySelector('#entriesTable tbody');
             if (!silent) {
-                isFetching = true;
                 tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;"><span class="spinner" style="border-color:#10b981;border-top-color:transparent;"></span> กำลังโหลดข้อมูล...</td></tr>';
             }
 
@@ -2546,9 +2547,10 @@
 
         // ================= MEMBER MANAGEMENT =================
         function loadMembers(silent) {
+            if (isFetching) return;
+            isFetching = true;
             const tbody = document.querySelector('#membersTable tbody');
             if (!silent) {
-                isFetching = true;
                 tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;"><span class="spinner" style="border-color:#10b981;border-top-color:transparent;"></span> กำลังโหลดข้อมูลสมาชิก...</td></tr>';
             }
 
