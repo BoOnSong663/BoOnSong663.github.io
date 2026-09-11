@@ -1,6 +1,9 @@
 export default {
   async fetch(request) {
     const url = new URL(request.url);
+    if (url.pathname === '/api/gas' && request.method === 'POST') {
+      return handleGasProxy(request, ctx);
+    }
     let path = url.pathname;
 
     // จัดการชื่อหน้าให้อัตโนมัติ
