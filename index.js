@@ -40,3 +40,55 @@ export default {
     });
   }
 };
+async function handleGasProxy(request, ctx) {
+  let body;
+  try { body = await request.json(); }
+  catch (e) {
+    return new Response(JSON.stringify({ status: 'error', message: 'invalid json' }), {
+      status: 400, headers: { 'content-type': 'application/json' }
+    });
+  }
+
+  const isCacheable = CACHEABLE_ACTIONS.has(body.action);
+  const cache = caches.default;
+  const cacheKeyUrl = new URL(request.url);
+  cacheKeyUrl.searchParams.set('action', body.action);
+  const cacheKey = new Request(cacheKeyUrl.toString(), { method: 'GET' });
+
+  if (isCacheable) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  let gasRes;
+  try {
+    gasRes = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+  } catch (err) {
+    clearTimeout(timer);
+    return new Response(JSON.stringify({ status: 'error', message: 'GAS unreachable: ' + err.message }), {
+      status: 502, headers: { 'content-type': 'application/json' }
+    });
+  }
+  clearTimeout(timer);
+
+  const text = await gasRes.text();
+  const response = new Response(text, {
+    status: gasRes.status,
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': isCacheable ? `public, max-age=${CACHE_TTL_SECONDS}` : 'no-store'
+    }
+  });
+
+  if (isCacheable && gasRes.ok) {
+    ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  }
+  return response;
+}
