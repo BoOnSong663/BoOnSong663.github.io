@@ -3,6 +3,4 @@ main = "_worker.js"
 compatibility_date = "2024-09-23"
 
 [assets]
-directory = "./public"   # หรือ path ที่เก็บไฟล์ static ถ้ามี
 run_worker_first = true
-binding = "ASSETS"
