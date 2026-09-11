@@ -1262,13 +1262,50 @@
             updateCardPreview();
         }
 
+        const FACULTIES_CACHE_KEY = 'fc_faculties_cache';
+        const FACULTIES_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 ชม.
+        
         function loadFaculties() {
+            const cached = getCachedFaculties();
+            if (cached) {               // โชว์ข้อมูลเก่าไปก่อนทันที ไม่ต้องรอ
+                rawFacultiesList = cached;
+                renderFacultyOptions();
+            }
+        
             google.script.run
                 .withSuccessHandler(list => {
-                    rawFacultiesList = list || [];
-                    renderFacultyOptions();
+                    if (list && list.length > 0) {
+                        rawFacultiesList = list;
+                        renderFacultyOptions();
+                        setCachedFaculties(list);
+                    }
+                })
+                .withFailureHandler(err => {
+                    console.error('loadFaculties failed:', err);
+                    if (!cached) showFacultyLoadError();   // ไม่มีทั้งของสดและ cache ค่อยโชว์ปุ่ม retry
                 })
                 .getFaculties();
+        }
+        
+        function getCachedFaculties() {
+            try {
+                const { data, ts } = JSON.parse(localStorage.getItem(FACULTIES_CACHE_KEY) || 'null') || {};
+                if (!data || Date.now() - ts > FACULTIES_CACHE_TTL) return null;
+                return data;
+            } catch (e) { return null; }
+        }
+        
+        function setCachedFaculties(list) {
+            try {
+                localStorage.setItem(FACULTIES_CACHE_KEY, JSON.stringify({ data: list, ts: Date.now() }));
+            } catch (e) {}
+        }
+        
+        function showFacultyLoadError() {
+            const dropdown = document.getElementById('facultyDropdown');
+            if (!dropdown) return;
+            dropdown.querySelector('.c-dropdown-label').textContent = 'โหลดรายชื่อคณะไม่สำเร็จ - แตะเพื่อลองใหม่';
+            dropdown.querySelector('.c-dropdown-btn').onclick = e => { e.stopPropagation(); loadFaculties(); };
         }
 
         function loadPrices() {
