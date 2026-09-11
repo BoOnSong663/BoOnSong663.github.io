@@ -4,7 +4,12 @@ const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7W
 const CACHEABLE_ACTIONS = new Set([
   'getFaculties', 'getPublicPrices', 'getMonthlyPrices', 'getPublicQuotas', 'getBankInfo'
 ]);
-
+const CACHE_INVALIDATION_MAP = {
+  'updatePrices': ['getPublicPrices', 'getMonthlyPrices'],
+  'updateMemberQuotas': ['getPublicQuotas'],
+  'updateBankInfo': ['getBankInfo'],
+  'saveFaculties': ['getFaculties']
+};
 const CACHE_TTL_SECONDS = 300; // cache 5 นาที
 
 // ==================== Worker หลัก ====================
@@ -110,5 +115,19 @@ async function handleGasProxy(request, ctx) {
   if (isCacheable && gasRes.ok) {
     ctx.waitUntil(cache.put(cacheKey, response.clone()));
   }
+
+  // ✅ เพิ่มส่วนนี้: ถ้าเป็น action แก้ไขที่สำเร็จ ให้ล้างแคชของ action อ่านที่เกี่ยวข้องทันที
+  const actionsToInvalidate = CACHE_INVALIDATION_MAP[body.action];
+  if (actionsToInvalidate && gasRes.ok) {
+    ctx.waitUntil((async () => {
+      for (const actionName of actionsToInvalidate) {
+        const invalidateUrl = new URL(request.url);
+        invalidateUrl.searchParams.set('action', actionName);
+        const invalidateKey = new Request(invalidateUrl.toString(), { method: 'GET' });
+        await cache.delete(invalidateKey);
+      }
+    })());
+  }
+
   return response;
 }
