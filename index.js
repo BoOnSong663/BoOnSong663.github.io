@@ -1,9 +1,21 @@
+// ==================== การตั้งค่า ====================
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
+
+const CACHEABLE_ACTIONS = new Set([
+  'getFaculties', 'getPublicPrices', 'getMonthlyPrices', 'getPublicQuotas', 'getBankInfo'
+]);
+
+const CACHE_TTL_SECONDS = 300; // cache 5 นาที
+
+// ==================== Worker หลัก ====================
 export default {
-  async fetch(request) {
+  async fetch(request, env, ctx) {   // ← เพิ่ม env, ctx ตรงนี้
     const url = new URL(request.url);
+
     if (url.pathname === '/api/gas' && request.method === 'POST') {
       return handleGasProxy(request, ctx);
     }
+
     let path = url.pathname;
 
     // จัดการชื่อหน้าให้อัตโนมัติ
@@ -40,6 +52,8 @@ export default {
     });
   }
 };
+
+// ==================== Proxy สำหรับเรียก Google Apps Script ====================
 async function handleGasProxy(request, ctx) {
   let body;
   try { body = await request.json(); }
