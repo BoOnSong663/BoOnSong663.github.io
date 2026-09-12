@@ -1,133 +1,50 @@
-// ==================== การตั้งค่า ====================
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwetSgXYlfCuKE7wj7WtryWxhB-MADsZ5rj_3wpUpbeoX6vw9zpgmma3EmRHc9i4TZe/exec";
+/**
+ * CLOUDFLARE PAGES / WORKER ENTRY
+ */
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbye-Y6fXI5STtReHVMr5r0k48xkNZxk0T5XRvbztlPsU_O0hS6ie0JMAsBtc5BbcYAS/exec';
 
-const CACHEABLE_ACTIONS = new Set([
-  'getFaculties', 'getPublicPrices', 'getMonthlyPrices', 'getPublicQuotas', 'getBankInfo'
-]);
-const CACHE_INVALIDATION_MAP = {
-  'updatePrices': ['getPublicPrices', 'getMonthlyPrices'],
-  'updateMemberQuotas': ['getPublicQuotas'],
-  'updateBankInfo': ['getBankInfo'],
-  'saveFaculties': ['getFaculties']
-};
-const CACHE_TTL_SECONDS = 300; // cache 5 นาที
-
-// ==================== Worker หลัก ====================
 export default {
-  async fetch(request, env, ctx) {   // ← เพิ่ม env, ctx ตรงนี้
+  async fetch(request, env, ctx) {
+    const scriptUrl = (env && env.GOOGLE_SCRIPT_URL) || GOOGLE_SCRIPT_URL;
+
     const url = new URL(request.url);
+    const targetUrl = new URL(scriptUrl);
 
-    if (url.pathname === '/api/gas' && request.method === 'POST') {
-      return handleGasProxy(request, ctx);
-    }
-
-    let path = url.pathname;
-
-    // จัดการชื่อหน้าให้อัตโนมัติ
-    if (path === '/' || path === '/index' || path === '/customer.html') {
-      path = '/index.html';
-    } else if (path === '/signup') {
-      path = '/signup.html';
-    } else if (path === '/admin') {
-      path = '/admin.html';
-    }
-
-    // ลิงก์ดึงไฟล์จาก GitHub Repo: BoOnSong663.github.io พร้อม Cloudflare Edge Cache
-    const githubUrl = `https://raw.githubusercontent.com/BoOnSong663/BoOnSong663.github.io/main${path}`;
-    const res = await fetch(githubUrl, {
-      cf: {
-        cacheTtl: 120,
-        cacheEverything: true
-      }
+    url.searchParams.forEach((value, key) => {
+      targetUrl.searchParams.set(key, value);
     });
 
-    if (!res.ok) {
-      return new Response(`ไม่พบหน้านี้ (404 Not Found): ${path}`, {
-        status: 404,
-        headers: { "content-type": "text/html;charset=UTF-8" }
-      });
-    }
-
-    const html = await res.text();
-    return new Response(html, {
+    const init = {
+      method: request.method,
       headers: {
-        "content-type": "text/html;charset=UTF-8",
-        "cache-control": "public, max-age=60, s-maxage=120",
+        'Accept': request.headers.get('Accept') || '*/*',
+        'User-Agent': request.headers.get('User-Agent') || 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)'
       },
-    });
+      redirect: 'follow'
+    };
+
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      init.body = request.body;
+      const contentType = request.headers.get('content-type');
+      if (contentType) init.headers['Content-Type'] = contentType;
+    }
+
+    try {
+      const response = await fetch(targetUrl.toString(), init);
+
+      const newHeaders = new Headers(response.headers);
+      newHeaders.set('Access-Control-Allow-Origin', '*');
+      newHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      newHeaders.delete('X-Frame-Options');
+      newHeaders.delete('Content-Security-Policy');
+
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders
+      });
+    } catch (err) {
+      return new Response(`Proxy Error: ${err.message}`, { status: 500 });
+    }
   }
 };
-
-// ==================== Proxy สำหรับเรียก Google Apps Script ====================
-async function handleGasProxy(request, ctx) {
-  let body;
-  try { body = await request.json(); }
-  catch (e) {
-    return new Response(JSON.stringify({ status: 'error', message: 'invalid json' }), {
-      status: 400, headers: { 'content-type': 'application/json' }
-    });
-  }
-
-  const isCacheable = CACHEABLE_ACTIONS.has(body.action);
-  const cache = caches.default;
-  const cacheKeyUrl = new URL(request.url);
-  cacheKeyUrl.searchParams.set('action', body.action);
-  const cacheKey = new Request(cacheKeyUrl.toString(), { method: 'GET' });
-
-  if (isCacheable) {
-    const cached = await cache.match(cacheKey);
-    if (cached) return cached;
-  }
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
-  let gasRes;
-  try {
-    gasRes = await fetch(GAS_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-  } catch (err) {
-    clearTimeout(timer);
-    const isTimeout = err.name === 'AbortError';
-    return new Response(JSON.stringify({ 
-      status: 'error', 
-      message: isTimeout 
-        ? 'เชื่อมต่อช้าเกินไป กรุณาลองใหม่อีกครั้ง' 
-        : 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่' 
-    }), {
-      status: 502, headers: { 'content-type': 'application/json' }
-    });
-  }
-  clearTimeout(timer);
-
-  const text = await gasRes.text();
-  const response = new Response(text, {
-    status: gasRes.status,
-    headers: {
-      'content-type': 'application/json',
-      'cache-control': isCacheable ? `public, max-age=${CACHE_TTL_SECONDS}` : 'no-store'
-    }
-  });
-
-  if (isCacheable && gasRes.ok) {
-    ctx.waitUntil(cache.put(cacheKey, response.clone()));
-  }
-
-  // ✅ เพิ่มส่วนนี้: ถ้าเป็น action แก้ไขที่สำเร็จ ให้ล้างแคชของ action อ่านที่เกี่ยวข้องทันที
-  const actionsToInvalidate = CACHE_INVALIDATION_MAP[body.action];
-  if (actionsToInvalidate && gasRes.ok) {
-    ctx.waitUntil((async () => {
-      for (const actionName of actionsToInvalidate) {
-        const invalidateUrl = new URL(request.url);
-        invalidateUrl.searchParams.set('action', actionName);
-        const invalidateKey = new Request(invalidateUrl.toString(), { method: 'GET' });
-        await cache.delete(invalidateKey);
-      }
-    })());
-  }
-
-  return response;
-}
