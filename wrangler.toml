@@ -1,4 +1,8 @@
-name = "boonsong663-github-io"
+name = "nkelite"
 main = "_worker.js"
-compatibility_date = "2024-09-23"
+compatibility_date = "2024-01-01"
+
+[vars]
+GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye-Y6fXI5STtReHVMr5r0k48xkNZxk0T5XRvbztlPsU_O0hS6ie0JMAsBtc5BbcYAS/exec"
+
 
