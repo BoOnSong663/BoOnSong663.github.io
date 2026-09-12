@@ -2764,7 +2764,33 @@
                 })
                 .deleteEntry(TOKEN, year, rowIndex);
         }
-
+        function toggleSlipViewedRow(rowIndex, isChecked, checkboxEl) {
+            const year = document.getElementById('lYear').value || currentYear;
+            checkboxEl.disabled = true;
+        
+            google.script.run
+                .withSuccessHandler(res => {
+                    checkboxEl.disabled = false;
+                    if (!res || res.status !== 'ok') {
+                        alert('บันทึกสถานะไม่สำเร็จ: ' + (res && res.message || ''));
+                        checkboxEl.checked = !isChecked; // ย้อนกลับถ้าพลาด
+                        return;
+                    }
+                    // อัปเดต local data เพื่อไม่ต้องโหลดใหม่ทั้งตาราง
+                    const entry = allEntriesData.find(e => e.rowIndex === rowIndex);
+                    if (entry) entry.slipViewed = isChecked;
+                    
+                    // เปลี่ยนสีพื้นหลังแถวตามสถานะใหม่ทันที
+                    const tr = checkboxEl.closest('tr');
+                    if (tr) tr.style.background = isChecked ? '' : '#fffbeb';
+                })
+                .withFailureHandler(err => {
+                    checkboxEl.disabled = false;
+                    checkboxEl.checked = !isChecked;
+                    alert('เกิดข้อผิดพลาด: ' + err.message);
+                })
+                .toggleSlipViewed(TOKEN, year, rowIndex, isChecked);
+        }
         // ================= MEMBER MANAGEMENT =================
         function loadMembers(silent) {
             if (isFetching) return;
