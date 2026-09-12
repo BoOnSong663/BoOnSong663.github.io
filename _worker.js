@@ -7,9 +7,17 @@ const CACHEABLE_ACTIONS = new Set([
 
 const CACHE_TTL_SECONDS = 300; // cache 5 นาที
 
+// บอกว่า action แก้ไขไหน ต้องไปล้างแคชของ action อ่านตัวไหนบ้าง
+const CACHE_INVALIDATION_MAP = {
+  'updatePrices': ['getPublicPrices', 'getMonthlyPrices'],
+  'updateMemberQuotas': ['getPublicQuotas'],
+  'updateBankInfo': ['getBankInfo'],
+  'saveFaculties': ['getFaculties']
+};
+
 // ==================== Worker หลัก ====================
 export default {
-  async fetch(request, env, ctx) {   // ← เพิ่ม env, ctx ตรงนี้
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/gas' && request.method === 'POST') {
@@ -75,7 +83,7 @@ async function handleGasProxy(request, ctx) {
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 15000);
   let gasRes;
   try {
     gasRes = await fetch(GAS_API_URL, {
@@ -86,7 +94,13 @@ async function handleGasProxy(request, ctx) {
     });
   } catch (err) {
     clearTimeout(timer);
-    return new Response(JSON.stringify({ status: 'error', message: 'GAS unreachable: ' + err.message }), {
+    const isTimeout = err.name === 'AbortError';
+    return new Response(JSON.stringify({
+      status: 'error',
+      message: isTimeout
+        ? 'เชื่อมต่อช้าเกินไป กรุณาลองใหม่อีกครั้ง'
+        : 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่'
+    }), {
       status: 502, headers: { 'content-type': 'application/json' }
     });
   }
@@ -104,5 +118,19 @@ async function handleGasProxy(request, ctx) {
   if (isCacheable && gasRes.ok) {
     ctx.waitUntil(cache.put(cacheKey, response.clone()));
   }
+
+  // ถ้าเป็น action แก้ไขที่สำเร็จ ให้ล้างแคชของ action อ่านที่เกี่ยวข้องทันที
+  const actionsToInvalidate = CACHE_INVALIDATION_MAP[body.action];
+  if (actionsToInvalidate && gasRes.ok) {
+    ctx.waitUntil((async () => {
+      for (const actionName of actionsToInvalidate) {
+        const invalidateUrl = new URL(request.url);
+        invalidateUrl.searchParams.set('action', actionName);
+        const invalidateKey = new Request(invalidateUrl.toString(), { method: 'GET' });
+        await cache.delete(invalidateKey);
+      }
+    })());
+  }
+
   return response;
 }
