@@ -1654,6 +1654,7 @@
                 </div>
                 <div class="fld" style="flex:1;min-width:180px;"><label>ค้นหา (ชื่อ/เบอร์/คณะ/รหัสสมาชิก)</label><input
                         type="text" id="lSearch" placeholder="พิมพ์คำค้นหา..."></div>
+                <button class="btn-secondary" onclick="resetToToday()">วันนี้</button>
                 <button class="btn-primary" onclick="loadEntries()">ค้นหา</button>
                 <button class="btn-excel" onclick="exportEntriesToExcel()">ส่งออก Excel หน้านี้</button>
             </div>
@@ -2551,7 +2552,7 @@
         function populateDateFilters() {
             const todayStr = getLocalDateString();
             setDatePickerValue('dDayPicker', todayStr);
-            setDatePickerValue('lDayPicker', '');
+            setDatePickerValue('lDayPicker', 'todayStr');
             setDatePickerValue('expDayPicker', todayStr);
 
             const mOptions = [{ val: '', text: 'ทั้งหมด / ทุกเดือน' }];
@@ -2569,6 +2570,21 @@
                 ageOptions.push({ val: a, text: a + ' ปี' });
             });
             setDropdownOptions('lAgeRangeDropdown', ageOptions, '');
+        }
+        
+        function resetToToday() {
+            const todayStr = getLocalDateString();
+            const curMonth = String(new Date().getMonth() + 1);
+            const curYear = String(new Date().getFullYear());
+        
+            setDropdownValue('lYearDropdown', curYear);
+            setDropdownValue('lMonthDropdown', curMonth);
+            setDatePickerValue('lDayPicker', todayStr);
+            setDropdownValue('lTypeDropdown', '');
+            setDropdownValue('lAgeRangeDropdown', '');
+            document.getElementById('lSearch').value = '';
+        
+            loadEntries();
         }
 
         function loadYears() {
