@@ -660,6 +660,93 @@
             font-weight: 700;
             text-decoration: none;
         }
+       :root {
+            --primary: #4f9a22;
+            --primary-dark: #3f7f1a;
+            --primary-light: #e3f1d6;
+            --primary-bg: #eef6e8;
+            --emerald-gradient: linear-gradient(135deg, #5aa82a 0%, #3f8a1a 100%);
+            --card-gradient: #fbfbf8;
+            --text-title: #1d2a14;
+            --text-main: #2b2f26;
+            --text-muted: #8a8f84;
+            --border-color: #e6e8df;
+            --border-focus: #4f9a22;
+            --radius-lg: 28px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow-subtle: 0 1px 2px rgba(30, 40, 20, .05), 0 24px 48px -20px rgba(40, 80, 20, .22);
+            --shadow-pop: 0 16px 32px -8px rgba(30, 40, 20, .16);
+            --dark-btn: #2b2b2b;
+        }
+        
+        body { background: linear-gradient(160deg, #cfeab8 0%, #e9f4de 45%, #f3f6ee 100%); background-attachment: fixed; }
+        
+        .glass-card {
+            background: #fbfbf8; backdrop-filter: none; -webkit-backdrop-filter: none;
+            border: 1px solid #ecece6; box-shadow: var(--shadow-subtle);
+        }
+        
+        /* ---------- Header ---------- */
+        .lang-switch { background: #efefe9; }
+        .lang-btn { color: #8a8f84; }
+        .lang-btn.active { color: var(--primary-dark); box-shadow: 0 1px 3px rgba(30, 40, 20, .1); }
+        .header-icon { background: var(--primary-bg); border-radius: 16px; box-shadow: none; width: 52px; height: 52px; }
+        h1 { color: var(--text-title); font-weight: 700; }
+        .sub { color: var(--text-muted); }
+        
+        /* ---------- Mode toggle ---------- */
+        .mode-toggle { background: #efefe9; border-radius: 16px; }
+        .mode-btn { color: #8a8f84; font-weight: 600; border-radius: 12px; }
+        .mode-btn.active { background: #fff; color: var(--primary-dark); box-shadow: 0 1px 3px rgba(30, 40, 20, .1); }
+        
+        /* ---------- Member lookup ---------- */
+        .member-lookup-box { background: var(--primary-bg); border: 1px solid #d6e8c6; }
+        .member-search-row input { border: 1px solid #d6e8c6; border-radius: 12px; }
+        .member-search-row button { background: var(--dark-btn); box-shadow: none; border-radius: 12px; }
+        .member-info-card { border: 1px solid #e3efd8; border-radius: 12px; }
+        .quota-badge { background: #e3f1d6; color: #3f7f1a; padding: 4px 12px; }
+        .quota-badge.danger { background: #fdecea; color: #c8372d; }
+        
+        /* ---------- Inputs / dropdown ---------- */
+        label { color: #5d6356; font-weight: 600; }
+        input[type="text"], input[type="tel"], .c-dropdown-btn {
+            background: #fff; border: 1px solid var(--border-color); border-radius: 14px; padding: 13px 15px;
+        }
+        input:focus { box-shadow: 0 0 0 3px rgba(79, 154, 34, .15); }
+        .c-dropdown-btn:hover { border-color: #cfd6c2; }
+        .c-dropdown.open .c-dropdown-btn { box-shadow: 0 0 0 3px rgba(79, 154, 34, .15); }
+        .c-dropdown-menu { border: 1px solid #e6eadf; border-radius: 16px; }
+        .c-dropdown-item { border-radius: 10px; }
+        .c-dropdown-menu::-webkit-scrollbar-thumb { background: #cfdcc0; }
+        .c-dropdown-menu::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        
+        /* ---------- Type cards ---------- */
+        .type-opt { border: 1px solid var(--border-color); border-radius: 16px; background: #fff; color: #3a3f33; }
+        .type-opt:hover { border-color: #cfe5bd; background: #f6faf1; }
+        .type-opt.selected { border: 1.5px solid var(--primary); background: var(--primary-bg); color: var(--primary-dark); box-shadow: none; }
+        .type-opt .price-tag { color: #c0661b; }
+        .type-opt .price-tag.free { color: var(--primary-dark); }
+        
+        /* ---------- Bank / upload / notes ---------- */
+        .bank-info { background: var(--primary-bg); border: 1px dashed #bcd9a3; }
+        .bank-info-title { color: var(--primary-dark); }
+        .upload-box { background: #fff; border: 1.5px dashed #cfe0bd; }
+        .upload-box:hover { border-color: var(--primary); background: #f6faf1; }
+        .upload-box img { box-shadow: 0 2px 8px rgba(30, 40, 20, .1); }
+        .free-note { background: var(--primary-bg); color: var(--primary-dark); font-weight: 600; }
+        
+        /* ---------- Submit ---------- */
+        button.submit { background: var(--dark-btn); box-shadow: none; border-radius: 16px; font-weight: 700; }
+        button.submit:hover { background: #111; box-shadow: none; }
+        button.submit:disabled { background: #cfd5c6; }
+        
+        /* ---------- Messages / footer ---------- */
+        .msg.ok { background: var(--primary-bg); color: #3f7f1a; border: 1px solid #d6e8c6; }
+        .msg.err { background: #fdecea; color: #c8372d; border: 1px solid #f6cfca; }
+        .msg.warn { background: #fff4e3; color: #b3641c; border: 1px solid #f6e0bd; }
+        .footer-note { border-top: 1px solid #efefe9; }
+        .footer-note a { color: var(--primary-dark); }
     
         :root { --gold-gradient: linear-gradient(135deg, #5aa82a 0%, #3f7f1a 55%, #2f6213 100%); }
         
