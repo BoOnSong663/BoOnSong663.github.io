@@ -438,6 +438,10 @@
         .compact-tables table { font-size: 12.5px; }
         .compact-tables th { padding: 8px 14px; font-size: 11.5px; }
         .compact-tables td { padding: 7px 14px; }
+
+        /* ===== สถานะสมาชิก (รออนุมัติ / ไม่ผ่าน) ===== */
+        .badge.orange { background: #fdeede; color: #c0661b; }
+        .badge.red { background: #fdecea; color: #c8372d; }
     </style>
 </head>
 
@@ -1375,7 +1379,8 @@
                 signupCount: signups.length,
                 signupRevenue: signups.reduce((a, r) => a + (Number(r.price) || 0), 0),
                 unviewedSlips: list.filter(r => r.slipUrl && !r.slipViewed).length,
-                expiring: (Array.isArray(members) ? members : []).filter(m => Number(m.remaining) <= 3).length
+                // ไม่นับใบสมัครที่ยังรออนุมัติ/ถูกปฏิเสธ
+                expiring: (Array.isArray(members) ? members : []).filter(m => Number(m.remaining) <= 3 && (!m.status || m.status === 'active')).length
             };
 
             renderStatCards(s, extra);
@@ -1617,22 +1622,34 @@ function renderSummaryTable(tableId, data) {
             tbody.innerHTML = `<tr><td colspan="${MEMBER_COLS}" class="empty-state">ไม่พบข้อมูลสมาชิก</td></tr>`;
             return;
         }
-        tbody.innerHTML = list.map(m => `
-            <tr>
-                <td><strong style="color:var(--text-title);">${esc(m.memberId)}</strong></td>
+        tbody.innerHTML = list.map(m => {
+            const pending = m.status === 'pending', rejected = m.status === 'rejected';
+            const su = safeUrl(m.slipUrl), id = esc(m.memberId);
+            const stat = pending ? ' <span class="badge orange">รออนุมัติ</span>' : rejected ? ' <span class="badge red">ไม่ผ่าน</span>' : '';
+            const slipBtn = su ? `<a class="slip-link" href="${su}" target="_blank" rel="noopener">ดูสลิป</a>` : '';
+            const actions = pending
+                ? `${slipBtn}
+                   <button class="action-btn edit" data-act="approve" data-id="${id}">อนุมัติ</button>
+                   <button class="action-btn delete" data-act="reject" data-id="${id}">ปฏิเสธ</button>`
+                : rejected
+                ? `${slipBtn}
+                   <button class="action-btn delete" data-act="del-member" data-id="${id}">ลบ</button>`
+                : `<button class="action-btn add-quota" data-act="add-quota" data-id="${id}">+ เติมรอบ</button>
+                   <button class="action-btn edit" data-act="edit-member" data-id="${id}">แก้ไข</button>
+                   <button class="action-btn delete" data-act="del-member" data-id="${id}">ลบ</button>`;
+            return `
+            <tr class="${pending ? 'unviewed' : ''}">
+                <td><strong style="color:var(--text-title);">${id}</strong>${stat}</td>
                 <td><strong>${esc(m.name)}</strong></td>
                 <td>${esc(m.faculty || '-')}</td>
                 <td>${esc(cleanPhone(m.phone) || '-')}</td>
                 <td><span class="badge blue">${esc(m.type)}</span></td>
                 <td>${esc(m.usedCount)} / ${esc(m.totalLimit)} ครั้ง</td>
-                <td><span class="quota-pill ${m.remaining <= 0 ? 'empty' : ''}">${esc(m.remaining)} ครั้ง</span></td>
+                <td><span class="quota-pill ${m.remaining <= 0 || pending || rejected ? 'empty' : ''}">${pending ? 'รอ' : rejected ? '-' : esc(m.remaining) + ' ครั้ง'}</span></td>
                 <td>${esc(m.registeredDate || '-')}</td>
-                <td><div style="display:flex;gap:6px;">
-                    <button class="action-btn add-quota" data-act="add-quota" data-id="${esc(m.memberId)}">+ เติมรอบ</button>
-                    <button class="action-btn edit" data-act="edit-member" data-id="${esc(m.memberId)}">แก้ไข</button>
-                    <button class="action-btn delete" data-act="del-member" data-id="${esc(m.memberId)}">ลบ</button>
-                </div></td>
-            </tr>`).join('');
+                <td><div style="display:flex;gap:6px;align-items:center;">${actions}</div></td>
+            </tr>`;
+        }).join('');
     }
 
     const findMember = id => allMembersData.find(x => x.memberId === id);
@@ -1730,6 +1747,17 @@ function renderSummaryTable(tableId, data) {
         loadMembers();
     }
 
+    // อนุมัติ/ปฏิเสธใบสมัครที่รอตรวจสลิป
+    async function reviewMemberItem(memberId, approve) {
+        const m = findMember(memberId);
+        if (!m || !confirm(`${approve ? 'อนุมัติ' : 'ปฏิเสธ'}ใบสมัครของ "${m.name}" (${memberId}) หรือไม่?`)) return;
+        try {
+            await api('reviewMember', TOKEN, memberId, approve);
+            showToast(approve ? 'อนุมัติแล้ว สมาชิกใช้สิทธิ์ได้ทันที' : 'ปฏิเสธใบสมัครแล้ว');
+        } catch (e) { handleErr(e); }
+        loadMembers();
+    }
+
     // =====================================================================
     // 8) EVENT DELEGATION (ไม่ต้องใส่ชื่อคนใน onclick อีกต่อไป)
     // =====================================================================
@@ -1751,6 +1779,8 @@ function renderSummaryTable(tableId, data) {
             if (b.dataset.act === 'add-quota') quickAddQuota(id);
             if (b.dataset.act === 'edit-member') { const m = findMember(id); if (m) openMemberModal(m); }
             if (b.dataset.act === 'del-member') deleteMemberItem(id);
+            if (b.dataset.act === 'approve') reviewMemberItem(id, true);
+            if (b.dataset.act === 'reject') reviewMemberItem(id, false);
         });
         $('facultyChipsContainer').addEventListener('click', e => {
             const b = e.target.closest('[data-idx]');
