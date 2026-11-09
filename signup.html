@@ -660,6 +660,35 @@
             font-weight: 700;
             text-decoration: none;
         }
+    
+        :root { --gold-gradient: linear-gradient(135deg, #5aa82a 0%, #3f7f1a 55%, #2f6213 100%); }
+        
+        /* ---------- บัตรสมาชิกตัวอย่าง ---------- */
+        .member-card-preview {
+            border: none; border-radius: 24px;
+            box-shadow: 0 18px 32px -14px rgba(63, 127, 26, .55);
+        }
+        .card-brand, .card-faculty { color: #e3f1d6; }
+        .card-meta-label { color: #cfe5bd; }
+        .card-tier-pill { background: rgba(255, 255, 255, .22); }
+        .card-name { font-weight: 700; }
+        
+        /* ---------- การ์ดเลือกแพ็กเกจ ---------- */
+        .tier-card { border: 1px solid var(--border-color); border-radius: 16px; background: #fff; }
+        .tier-card:hover { border-color: #cfe5bd; background: #f6faf1; }
+        .tier-card.selected { border: 1.5px solid var(--primary); background: var(--primary-bg); box-shadow: none; }
+        .tier-name { color: #5d6356; font-weight: 600; }
+        .tier-card.selected .tier-name { color: var(--primary-dark); }
+        .tier-price { color: #c0661b; font-weight: 700; }
+        .tier-price span { color: #9aa092; }
+        .tier-quota { color: var(--primary-dark); }
+        
+        /* ---------- หน้าสมัครสำเร็จ ---------- */
+        .success-box > div:first-child { background: var(--primary-bg) !important; color: var(--primary-dark) !important; }
+        .success-id-badge { background: var(--primary-bg); border: 1px solid #cfe5bd; border-radius: 16px; color: #1d2a14; font-weight: 700; }
+        .btn-copy { background: var(--dark-btn); border-radius: 10px; }
+        #finalMemberQuota { color: var(--primary-dark) !important; }
+        #btnGoCheckin { background: var(--dark-btn) !important; box-shadow: none !important; border-radius: 14px !important; font-weight: 600 !important; }
     </style>
 </head>
 
