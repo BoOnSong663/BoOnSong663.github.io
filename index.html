@@ -1580,8 +1580,11 @@
                         verifiedMemberData = res;
                         document.getElementById('memberIdInput').value = res.memberId;
 
-                        if (res.name) document.getElementById('name').value = res.name;
-                        if (res.phone) document.getElementById('phone').value = res.phone;
+                        // เซิร์ฟเวอร์ส่งชื่อแบบซ่อนและไม่ส่งเบอร์มาแล้ว จึงไม่เติมชื่อ/เบอร์ของสมาชิกลงฟอร์ม
+                        // (ผู้ใช้กรอกเอง; ถ้าค้นด้วยเบอร์ จะเติมเบอร์ที่ผู้ใช้พิมพ์เองให้)
+                        if (/^[0-9\-\s]+$/.test(q) && !document.getElementById('phone').value) {
+                            document.getElementById('phone').value = q.replace(/[^0-9]/g, '').slice(0, 10);
+                        }
                         if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
 
                         if (res.type) {
@@ -1596,25 +1599,34 @@
                             setDropdownValue('facultyDropdown', res.faculty);
                         }
 
+                        const isPending = res.status === 'pending';
+                        const isRejected = res.status === 'rejected';
+
                         const card = document.getElementById('memberInfoCard');
                         const nameTag = document.getElementById('cardMemberName');
                         const quotaBadge = document.getElementById('cardMemberQuota');
                         const detailsText = document.getElementById('cardMemberDetails');
 
                         nameTag.textContent = res.name + ' (' + res.memberId + ')';
-                        quotaBadge.textContent = `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
-                        quotaBadge.className = 'quota-badge ' + (res.remaining <= 0 ? 'danger' : '');
+                        quotaBadge.textContent = isPending ? 'รออนุมัติ'
+                            : isRejected ? 'ไม่ผ่านอนุมัติ'
+                            : `สิทธิ์คงเหลือ: ${res.remaining} / ${res.totalLimit} ครั้ง`;
+                        quotaBadge.className = 'quota-badge ' + ((isPending || isRejected || res.remaining <= 0) ? 'danger' : '');
 
                         detailsText.innerHTML = `ประเภท: <strong>${res.type}</strong>` +
                             (res.faculty && res.faculty !== 'บุคคลภายนอก' ? ` • คณะ: <strong>${res.faculty}</strong>` : '') +
-                            (res.remaining <= 0 ? '<br><span style="color:#dc2626;font-weight:700;">สิทธิ์การใช้งานครบกำหนดแล้ว กรุณาต่ออายุสมาชิก</span>' : '');
+                            (isPending ? '<br><span style="color:#b3641c;font-weight:700;">รอแอดมินตรวจสลิป ยังใช้สิทธิ์ไม่ได้</span>'
+                                : isRejected ? '<br><span style="color:#dc2626;font-weight:700;">ใบสมัครนี้ไม่ผ่านการอนุมัติ กรุณาติดต่อเจ้าหน้าที่</span>'
+                                : res.remaining <= 0 ? '<br><span style="color:#dc2626;font-weight:700;">สิทธิ์การใช้งานครบกำหนดแล้ว กรุณาต่ออายุสมาชิก</span>' : '');
 
                         card.classList.add('show');
-                        showMsg(`พบสมาชิก ${res.name} (คงเหลือ ${res.remaining} ครั้ง)`, 'ok');
+                        if (isPending) showMsg('สมาชิกนี้ยังรอแอดมินตรวจสลิป ยังใช้สิทธิ์ไม่ได้', 'warn');
+                        else if (isRejected) showMsg('ใบสมัครนี้ไม่ผ่านการอนุมัติ กรุณาติดต่อเจ้าหน้าที่', 'err');
+                        else showMsg(`พบสมาชิก ${res.name} (คงเหลือ ${res.remaining} ครั้ง)`, 'ok');
                     } else {
                         verifiedMemberData = null;
                         document.getElementById('memberInfoCard').classList.remove('show');
-                        showMsg(res.message || 'ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัสอีกครั้ง', 'err');
+                        showMsg((res && res.message) || 'ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัสอีกครั้ง', 'err');
                     }
                 })
                 .withFailureHandler(err => {
@@ -1843,14 +1855,14 @@
             google.script.run
                 .withSuccessHandler(res => {
                     if (res && res.found) {
-                        if (res.name) document.getElementById('name').value = res.name;
+                        // ไม่เติมชื่อ: เซิร์ฟเวอร์ส่งชื่อแบบซ่อน (เช่น "สม***") ถ้าเติมลงช่องจะถูกบันทึกเป็นชื่อจริงผิดๆ
                         if (res.ageRange) setDropdownValue('ageRangeDropdown', res.ageRange);
                         if (res.faculty) setDropdownValue('facultyDropdown', res.faculty);
                         if (res.type) {
                             const opt = document.querySelector(`#dailyTypeGrid .type-opt[data-type="${res.type}"]`);
                             if (opt) opt.click();
                         }
-                        showMsg('พบข้อมูลเดิมของคุณ เติมให้อัตโนมัติแล้ว', 'ok');
+                        showMsg('พบข้อมูลเดิมของคุณ เติมให้อัตโนมัติแล้ว (กรุณากรอกชื่อเอง)', 'ok');
                     }
                 })
                 .withFailureHandler(err => console.error('autoFillFromPhone error:', err))
