@@ -1110,6 +1110,21 @@
             }
         };
 
+        // ข้อความหน้า "ส่งใบสมัครแล้ว รออนุมัติ" (ใช้เมื่อเซิร์ฟเวอร์ตอบ pending = true)
+        let signupPending = false;
+        const PENDING_TEXT = {
+            th: { title: 'ส่งใบสมัครเรียบร้อย รอตรวจสลิป', sub: 'เจ้าหน้าที่จะตรวจสอบการโอนเงิน เมื่ออนุมัติแล้วจึงใช้รหัสนี้เช็คอินได้ กรุณาจดรหัสไว้', note: 'สถานะ: รออนุมัติ (ยังใช้สิทธิ์ไม่ได้)' },
+            en: { title: 'Application submitted, pending review', sub: 'Staff will verify your payment. You can check in with this ID once approved. Please keep it.', note: 'Status: Pending approval (not usable yet)' },
+            zh: { title: '申请已提交，等待审核', sub: '工作人员将核实您的付款，审核通过后即可使用此会员号签到，请妥善保存。', note: '状态：待审核（暂不可使用）' }
+        };
+        function applyPendingTexts() {
+            if (!signupPending) return;
+            const p = PENDING_TEXT[currentLang] || PENDING_TEXT.th;
+            document.getElementById('successTitle').textContent = p.title;
+            document.getElementById('successSub').textContent = p.sub;
+            document.getElementById('finalMemberQuota').textContent = p.note;
+        }
+
         const AGE_RANGE_TRANSLATIONS = {
             th: {
                 '': '-- เลือกช่วงอายุ --',
@@ -1376,6 +1391,7 @@
             renderFacultyOptions();
             renderBankInfo();
             updateCardPreview();
+            applyPendingTexts();
         }
 
         const FACULTIES_CACHE_KEY = 'fc_faculties_cache';
@@ -1590,9 +1606,11 @@
                         document.getElementById('successBox').style.display = 'block';
                         document.getElementById('finalMemberId').textContent = res.memberId;
                         document.getElementById('previewMemberId').textContent = res.memberId;
+                        signupPending = Boolean(res.pending);
                         document.getElementById('finalMemberQuota').textContent = `ได้รับสิทธิ์การใช้งาน ${res.totalLimit} ครั้ง (สิทธิ์คงเหลือ: ${res.remaining} ครั้ง)`;
+                        applyPendingTexts();
                     } else {
-                        showMsg(res.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก', 'err');
+                        showMsg((res && res.message) || 'เกิดข้อผิดพลาดในการสมัครสมาชิก', 'err');
                     }
                 })
                 .withFailureHandler(err => {
