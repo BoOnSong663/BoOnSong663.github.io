@@ -562,7 +562,7 @@
                                 <div class="table-header-bar"><div class="table-title">สรุปตามประเภทผู้ใช้บริการ</div></div>
                                 <div class="table-wrap">
                                     <table id="typeTable">
-                                        <thead><tr><th>ประเภท</th><th>จำนวนคน</th><th>รายได้ (บาท)</th></tr></thead>
+                                        <thead><tr><th>ประเภท</th><th>เช็คอิน</th><th>สมัครใหม่</th><th>รายได้ (บาท)</th></tr></thead>
                                         <tbody></tbody>
                                     </table>
                                 </div>
@@ -571,7 +571,7 @@
                                 <div class="table-header-bar"><div class="table-title">สรุปตามช่วงอายุ</div></div>
                                 <div class="table-wrap">
                                     <table id="ageTable">
-                                        <thead><tr><th>ช่วงอายุ</th><th>จำนวนคน</th><th>รายได้ (บาท)</th></tr></thead>
+                                        <thead><tr><th>ช่วงอายุ</th><th>เช็คอิน</th><th>สมัครใหม่</th><th>รายได้ (บาท)</th></tr></thead>
                                         <tbody></tbody>
                                     </table>
                                 </div>
@@ -1418,15 +1418,18 @@
 
     const CHART_COLORS = ['#4f9a22', '#f08a3c', '#c9b8a2', '#8cc152', '#f6b26b', '#7a9e5c', '#d9c7ae', '#b5651d'];
 
+    // จำนวนคนรวมในกราฟ = เช็คอิน + สมัครใหม่ (ถ้าอยากนับเฉพาะเช็คอิน ให้เปลี่ยนเป็น v => v.count || 0)
+    const tot = v => (v.count || 0) + (v.signups || 0);
+
     function renderDonut(id, data) {
-        const rows = Object.entries(data || {}).filter(([, v]) => v.count > 0);
-        const total = rows.reduce((a, [, v]) => a + v.count, 0);
+        const rows = Object.entries(data || {}).filter(([, v]) => tot(v) > 0);
+        const total = rows.reduce((a, [, v]) => a + tot(v), 0);
         const box = $(id);
         if (!total) { box.innerHTML = '<div class="empty-state">ไม่มีข้อมูลในช่วงที่เลือก</div>'; return; }
         const R = 52, C = 2 * Math.PI * R;
         let offset = 0;
         const arcs = rows.map(([, v], i) => {
-            const len = v.count / total * C;
+            const len = tot(v) / total * C;
             const el = `<circle cx="70" cy="70" r="${R}" fill="none" stroke="${CHART_COLORS[i % CHART_COLORS.length]}" stroke-width="16" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-offset}" transform="rotate(-90 70 70)"/>`;
             offset += len;
             return el;
@@ -1434,7 +1437,7 @@
         const legend = rows.map(([k, v], i) => `
             <div class="lg-item"><span class="lg-dot" style="background:${CHART_COLORS[i % CHART_COLORS.length]}"></span>
             <span class="lg-name">${esc(k)}</span>
-            <span class="lg-val">${v.count.toLocaleString()} <small>(${Math.round(v.count / total * 100)}%)</small></span></div>`).join('');
+            <span class="lg-val">${tot(v).toLocaleString()} <small>(${Math.round(tot(v) / total * 100)}%)</small></span></div>`).join('');
         box.innerHTML = `<div class="donut-wrap">
             <svg viewBox="0 0 140 140" class="donut">
                 <circle cx="70" cy="70" r="${R}" fill="none" stroke="#efefe9" stroke-width="16"/>${arcs}
@@ -1446,21 +1449,22 @@
 
     function renderAgeBars(id, data) {
         const rows = Object.entries(data || {});
-        const total = rows.reduce((a, [, v]) => a + v.count, 0);
+        const total = rows.reduce((a, [, v]) => a + tot(v), 0);
         if (!total) { $(id).innerHTML = '<div class="empty-state">ไม่มีข้อมูลในช่วงที่เลือก</div>'; return; }
-        const max = Math.max(1, ...rows.map(([, v]) => v.count));
+        const max = Math.max(1, ...rows.map(([, v]) => tot(v)));
         $(id).innerHTML = rows.map(([k, v]) => `
             <div class="bar-row"><span class="bar-name">${esc(k)}</span>
-            <div class="bar-track"><div class="bar-fill" style="width:${v.count / max * 100}%"></div></div>
-            <span class="bar-val">${v.count.toLocaleString()}</span></div>`).join('');
+            <div class="bar-track"><div class="bar-fill" style="width:${tot(v) / max * 100}%"></div></div>
+            <span class="bar-val">${tot(v).toLocaleString()}</span></div>`).join('');
     }
 
-function renderSummaryTable(tableId, data) {
+    function renderSummaryTable(tableId, data) {
         const tbody = document.querySelector(`#${tableId} tbody`);
         tbody.innerHTML = Object.keys(data || {}).map(k => `
             <tr><td><strong>${esc(k)}</strong></td>
-            <td>${data[k].count.toLocaleString()} คน</td>
-            <td>${data[k].revenue.toLocaleString()} บาท</td></tr>`).join('');
+            <td>${(data[k].count || 0).toLocaleString()} คน</td>
+            <td>${(data[k].signups || 0).toLocaleString()} คน</td>
+            <td>${(data[k].revenue || 0).toLocaleString()} บาท</td></tr>`).join('');
     }
 
     // =====================================================================
