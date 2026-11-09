@@ -15,6 +15,9 @@ const CACHE_INVALIDATION_MAP = {
   'saveFaculties': ['getFaculties']
 };
 
+// อนุญาตให้ดึงจาก GitHub เฉพาะหน้าเว็บเหล่านี้ (กันคนเปิด /code.gs หรือไฟล์อื่นใน repo)
+const ALLOWED_PAGES = new Set(['/index.html', '/signup.html', '/admin.html']);
+
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json' } });
 
@@ -31,6 +34,13 @@ export default {
     if (path === '/' || path === '/index' || path === '/customer.html') path = '/index.html';
     else if (path === '/signup') path = '/signup.html';
     else if (path === '/admin') path = '/admin.html';
+
+    if (!ALLOWED_PAGES.has(path)) {
+      return new Response(`ไม่พบหน้านี้ (404 Not Found): ${path}`, {
+        status: 404,
+        headers: { 'content-type': 'text/html;charset=UTF-8' }
+      });
+    }
 
     const githubUrl = `https://raw.githubusercontent.com/BoOnSong663/BoOnSong663.github.io/main${path}`;
     const res = await fetch(githubUrl, { cf: { cacheTtl: 120, cacheEverything: true } });
@@ -98,15 +108,29 @@ async function handleGasProxy(request, env, ctx) {
   clearTimeout(timer);
 
   const text = await gasRes.text();
+
+  // GAS ตอบ HTTP 200 เสมอแม้เกิด error -> ต้องดู body ก่อนว่าเป็น error หรือไม่ ไม่งั้นจะแคช error ไว้ 5 นาที
+  let shouldCache = isCacheable && gasRes.ok;
+  if (shouldCache) {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.status === 'error') {
+        shouldCache = false;
+      }
+    } catch (e) {
+      shouldCache = false; // ไม่ใช่ JSON (เช่น หน้า error ของ Google) ไม่แคช
+    }
+  }
+
   const response = new Response(text, {
     status: gasRes.status,
     headers: {
       'content-type': 'application/json',
-      'cache-control': isCacheable ? `public, max-age=${CACHE_TTL_SECONDS}` : 'no-store'
+      'cache-control': shouldCache ? `public, max-age=${CACHE_TTL_SECONDS}` : 'no-store'
     }
   });
 
-  if (isCacheable && gasRes.ok) {
+  if (shouldCache) {
     ctx.waitUntil(cache.put(cacheKeyFor(body.action), response.clone()));
   }
 
