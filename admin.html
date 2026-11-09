@@ -61,6 +61,7 @@
         .topbar { display: flex; justify-content: flex-end; align-items: center; background: #fff; height: var(--topbar-h); padding: 0 24px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 100; }
         .topbar-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .auto-refresh-control { display: inline-flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 600; color: #334155; position: relative; }
+        .refresh-status { font-size: 11.5px; font-weight: 500; color: #64748b; }
         .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); animation: pulse 1.8s infinite; }
         .pulse-dot.paused { background: #94a3b8; animation: none; box-shadow: none; }
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
@@ -269,6 +270,7 @@
                                 <button type="button" class="c-dropdown-btn"><span class="c-dropdown-label">ทุก 30 วินาที</span><svg class="c-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
                                 <div class="c-dropdown-menu"></div>
                             </div>
+                            <span class="refresh-status" id="refreshStatus"></span>
                         </div>
                         <a class="btn-view-site" href="index.html" target="_blank">หน้าเช็คอิน</a>
                         <a class="btn-view-site" href="signup.html" target="_blank">หน้าสมัคร</a>
@@ -535,7 +537,7 @@
                                 <hr style="margin:20px 0;border:none;border-top:1px solid var(--border-color);">
 
                                 <h3>เปลี่ยนรหัสผ่านหลังบ้าน</h3>
-                                <label>รหัสผ่านใหม่</label><input type="password" id="newAdminPw" placeholder="กรอกรหัสผ่านใหม่">
+                                <label>รหัสผ่านใหม่ (อย่างน้อย 4 ตัวอักษร)</label><input type="password" id="newAdminPw" placeholder="กรอกรหัสผ่านใหม่">
                                 <button class="btn-secondary full-btn" style="margin-top:12px;" onclick="saveAdminPw()">บันทึกรหัสผ่านใหม่</button>
                                 <div class="save-msg" id="pwSaveMsg"></div>
                             </div>
@@ -582,8 +584,8 @@
                 </div>
             </div>
             <div class="grid-2" style="margin-bottom:14px;">
-                <div class="fld"><label>สิทธิ์ทั้งหมด (ครั้ง)</label><input type="number" id="modalTotalLimit" value="30"></div>
-                <div class="fld"><label>ใช้ไปแล้ว (ครั้ง)</label><input type="number" id="modalUsedCount" value="0"></div>
+                <div class="fld"><label>สิทธิ์ทั้งหมด (ครั้ง)</label><input type="number" id="modalTotalLimit" value="30" min="0"></div>
+                <div class="fld"><label>ใช้ไปแล้ว (ครั้ง)</label><input type="number" id="modalUsedCount" value="0" min="0"></div>
             </div>
             <div class="fld" style="margin-bottom:14px;"><label>หมายเหตุ / บันทึก</label><input type="text" id="modalNotes" placeholder="เช่น บันทึกเพิ่มเติม"></div>
             <div class="modal-actions">
@@ -714,6 +716,14 @@
     const safeUrl = u => /^https:\/\//i.test(String(u || '')) ? esc(u) : '';
     const cleanPhone = p => String(p ?? '').replace(/^'/, '');
 
+    // อ่านค่าตัวเลขจาก input: ว่าง/ไม่ใช่ตัวเลข -> ใช้ค่า def (รองรับ 0 ได้)
+    function numOr(id, def) {
+        const v = $(id).value.trim();
+        if (v === '') return def;
+        const n = Number(v);
+        return isNaN(n) ? def : n;
+    }
+
     function getLocalDateString(d) {
         const date = d || new Date();
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -757,10 +767,15 @@
     // =====================================================================
     // 3) CUSTOM DROPDOWN + DATEPICKER ENGINE
     // =====================================================================
-    // เรียกเมื่อ "ผู้ใช้เลือก" เท่านั้น (setDropdownValue/setDatePickerValue จากโค้ดจะไม่เรียก)
+    // เปลี่ยนปีแล้วย้ายวันที่ตามปี (ถ้าวันไม่มีในปีใหม่ เช่น 29 ก.พ. ให้ปรับเป็นวันสุดท้ายของเดือน)
     function shiftDayYear(dpId, yearInputId) {
         const day = $(dpId).querySelector('input').value;
-        if (day) setDatePickerValue(dpId, $(yearInputId).value + day.slice(4), true);
+        if (!day) return;
+        const [, m, d] = day.split('-');
+        const newYear = $(yearInputId).value;
+        const lastDay = new Date(Number(newYear), Number(m), 0).getDate();
+        const safeDay = String(Math.min(Number(d), lastDay)).padStart(2, '0');
+        setDatePickerValue(dpId, `${newYear}-${m}-${safeDay}`, true);
     }
     const ON_PICK = {
         autoRefreshDropdown: () => startAutoRefresh(),
@@ -993,6 +1008,7 @@
         sessionStorage.removeItem('fc_admin_token');
         stopAutoRefresh();
         lastStats = null; lastEntriesCount = null; lastMembersCount = null;
+        setRefreshStatus('');
         $('dashScreen').style.display = 'none';
         $('loginScreen').style.display = 'flex';
         $('pwInput').value = '';
@@ -1028,30 +1044,57 @@
         });
     }
 
-    // ----- Auto refresh: ถาม server แค่ "จำนวนแถว" ก่อน ถ้าไม่เปลี่ยนก็ไม่ดึงข้อมูลทั้งชีท -----
+    // ----- Auto refresh: ถาม server แค่ "ลายเซ็นชีท" ก่อน ถ้าไม่เปลี่ยนก็ไม่ดึงข้อมูลทั้งชีท -----
     function startAutoRefresh() {
         stopAutoRefresh();
         const sec = Number($('autoRefreshInterval').value);
         $('refreshDot').className = sec > 0 ? 'pulse-dot' : 'pulse-dot paused';
+        if (sec <= 0) setRefreshStatus('');
         if (sec > 0) autoRefreshTimer = setInterval(triggerAutoSync, sec * 1000);
     }
     function stopAutoRefresh() { if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; } }
+
+    function setRefreshStatus(text, isErr) {
+        const el = $('refreshStatus');
+        if (!el) return;
+        el.textContent = text;
+        el.style.color = isErr ? '#dc2626' : '';
+    }
+    const nowText = () => new Date().toLocaleTimeString('th-TH');
 
     async function triggerAutoSync() {
         if (!TOKEN || document.hidden) return;
         const tab = document.querySelector('.tab-btn.active').dataset.tab;
         if (!['dashTab', 'listTab', 'memberTab'].includes(tab)) return;
         const year = (tab === 'dashTab' ? $('dYear').value : tab === 'listTab' ? $('lYear').value : '') || currentYear;
-        let s;
-        try { s = await api('getSheetStats', TOKEN, year); } catch (e) { handleErr(e, true); return; }
-        const changed = !lastStats || lastStats.year !== String(year) || s.entries !== lastStats.entries || s.members !== lastStats.members;
-        lastStats = { year: String(year), entries: s.entries, members: s.members };
-        if (!changed) return;
 
-        if (tab === 'dashTab') loadDashboard(true);
-        else if (tab === 'listTab') { if (document.activeElement !== $('lSearch')) loadEntries(true); }
-        else if (tab === 'memberTab') {
-            if (!$('memberModal').classList.contains('show') && document.activeElement !== $('mSearch')) loadMembers(true);
+        let s = null;
+        try {
+            s = await api('getSheetStats', TOKEN, year);
+        } catch (e) {
+            // เช็คสถานะไม่ได้ -> โหลดข้อมูลเต็มแทน (ไม่ให้อัปเดตอัตโนมัติเงียบหาย) และแจ้งในแถบสถานะ
+            handleErr(e, true);
+            setRefreshStatus('เช็คสถานะไม่ได้ (' + e.message + ')', true);
+            lastStats = null;
+        }
+
+        const newStats = s ? { year: String(year), entries: s.entries, members: s.members } : null;
+        const changed = !newStats || !lastStats || lastStats.year !== newStats.year
+            || newStats.entries !== lastStats.entries || newStats.members !== lastStats.members;
+        if (!changed) { setRefreshStatus('ตรวจล่าสุด ' + nowText()); return; }
+
+        // อัปเดต lastStats เฉพาะเมื่อสั่งโหลดจริง ไม่งั้นข้อมูลใหม่จะถูกมองว่า "ไม่เปลี่ยน" ตลอดไป
+        let started = false;
+        if (tab === 'dashTab') { loadDashboard(true); started = true; }
+        else if (tab === 'listTab') {
+            if (document.activeElement !== $('lSearch')) { loadEntries(true); started = true; }
+        } else if (tab === 'memberTab') {
+            if (!$('memberModal').classList.contains('show') && document.activeElement !== $('mSearch')) { loadMembers(true); started = true; }
+        }
+        if (started) {
+            if (newStats) { lastStats = newStats; setRefreshStatus('อัปเดตล่าสุด ' + nowText()); }
+        } else {
+            setRefreshStatus('มีข้อมูลใหม่ (รอคุณพิมพ์/ปิดหน้าต่างก่อนอัปเดต)');
         }
     }
 
@@ -1200,12 +1243,15 @@
     async function deleteEntryRow(rowIndex) {
         const e = allEntriesData.find(x => x.rowIndex === rowIndex);
         if (!e) return;
-        if (!confirm(`ยืนยันการลบรายการเช็คอินของ "${e.name}" หรือไม่?`)) return;
+        const monthlyNote = e.memberId && e.type && e.type.startsWith('รายเดือน') && !String(e.name).includes('(สมัครสมาชิก')
+            ? '\n(สิทธิ์ของสมาชิกจะถูกคืน 1 ครั้งอัตโนมัติ)' : '';
+        if (!confirm(`ยืนยันการลบรายการเช็คอินของ "${e.name}" หรือไม่?${monthlyNote}`)) return;
         try {
-            await api('deleteEntry', TOKEN, entriesYear, rowIndex, e.timestamp, cleanPhone(e.phone));
-            showToast('ลบรายการเรียบร้อย');
+            const res = await api('deleteEntry', TOKEN, entriesYear, rowIndex, e.timestamp, cleanPhone(e.phone));
+            showToast(res && res.refunded ? 'ลบรายการเรียบร้อย และคืนสิทธิ์ให้สมาชิกแล้ว' : 'ลบรายการเรียบร้อย');
         } catch (err) { handleErr(err); }
         loadEntries();
+        loadMembers(true);
     }
 
     async function toggleSlipViewedRow(rowIndex, isChecked, cb) {
@@ -1303,7 +1349,12 @@
             const th = f.th || (typeof f === 'string' ? f : '');
             facultyItems.push({ val: th, text: `${th} / ${f.en || th}` });
         });
-        setDropdownOptions('modalFacultyDropdown', facultyItems, member ? member.faculty : '');
+        // ถ้าคณะเดิมของสมาชิกไม่อยู่ในรายชื่อปัจจุบัน (เช่นเคยถูกลบ) ให้เพิ่มเป็นตัวเลือก กันค่าถูกบันทึกทับเป็นว่าง
+        const curFaculty = member ? (member.faculty || '') : '';
+        if (curFaculty && !facultyItems.some(i => i.val === curFaculty)) {
+            facultyItems.push({ val: curFaculty, text: curFaculty + ' (ไม่มีในรายชื่อปัจจุบัน)' });
+        }
+        setDropdownOptions('modalFacultyDropdown', facultyItems, curFaculty);
         $('memberModal').classList.add('show');
     }
     function closeMemberModal() { $('memberModal').classList.remove('show'); }
@@ -1313,8 +1364,8 @@
         const phone = $('modalPhone').value.trim();
         const type = $('modalType').value;
         const faculty = $('modalFaculty').value;
-        const totalLimit = Number($('modalTotalLimit').value) || 30;
-        const usedCount = Number($('modalUsedCount').value) || 0;
+        const totalLimit = Math.max(0, numOr('modalTotalLimit', 30));   // ตั้งเป็น 0 ได้
+        const usedCount = Math.max(0, numOr('modalUsedCount', 0));
         if (!name || !phone) { showToast('กรุณากรอกชื่อและเบอร์โทรศัพท์', 'err'); return; }
 
         const payload = {
@@ -1584,7 +1635,8 @@
     }
 
     function savePricesAndQuotas() {
-        const num = id => Number($(id).value);
+        // ช่องว่าง = NaN (เดิม Number('') = 0 ทำให้ราคาถูกตั้งเป็นฟรีโดยไม่รู้ตัว)
+        const num = id => $(id).value.trim() === '' ? NaN : Number($(id).value);
         const prices = {
             'บุคคลทั่วไป': num('priceExt'), 'นิสิต': num('priceStu'), 'บุคลากร': num('priceStaff'),
             'รายเดือนนิสิต': num('priceMonthlyStu'), 'รายเดือนบุคลากร': num('priceMonthlyStaff'), 'รายเดือนบุคคลภายนอก': num('priceMonthlyExt')
@@ -1593,7 +1645,8 @@
             'รายเดือนนิสิต': num('quotaMonthlyStu'), 'รายเดือนบุคลากร': num('quotaMonthlyStaff'), 'รายเดือนบุคคลภายนอก': num('quotaMonthlyExt')
         };
         saveWithMsg('priceSaveMsg', 'บันทึกราคาและโควตาสำเร็จ', async () => {
-            if ([...Object.values(prices), ...Object.values(quotas)].some(v => isNaN(v) || v < 0)) throw new Error('กรุณากรอกตัวเลขที่ไม่ติดลบให้ครบ');
+            if ([...Object.values(prices), ...Object.values(quotas)].some(v => isNaN(v) || v < 0)) throw new Error('กรุณากรอกตัวเลขที่ไม่ติดลบให้ครบทุกช่อง');
+            if (Object.values(quotas).some(v => v < 1)) throw new Error('โควตาต้องมีอย่างน้อย 1 ครั้ง');
             await Promise.all([api('updatePrices', TOKEN, prices), api('updateMemberQuotas', TOKEN, quotas)]);
         });
     }
