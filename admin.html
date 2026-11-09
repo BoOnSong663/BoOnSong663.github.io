@@ -405,6 +405,39 @@
         /* ปุ่มปิด ✕ ให้เบาลง */
         .modal-close { font-size: 18px; width: 32px; height: 32px; border-radius: 10px; color: #9aa092; }
         .modal-close:hover { background: #f0f2ea; color: #1d2a14; }
+    
+        /* ===== Dashboard: compact cards + charts ===== */
+        .cards.compact { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .cards.compact .stat-card { padding: 16px 18px; border-radius: 18px; }
+        .cards.compact .stat-card .label { font-size: 12.5px; }
+        .cards.compact .stat-card .value { font-size: 24px; margin-top: 6px; }
+        .cards.compact .stat-icon { width: 38px; height: 38px; border-radius: 12px; }
+        .cards.compact .stat-icon svg { width: 18px; height: 18px; }
+        .chart-row { gap: 18px; margin-bottom: 18px; }
+        .chart-row .table-card { margin-bottom: 0; }
+        .chart-body { padding: 8px 24px 22px; }
+        .donut-wrap { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+        .donut { width: 150px; height: 150px; flex-shrink: 0; }
+        .d-num { font-size: 26px; font-weight: 700; fill: #1d2a14; }
+        .d-lbl { font-size: 11px; fill: #9aa092; }
+        .lg { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 7px; }
+        .lg-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+        .lg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .lg-name { flex: 1; color: #3a3f33; }
+        .lg-val { font-weight: 700; }
+        .lg-val small { color: #9aa092; font-weight: 500; }
+        .bar-row { display: grid; grid-template-columns: 84px 1fr 40px; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12.5px; }
+        .bar-name { color: #3a3f33; font-weight: 600; }
+        .bar-track { background: #efefe9; height: 10px; border-radius: 999px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #7cc044, #4f9a22); border-radius: 999px; }
+        .bar-val { text-align: right; font-weight: 700; }
+        .compact-tables { gap: 14px; }
+        .compact-tables .table-card { border-radius: 18px; margin-bottom: 0; }
+        .compact-tables .table-header-bar { padding: 12px 18px 4px; }
+        .compact-tables .table-title { font-size: 14px; }
+        .compact-tables table { font-size: 12.5px; }
+        .compact-tables th { padding: 8px 14px; font-size: 11.5px; }
+        .compact-tables td { padding: 7px 14px; }
     </style>
 </head>
 
@@ -507,9 +540,20 @@
                             <button class="btn-excel" id="btnQuickExport" onclick="quickExportToday()">ส่งออก Excel วันนี้</button>
                         </div>
 
-                        <div class="cards" id="statCards"></div>
+                                                <div class="cards compact" id="statCards"></div>
 
-                        <div class="two-col">
+                        <div class="two-col chart-row">
+                            <div class="table-card">
+                                <div class="table-header-bar"><div class="table-title">สัดส่วนตามประเภทผู้ใช้บริการ</div></div>
+                                <div class="chart-body" id="typeChart"></div>
+                            </div>
+                            <div class="table-card">
+                                <div class="table-header-bar"><div class="table-title">ผู้ใช้บริการตามช่วงอายุ</div></div>
+                                <div class="chart-body" id="ageChart"></div>
+                            </div>
+                        </div>
+
+                        <div class="two-col compact-tables">
                             <div class="table-card">
                                 <div class="table-header-bar"><div class="table-title">สรุปตามประเภทผู้ใช้บริการ</div></div>
                                 <div class="table-wrap">
@@ -1306,7 +1350,7 @@
     // =====================================================================
     // 5) DASHBOARD
     // =====================================================================
-    function loadDashboard(silent) {
+        function loadDashboard(silent) {
         if (!TOKEN) return;
         runLoader('dash', async () => {
             const year = $('dYear').value || currentYear;
@@ -1314,31 +1358,99 @@
             const month = $('dMonth').value;
             if (scope === 'day' && !$('dDay').value) setDatePickerValue('dDayPicker', getLocalDateString(), true);
             const day = $('dDay').value;
-            const s = await api('getDashboardSummary', TOKEN, scope, { year, month, day });
-            renderStatCards(s);
+
+            const [s, entries, members] = await Promise.all([
+                api('getDashboardSummary', TOKEN, scope, { year, month, day }),
+                api('getEntries', TOKEN, { year }),
+                api('getMembers', TOKEN, {})
+            ]);
+
+            const list = Array.isArray(entries) ? entries : [];
+            const inScope = list.filter(r =>
+                scope === 'day' ? r.date === day
+                : scope === 'month' ? Number(String(r.date).split('-')[1]) === Number(month)
+                : true);
+            const signups = inScope.filter(r => String(r.name).includes('(สมัครสมาชิก'));
+            const extra = {
+                signupCount: signups.length,
+                signupRevenue: signups.reduce((a, r) => a + (Number(r.price) || 0), 0),
+                unviewedSlips: list.filter(r => r.slipUrl && !r.slipViewed).length,
+                expiring: (Array.isArray(members) ? members : []).filter(m => Number(m.remaining) <= 3).length
+            };
+
+            renderStatCards(s, extra);
+            renderDonut('typeChart', s.byType);
+            renderAgeBars('ageChart', s.byAgeRange);
             renderSummaryTable('typeTable', s.byType);
             renderSummaryTable('ageTable', s.byAgeRange);
         }, silent);
     }
 
-    function renderStatCards(s) {
-        const svg = p => `<svg viewBox="0 0 24 24">${p}</svg>`;
-        const userIco = svg('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>');
-        const walletIco = svg('<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>');
-        $('statCards').innerHTML = `
+    function renderStatCards(s, x) {
+        const I = p => `<svg viewBox="0 0 24 24">${p}</svg>`;
+        const user = '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>';
+        const wallet = '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>';
+        const userPlus = '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>';
+        const card = '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>';
+        const fileCheck = '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/>';
+        const clock = '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>';
+
+        const cards = [
+            ['ผู้ใช้บริการรวม', s.totalCount, 'คน', '', user],
+            ['รายได้รวม', s.totalRevenue, 'บาท', 'orange', wallet],
+            ['สมัครสมาชิกใหม่', x.signupCount, 'คน', '', userPlus],
+            ['รายได้ค่าสมัครสมาชิก', x.signupRevenue, 'บาท', 'orange', card],
+            ['สลิปยังไม่ได้ตรวจ (ทั้งปี)', x.unviewedSlips, 'รายการ', 'orange', fileCheck],
+            ['สมาชิกเหลือสิทธิ์ ≤ 3 ครั้ง', x.expiring, 'คน', '', clock]
+        ];
+        $('statCards').innerHTML = cards.map(([label, val, unit, cls, ico]) => `
             <div class="stat-card">
-                <div><div class="label">จำนวนผู้ใช้บริการรวม</div>
-                <div class="value">${(s.totalCount || 0).toLocaleString()} <span class="unit">คน</span></div></div>
-                <span class="stat-icon">${userIco}</span>
-            </div>
-            <div class="stat-card">
-                <div><div class="label">รายได้รวม</div>
-                <div class="value">${(s.totalRevenue || 0).toLocaleString()} <span class="unit">บาท</span></div></div>
-                <span class="stat-icon orange">${walletIco}</span>
-            </div>`;
+                <div><div class="label">${label}</div>
+                <div class="value">${(val || 0).toLocaleString()} <span class="unit">${unit}</span></div></div>
+                <span class="stat-icon ${cls}">${I(ico)}</span>
+            </div>`).join('');
     }
 
-    function renderSummaryTable(tableId, data) {
+    const CHART_COLORS = ['#4f9a22', '#f08a3c', '#c9b8a2', '#8cc152', '#f6b26b', '#7a9e5c', '#d9c7ae', '#b5651d'];
+
+    function renderDonut(id, data) {
+        const rows = Object.entries(data || {}).filter(([, v]) => v.count > 0);
+        const total = rows.reduce((a, [, v]) => a + v.count, 0);
+        const box = $(id);
+        if (!total) { box.innerHTML = '<div class="empty-state">ไม่มีข้อมูลในช่วงที่เลือก</div>'; return; }
+        const R = 52, C = 2 * Math.PI * R;
+        let offset = 0;
+        const arcs = rows.map(([, v], i) => {
+            const len = v.count / total * C;
+            const el = `<circle cx="70" cy="70" r="${R}" fill="none" stroke="${CHART_COLORS[i % CHART_COLORS.length]}" stroke-width="16" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-offset}" transform="rotate(-90 70 70)"/>`;
+            offset += len;
+            return el;
+        }).join('');
+        const legend = rows.map(([k, v], i) => `
+            <div class="lg-item"><span class="lg-dot" style="background:${CHART_COLORS[i % CHART_COLORS.length]}"></span>
+            <span class="lg-name">${esc(k)}</span>
+            <span class="lg-val">${v.count.toLocaleString()} <small>(${Math.round(v.count / total * 100)}%)</small></span></div>`).join('');
+        box.innerHTML = `<div class="donut-wrap">
+            <svg viewBox="0 0 140 140" class="donut">
+                <circle cx="70" cy="70" r="${R}" fill="none" stroke="#efefe9" stroke-width="16"/>${arcs}
+                <text x="70" y="68" text-anchor="middle" class="d-num">${total.toLocaleString()}</text>
+                <text x="70" y="86" text-anchor="middle" class="d-lbl">คน</text>
+            </svg>
+            <div class="lg">${legend}</div></div>`;
+    }
+
+    function renderAgeBars(id, data) {
+        const rows = Object.entries(data || {});
+        const total = rows.reduce((a, [, v]) => a + v.count, 0);
+        if (!total) { $(id).innerHTML = '<div class="empty-state">ไม่มีข้อมูลในช่วงที่เลือก</div>'; return; }
+        const max = Math.max(1, ...rows.map(([, v]) => v.count));
+        $(id).innerHTML = rows.map(([k, v]) => `
+            <div class="bar-row"><span class="bar-name">${esc(k)}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${v.count / max * 100}%"></div></div>
+            <span class="bar-val">${v.count.toLocaleString()}</span></div>`).join('');
+    }
+
+function renderSummaryTable(tableId, data) {
         const tbody = document.querySelector(`#${tableId} tbody`);
         tbody.innerHTML = Object.keys(data || {}).map(k => `
             <tr><td><strong>${esc(k)}</strong></td>
